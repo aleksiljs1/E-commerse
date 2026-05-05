@@ -14,7 +14,7 @@ export default function ProductsPage() {
   async function fetchProducts() {
     try {
       const res = await api.get("/api/admin/products");
-      setProducts(res.data);
+      setProducts(res.data.data ?? res.data);
     } catch {
       toast.error("Failed to load products");
     } finally {

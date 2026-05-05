@@ -31,7 +31,7 @@ function OrdersContent() {
           ? `/api/admin/orders?status=${activeStatus}`
           : "/api/admin/orders";
         const res = await api.get(url);
-        setOrders(res.data);
+        setOrders(res.data.data ?? res.data);
       } catch {
         toast.error("Failed to load orders");
       } finally {
