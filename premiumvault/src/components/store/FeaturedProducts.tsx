@@ -56,6 +56,17 @@ export function FeaturedProducts({ products }: Props) {
     };
   }, [startAutoplay]);
 
+  // Register non-passive touchmove so e.preventDefault() works
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const onMove = (e: TouchEvent) => {
+      if (isHorizontalDrag.current === true) e.preventDefault();
+    };
+    el.addEventListener("touchmove", onMove, { passive: false });
+    return () => el.removeEventListener("touchmove", onMove);
+  }, []);
+
   const pauseAndResume = useCallback(() => {
     isPaused.current = true;
     if (pauseTimer.current) clearTimeout(pauseTimer.current);
@@ -65,38 +76,51 @@ export function FeaturedProducts({ products }: Props) {
   const prev = () => { setActive((i) => (i - 1 + featured.length) % featured.length); pauseAndResume(); };
   const next = () => { setActive((i) => (i + 1) % featured.length); pauseAndResume(); };
 
-  // Mobile drag handlers — cards follow finger in real time
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef<number | null>(null);
+  const isHorizontalDrag = useRef<boolean | null>(null);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
-    isDragging.current = true;
+    touchStartY.current = e.touches[0].clientY;
+    isHorizontalDrag.current = null;
     isPaused.current = true;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging.current || touchStartX.current === null) return;
-    const diff = e.touches[0].clientX - touchStartX.current;
-    // Apply resistance at edges
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.touches[0].clientX - touchStartX.current;
+    const dy = e.touches[0].clientY - touchStartY.current;
+
+    // Decide once on first meaningful movement
+    if (isHorizontalDrag.current === null && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
+      isHorizontalDrag.current = Math.abs(dx) > Math.abs(dy);
+    }
+
+    // Only drag cards if horizontal — let vertical scroll pass through
+    if (!isHorizontalDrag.current) return;
+    e.preventDefault();
+    isDragging.current = true;
+
     const resistance = 0.4;
-    const atStart = active === 0 && diff > 0;
-    const atEnd = active === featured.length - 1 && diff < 0;
-    setDragOffset(atStart || atEnd ? diff * resistance : diff);
+    const atStart = active === 0 && dx > 0;
+    const atEnd = active === featured.length - 1 && dx < 0;
+    setDragOffset(atStart || atEnd ? dx * resistance : dx);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
-    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
 
-    // Snap based on how far they dragged (threshold = 30% of spread)
-    if (Math.abs(diff) > spreadPx * 0.3) {
-      if (diff < 0) next(); else prev();
-    } else {
-      // Snap back
-      setActive((i) => i);
+    if (isDragging.current && Math.abs(dx) > spreadPx * 0.25) {
+      dx < 0 ? next() : prev();
     }
 
     setDragOffset(0);
     isDragging.current = false;
     touchStartX.current = null;
+    touchStartY.current = null;
+    isHorizontalDrag.current = null;
     pauseAndResume();
   };
 
@@ -121,6 +145,7 @@ export function FeaturedProducts({ products }: Props) {
 
       {/* Carousel */}
       <div
+        ref={carouselRef}
         className="relative flex items-center justify-center select-none"
         style={{ perspective: "1200px", height: "420px" }}
         onTouchStart={handleTouchStart}
@@ -216,11 +241,11 @@ export function FeaturedProducts({ products }: Props) {
                       opacity: isActive ? 1 : 0,
                       transition: "opacity 0.4s ease",
                       pointerEvents: isActive ? "auto" : "none",
-                      paddingBottom: "4px",
+                      paddingBottom: "8px",
                       width: "100%",
                     }}
                   >
-                    <span className="inline-block text-[#A0B5A8] hover:text-[#E8F5EE] text-xs font-medium border border-[#1F8A5B]/25 hover:border-[#1F8A5B]/60 rounded-lg px-4 py-2 transition-all duration-200 bg-black/10">
+                    <span className="inline-block w-full text-center text-sm font-semibold text-white bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] rounded-xl px-6 py-3 transition-all duration-200 shadow-[0_4px_16px_rgba(46,204,113,0.25)]">
                       View
                     </span>
                   </div>
