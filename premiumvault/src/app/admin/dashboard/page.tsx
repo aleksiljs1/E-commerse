@@ -29,7 +29,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+      <h1 className="font-rajdhani text-2xl font-bold text-white">Dashboard</h1>
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -42,37 +42,37 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Recent orders mini-table */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Recent Orders</h2>
+      {/* Recent orders */}
+      <div className="bg-[#0d0d18] border border-[#1e1e2e] rounded-2xl p-6">
+        <h2 className="text-white font-semibold mb-4">Recent Orders</h2>
         {recentOrders.length === 0 ? (
-          <p className="text-zinc-500 text-sm">No orders yet.</p>
+          <p className="text-[#52525b] text-sm">No orders yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-zinc-800">
-                  <th className="text-left py-2 px-2 text-zinc-400 font-medium">Order #</th>
-                  <th className="text-left py-2 px-2 text-zinc-400 font-medium">Email</th>
-                  <th className="text-left py-2 px-2 text-zinc-400 font-medium">Amount</th>
-                  <th className="text-left py-2 px-2 text-zinc-400 font-medium">Status</th>
-                  <th className="text-left py-2 px-2 text-zinc-400 font-medium">Date</th>
+                <tr className="border-b border-[#1e1e2e]">
+                  <th className="text-left py-2 px-2 text-[#a1a1aa] font-medium">Order #</th>
+                  <th className="text-left py-2 px-2 text-[#a1a1aa] font-medium">Email</th>
+                  <th className="text-left py-2 px-2 text-[#a1a1aa] font-medium">Amount</th>
+                  <th className="text-left py-2 px-2 text-[#a1a1aa] font-medium">Status</th>
+                  <th className="text-left py-2 px-2 text-[#a1a1aa] font-medium">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {recentOrders.map((order) => (
-                  <tr key={order.id} className="border-b border-zinc-800/50">
-                    <td className="py-2 px-2 font-mono text-xs text-zinc-300">
+                  <tr key={order.id} className="border-b border-[#1e1e2e]/50 hover:bg-[#141420]">
+                    <td className="py-2 px-2 font-mono text-xs text-white">
                       {order.orderNumber}
                     </td>
-                    <td className="py-2 px-2 text-zinc-300">{order.customerEmail}</td>
-                    <td className="py-2 px-2 text-zinc-300">
+                    <td className="py-2 px-2 text-[#a1a1aa]">{order.customerEmail}</td>
+                    <td className="py-2 px-2 text-white">
                       £{Number(order.totalAmount).toFixed(2)}
                     </td>
                     <td className="py-2 px-2">
                       <StatusBadge status={order.status} />
                     </td>
-                    <td className="py-2 px-2 text-zinc-400 text-xs">
+                    <td className="py-2 px-2 text-[#a1a1aa] text-xs">
                       {format(new Date(order.createdAt), "dd MMM yyyy")}
                     </td>
                   </tr>
