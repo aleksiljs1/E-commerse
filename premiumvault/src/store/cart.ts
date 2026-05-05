@@ -60,6 +60,9 @@ export const useCartStore = create<CartState>()(
 
       totalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
     }),
-    { name: "premiumvault-cart" }
+    {
+      name: "premiumvault-cart",
+      partialize: (state) => ({ items: state.items }),
+    }
   )
 );
