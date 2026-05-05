@@ -56,15 +56,13 @@ export function FeaturedProducts({ products }: Props) {
     };
   }, [startAutoplay]);
 
-  // Register non-passive touchmove so e.preventDefault() works
+  // Non-passive touchmove on document so e.preventDefault() works during drag
   useEffect(() => {
-    const el = carouselRef.current;
-    if (!el) return;
     const onMove = (e: TouchEvent) => {
       if (isHorizontalDrag.current === true) e.preventDefault();
     };
-    el.addEventListener("touchmove", onMove, { passive: false });
-    return () => el.removeEventListener("touchmove", onMove);
+    document.addEventListener("touchmove", onMove, { passive: false });
+    return () => document.removeEventListener("touchmove", onMove);
   }, []);
 
   const pauseAndResume = useCallback(() => {
@@ -148,9 +146,6 @@ export function FeaturedProducts({ products }: Props) {
         ref={carouselRef}
         className="relative flex items-center justify-center select-none"
         style={{ perspective: "1200px", height: "420px" }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {featured.map((product, i) => {
           const offset = i - active;
@@ -171,6 +166,9 @@ export function FeaturedProducts({ products }: Props) {
           return (
             <div
               key={product.id}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
               onClick={() => {
                 if (isDragging.current) return;
                 if (isActive) router.push(`/products/${product.id}`);
