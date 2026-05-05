@@ -21,14 +21,12 @@ export default async function ProductDetailPage({
   const stock = product.stock;
 
   let stockColor = "text-green-400";
-  let stockLabel = `${stock} in stock`;
   if (stock < 3) {
     stockColor = "text-red-400";
-    stockLabel = `Only ${stock} left — hurry!`;
   } else if (stock < 10) {
     stockColor = "text-amber-400";
-    stockLabel = `Only ${stock} left`;
   }
+  const stockLabel = `${stock} in stock`;
 
   return (
     <div className="bg-zinc-950 text-white min-h-screen px-4 py-12">
@@ -49,12 +47,9 @@ export default async function ProductDetailPage({
           </div>
 
           {/* 3. Description */}
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-2">About this service</h2>
-            <p className="text-zinc-400 text-sm leading-relaxed whitespace-pre-line">
-              {product.description}
-            </p>
-          </div>
+          <p className="text-zinc-300 text-sm leading-relaxed">
+            {product.description}
+          </p>
 
           {/* 4. What we require */}
           <div>
@@ -63,9 +58,9 @@ export default async function ProductDetailPage({
               {[
                 "Your account email address",
                 "Your account password (submitted via secure encrypted link after payment)",
-                "Confirmation of your account region / country",
+                "Do not change your password during the upgrade process",
               ].map((req) => (
-                <li key={req} className="flex items-start gap-2 text-zinc-400 text-sm">
+                <li key={req} className="flex items-start gap-2 text-zinc-300 text-sm">
                   <span className="text-indigo-400 mt-0.5">•</span>
                   {req}
                 </li>
@@ -83,7 +78,7 @@ export default async function ProductDetailPage({
                 "Your credentials are encrypted and never stored in plain text",
                 "Do not change your password during the upgrade window",
               ].map((t) => (
-                <li key={t} className="flex items-start gap-2 text-zinc-400 text-sm">
+                <li key={t} className="flex items-start gap-2 text-zinc-300 text-sm">
                   <span className="text-green-400 mt-0.5">✓</span>
                   {t}
                 </li>
