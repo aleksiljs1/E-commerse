@@ -29,7 +29,7 @@ export function OrderDetailView({ order: initialOrder }: Props) {
     try {
       await api.patch(`/api/admin/orders/${order.id}/status`, { status });
       setOrder((prev: any) => ({ ...prev, status }));
-      toast.success(`Order marked as ${status.toLowerCase().replace("_", " ")}`);
+      toast.success(`Order marked as ${status.toLowerCase().replace(/_/g, " ")}`);
       router.refresh();
     } catch {
       toast.error("Failed to update order status");

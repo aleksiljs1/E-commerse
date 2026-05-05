@@ -93,6 +93,7 @@ export default function CheckoutPage() {
       }
     } catch {
       toast.error("Payment failed. Please try again.");
+    } finally {
       setIsProcessing(false);
     }
   };
