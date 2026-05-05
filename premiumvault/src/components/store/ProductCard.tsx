@@ -68,7 +68,7 @@ export function ProductCard({ product }: Props) {
         <button
           type="button"
           onClick={handleAddToCart}
-          className="w-full py-2.5 bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:opacity-90 text-white text-sm font-semibold rounded-xl transition-opacity"
+          className="cursor-pointer w-full py-2.5 bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:opacity-90 text-white text-sm font-semibold rounded-xl transition-opacity"
         >
           Add to Cart
         </button>

@@ -163,7 +163,7 @@ export default function CheckoutPage() {
                     key={method}
                     type="button"
                     onClick={() => { setPaymentMethod(method); setShowErrors(false); }}
-                    className={`rounded-xl py-3 font-medium text-sm transition-all ${
+                    className={`cursor-pointer rounded-xl py-3 font-medium text-sm transition-all ${
                       paymentMethod === method
                         ? "bg-[#1F8A5B]/10 border border-[#1F8A5B] text-[#2ECC71]"
                         : "bg-[#16221B] border border-[#1F8A5B]/30 text-[#A0B5A8] hover:border-[#1F8A5B]/50"
@@ -236,7 +236,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={!isValid || !paymentMethod || isProcessing}
-              className="w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl py-3 font-semibold transition-colors"
+              className="cursor-pointer w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl py-3 font-semibold transition-colors"
             >
               {isProcessing ? "Processing..." : "Continue to Payment"}
             </button>

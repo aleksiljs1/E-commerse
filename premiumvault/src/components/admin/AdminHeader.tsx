@@ -39,7 +39,7 @@ export function AdminHeader({ user }: Props) {
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/admin/login" })}
-          className="text-[#A0B5A8] hover:text-[#7DFFB2] text-sm transition-colors flex items-center gap-1.5"
+          className="text-[#A0B5A8] hover:text-[#7DFFB2] text-sm transition-colors flex items-center gap-1.5 cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
           Sign Out

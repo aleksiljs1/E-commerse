@@ -149,7 +149,7 @@ export function ImageUpload({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => onChange("")}
-          className="text-xs text-[#A0B5A8] hover:text-red-400 transition-colors"
+          className="text-xs text-[#A0B5A8] hover:text-red-400 transition-colors cursor-pointer"
         >
           Remove image
         </button>

@@ -14,7 +14,7 @@ export function QuantityControl({ value, onIncrement, onDecrement, min = 1, max 
       <button
         onClick={onDecrement}
         disabled={value <= min}
-        className="w-8 h-8 rounded-md border border-[#1F8A5B]/30 bg-[#16221B] text-[#E8F5EE] flex items-center justify-center hover:bg-[#1F8A5B]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="cursor-pointer w-8 h-8 rounded-md border border-[#1F8A5B]/30 bg-[#16221B] text-[#E8F5EE] flex items-center justify-center hover:bg-[#1F8A5B]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         type="button"
       >
         −
@@ -23,7 +23,7 @@ export function QuantityControl({ value, onIncrement, onDecrement, min = 1, max 
       <button
         onClick={onIncrement}
         disabled={value >= max}
-        className="w-8 h-8 rounded-md border border-[#1F8A5B]/30 bg-[#16221B] text-[#E8F5EE] flex items-center justify-center hover:bg-[#1F8A5B]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="cursor-pointer w-8 h-8 rounded-md border border-[#1F8A5B]/30 bg-[#16221B] text-[#E8F5EE] flex items-center justify-center hover:bg-[#1F8A5B]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         type="button"
       >
         +

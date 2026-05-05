@@ -46,13 +46,23 @@ export default async function ProductDetailPage({
           <h1 className="text-3xl font-bold text-[#E8F5EE]">{product.title}</h1>
 
           {/* 2. Logo */}
-          <div className="flex justify-start">
-            <ServiceIcon
-              serviceType={product.serviceType}
-              logoUrl={product.logoUrl}
-              size="lg"
-            />
-          </div>
+          {product.logoUrl ? (
+            <div className="w-full rounded-2xl overflow-hidden bg-[#16221B] border border-[#1F8A5B]/20">
+              <img
+                src={product.logoUrl}
+                alt={product.title}
+                className="w-full h-56 object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex justify-start">
+              <ServiceIcon
+                serviceType={product.serviceType}
+                logoUrl={null}
+                size="lg"
+              />
+            </div>
+          )}
 
           {/* 3. Description */}
           <p className="text-[#A0B5A8] text-sm leading-relaxed">

@@ -53,7 +53,7 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
         type="button"
         onClick={handleAddToCart}
         disabled={isOutOfStock}
-        className="w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white disabled:opacity-50 rounded-xl py-3 font-semibold transition-colors"
+        className="cursor-pointer w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white disabled:opacity-50 rounded-xl py-3 font-semibold transition-colors"
       >
         {isOutOfStock ? "Out of Stock" : "Add to Cart"}
       </button>
@@ -62,7 +62,7 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
         type="button"
         onClick={handleBuyNow}
         disabled={isOutOfStock}
-        className="w-full border border-[#2ECC71] text-[#2ECC71] hover:bg-[#2ECC71]/10 rounded-xl py-3 font-semibold transition-colors disabled:opacity-50"
+        className="cursor-pointer w-full border border-[#2ECC71] text-[#2ECC71] hover:bg-[#2ECC71]/10 rounded-xl py-3 font-semibold transition-colors disabled:opacity-50"
       >
         Buy Now
       </button>

@@ -40,7 +40,7 @@ export function CartPopup() {
           <h2 className="text-base font-semibold text-[#E8F5EE]">Your Basket</h2>
           <button
             onClick={closeCart}
-            className="text-[#A0B5A8] hover:text-[#7DFFB2] transition-colors"
+            className="cursor-pointer text-[#A0B5A8] hover:text-[#7DFFB2] transition-colors"
             aria-label="Close basket"
           >
             <X className="w-4 h-4" />
@@ -68,7 +68,7 @@ export function CartPopup() {
             </div>
             <button
               onClick={handleCheckout}
-              className="w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white rounded-xl py-3 font-semibold transition-colors"
+              className="cursor-pointer w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white rounded-xl py-3 font-semibold transition-colors"
             >
               Checkout
             </button>

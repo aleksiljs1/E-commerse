@@ -38,7 +38,7 @@ export function CartItemRow({ item }: Props) {
         />
         <button
           onClick={() => removeItem(item.productId)}
-          className="p-1 text-[#A0B5A8]/70 hover:text-red-400 transition-colors"
+          className="cursor-pointer p-1 text-[#A0B5A8]/70 hover:text-red-400 transition-colors"
           aria-label="Remove item"
         >
           <Trash2 className="w-4 h-4" />

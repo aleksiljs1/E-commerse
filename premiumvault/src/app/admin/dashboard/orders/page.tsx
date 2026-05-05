@@ -59,7 +59,7 @@ function OrdersContent() {
           <button
             key={tab.value}
             onClick={() => setStatus(tab.value)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`cursor-pointer px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               activeStatus === tab.value
                 ? "bg-[#1F8A5B] text-white"
                 : "bg-[#16221B] text-[#A0B5A8] hover:text-[#7DFFB2] hover:bg-[#1F8A5B]/20"

@@ -127,7 +127,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-[#2ECC71] to-[#27AE60] text-white text-sm font-semibold hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-2"
+              className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-[#2ECC71] to-[#27AE60] text-white text-sm font-semibold hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-2 cursor-pointer"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
