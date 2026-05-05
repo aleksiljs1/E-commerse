@@ -116,9 +116,8 @@ export function FeaturedProducts({ products }: Props) {
           const isFar = Math.abs(offset) === 2;
 
           const scale = isActive ? 1 : isAdjacent ? 0.78 : 0.62;
-          // vw-based spread so cards fill the screen width
-          const spreadVw = typeof window !== "undefined" && window.innerWidth >= 768 ? 28 : 22;
-          const translateX = offset * spreadVw;
+          const spreadPx = typeof window !== "undefined" && window.innerWidth >= 768 ? 290 : 190;
+          const translateX = offset * spreadPx;
           const opacity = isActive ? 1 : isAdjacent ? 0.55 : 0.25;
           const zIndex = isActive ? 30 : isAdjacent ? 20 : 10;
           const blur = isActive ? 0 : isAdjacent ? 0 : 2;
@@ -131,7 +130,7 @@ export function FeaturedProducts({ products }: Props) {
               style={{
                 position: "absolute",
                 width: isActive ? "clamp(260px, 22vw, 320px)" : "clamp(220px, 18vw, 280px)",
-                transform: `translateX(${translateX}vw) scale(${scale})`,
+                transform: `translateX(${translateX}px) scale(${scale})`,
                 opacity,
                 zIndex,
                 filter: blur > 0 ? `blur(${blur}px)` : "none",
