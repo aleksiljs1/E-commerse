@@ -15,8 +15,8 @@ export function PaymentMethodSelector({ selected, onSelect }: Props) {
           onClick={() => onSelect(method)}
           className={`p-4 rounded-lg border text-sm font-semibold transition-all ${
             selected === method
-              ? "ring-2 ring-indigo-500 border-indigo-500 bg-indigo-500/10 text-white"
-              : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
+              ? "ring-2 ring-[#1F8A5B] border-[#1F8A5B] bg-[#1F8A5B]/10 text-[#6ED3A3]"
+              : "border-[#1F8A5B]/30 bg-[#16221B] text-[#A0B5A8] hover:border-[#1F8A5B]/60"
           }`}
         >
           {method === "PAYPAL" ? "PayPal F&F" : "Stripe"}

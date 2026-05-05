@@ -14,18 +14,18 @@ export function CartItemRow({ item }: Props) {
   const { removeItem, updateQuantity } = useCartStore();
 
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-[#1e1e2e] last:border-0">
+    <div className="flex items-center gap-3 py-3 border-b border-[#1F8A5B]/30 last:border-0">
       {/* Left: icon */}
       <ServiceIcon serviceType={item.serviceType} logoUrl={item.logoUrl} size="sm" />
 
       {/* Middle: details */}
       <div className="flex-1 min-w-0">
-        <p className="text-white text-sm font-medium truncate">{item.title}</p>
+        <p className="text-sm font-medium text-[#E8F5EE] truncate">{item.title}</p>
         {item.description && (
-          <p className="text-[#52525b] text-xs truncate">{item.description}</p>
+          <p className="text-xs text-[#A0B5A8]/70 truncate mt-0.5">{item.description}</p>
         )}
-        <p className="text-purple-400 text-xs font-medium">
-          £{(item.price * item.quantity).toFixed(2)}
+        <p className="text-xs text-[#A0B5A8] mt-0.5">
+          £{item.price.toFixed(2)} · Total: £{(item.price * item.quantity).toFixed(2)}
         </p>
       </div>
 
@@ -38,7 +38,7 @@ export function CartItemRow({ item }: Props) {
         />
         <button
           onClick={() => removeItem(item.productId)}
-          className="text-[#52525b] hover:text-red-400 transition-colors p-1"
+          className="p-1 text-[#A0B5A8]/70 hover:text-red-400 transition-colors"
           aria-label="Remove item"
         >
           <Trash2 className="w-4 h-4" />

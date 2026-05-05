@@ -48,8 +48,14 @@ export function ImageUpload({ value, onChange }: Props) {
   const onDragLeave = () => setDragging(false);
 
   return (
-    <div className="space-y-3">
-      {/* Drop zone */}
+    <div className="space-y-2">
+      {value && (
+        <img
+          src={value}
+          alt="Product logo"
+          className="w-20 h-20 rounded-xl object-contain bg-[#0F1412] p-2"
+        />
+      )}
       <div
         onClick={() => !uploading && inputRef.current?.click()}
         onDrop={onDrop}
@@ -58,8 +64,8 @@ export function ImageUpload({ value, onChange }: Props) {
         className={[
           "relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-8 cursor-pointer transition-colors",
           dragging
-            ? "border-indigo-400 bg-indigo-500/10"
-            : "border-zinc-700 bg-zinc-900 hover:border-zinc-500 hover:bg-zinc-800/60",
+            ? "border-[#1F8A5B] bg-[#1F8A5B]/10"
+            : "border-[#1F8A5B]/30 bg-[#16221B] hover:border-[#1F8A5B] hover:bg-[#1F8A5B]/10",
           uploading ? "pointer-events-none opacity-60" : "",
         ].join(" ")}
       >
@@ -76,13 +82,13 @@ export function ImageUpload({ value, onChange }: Props) {
           <img
             src={value}
             alt="Product image"
-            className="w-24 h-24 rounded-xl object-contain bg-zinc-800 p-2 shadow-lg"
+            className="w-24 h-24 rounded-xl object-contain bg-[#0F1412] p-2 shadow-lg"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-[#0F1412] flex items-center justify-center">
             {uploading ? (
               <svg
-                className="w-6 h-6 text-indigo-400 animate-spin"
+                className="w-6 h-6 text-[#6ED3A3] animate-spin"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -102,7 +108,7 @@ export function ImageUpload({ value, onChange }: Props) {
               </svg>
             ) : (
               <svg
-                className="w-6 h-6 text-zinc-400"
+                className="w-6 h-6 text-[#A0B5A8]"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
@@ -120,19 +126,19 @@ export function ImageUpload({ value, onChange }: Props) {
 
         <div className="text-center">
           {uploading ? (
-            <p className="text-sm text-indigo-400 font-medium">Uploading…</p>
+            <p className="text-sm text-[#6ED3A3] font-medium">Uploading…</p>
           ) : value ? (
             <>
-              <p className="text-sm font-medium text-zinc-200">Click or drag to replace</p>
-              <p className="text-xs text-zinc-500 mt-0.5">JPG, PNG, WebP, GIF, SVG · max 5 MB</p>
+              <p className="text-sm font-medium text-[#E8F5EE]">Click or drag to replace</p>
+              <p className="text-xs text-[#A0B5A8] mt-0.5">JPG, PNG, WebP, GIF, SVG · max 5 MB</p>
             </>
           ) : (
             <>
-              <p className="text-sm font-medium text-zinc-200">
+              <p className="text-sm font-medium text-[#E8F5EE]">
                 Drag &amp; drop or{" "}
-                <span className="text-indigo-400 underline underline-offset-2">browse</span>
+                <span className="text-[#6ED3A3] underline underline-offset-2">browse</span>
               </p>
-              <p className="text-xs text-zinc-500 mt-0.5">JPG, PNG, WebP, GIF, SVG · max 5 MB</p>
+              <p className="text-xs text-[#A0B5A8] mt-0.5">JPG, PNG, WebP, GIF, SVG · max 5 MB</p>
             </>
           )}
         </div>
@@ -143,7 +149,7 @@ export function ImageUpload({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => onChange("")}
-          className="text-xs text-zinc-500 hover:text-red-400 transition-colors"
+          className="text-xs text-[#A0B5A8] hover:text-red-400 transition-colors"
         >
           Remove image
         </button>

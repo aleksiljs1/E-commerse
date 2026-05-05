@@ -96,10 +96,12 @@ export default function CheckoutPage() {
   const total = subtotal();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
-      {/* Top bar */}
-      <header className="border-b border-[#1e1e2e] px-6 py-4 flex items-center">
-        <span className="font-rajdhani text-xl font-bold text-white">🔐 PremiumVault</span>
+    <div className="min-h-screen bg-[#0F1412] text-[#E8F5EE]">
+      {/* Top bar — no nav */}
+      <header className="border-b border-[#1F8A5B]/30 px-6 py-4">
+        <div className="max-w-5xl mx-auto">
+          <span className="text-2xl font-bold text-[#E8F5EE]">PremiumVault</span>
+        </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-5 md:px-10 py-10">
@@ -107,37 +109,39 @@ export default function CheckoutPage() {
 
           {/* LEFT: Order Summary */}
           <div>
-            <h2 className="font-rajdhani text-xl font-bold text-white mb-6">Order Summary</h2>
+            <h2 className="text-xl font-bold text-[#E8F5EE] mb-6">Order Summary</h2>
             <div>
               {items.map((item) => (
-                <div key={item.productId} className="flex items-center gap-3 py-3 border-b border-[#1e1e2e]">
+                <div key={item.productId} className="flex items-center gap-3 py-3 border-b border-[#1F8A5B]/30">
                   <ServiceIcon serviceType={item.serviceType} logoUrl={item.logoUrl} size="sm" />
-                  <span className="text-white text-sm flex-1">{item.quantity}× {item.title}</span>
-                  <span className="text-[#a1a1aa] text-sm">£{(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="text-[#E8F5EE] text-sm flex-1">{item.quantity}× {item.title}</span>
+                  <span className="text-[#A0B5A8] text-sm">£{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
             <div className="flex justify-between pt-4 mt-2">
-              <span className="text-white font-bold">Total</span>
-              <span className="text-white font-bold text-lg">£{total.toFixed(2)}</span>
+              <span className="text-[#E8F5EE] font-bold">Total</span>
+              <span className="text-[#E8F5EE] font-bold text-lg">£{total.toFixed(2)}</span>
             </div>
           </div>
 
           {/* CENTER: 1px divider */}
-          <div className="hidden lg:block bg-[#1e1e2e]" />
+          <div className="hidden lg:block w-px bg-[#1F8A5B]/30" />
 
           {/* RIGHT: Checkout Form */}
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <h2 className="font-rajdhani text-xl font-bold text-white mb-6">Checkout</h2>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-[#E8F5EE] mb-1">Checkout</h2>
+            </div>
 
             {/* Email */}
-            <div>
-              <label className="block text-white text-sm font-semibold mb-1">Email</label>
-              <p className="text-[#a1a1aa] text-xs mb-2">The order will be sent to this email</p>
+            <div className="space-y-2">
+              <label className="text-base font-semibold text-[#E8F5EE]">Email</label>
+              <p className="text-sm text-[#A0B5A8]">The order will be sent to this email</p>
               <input
                 type="email"
                 placeholder="your@email.com"
-                className="bg-[#141420] border border-[#1e1e2e] focus:border-purple-600 rounded-xl text-white px-4 py-3 w-full outline-none transition-colors"
+                className="bg-[#16221B] border border-[#1F8A5B]/30 focus:border-[#1F8A5B] rounded-xl text-[#E8F5EE] px-4 py-3 w-full outline-none transition-colors"
                 {...register("email")}
               />
               {errors.email && (
@@ -146,9 +150,9 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Method */}
-            <div className="mt-5">
-              <label className="block text-white text-sm font-semibold mb-1">Payment Method</label>
-              <p className="text-[#a1a1aa] text-xs mb-3">Select your payment method</p>
+            <div className="space-y-2">
+              <label className="text-base font-semibold text-[#E8F5EE]">Payment Method</label>
+              <p className="text-sm text-[#A0B5A8]">Select payment method</p>
               <div className="grid grid-cols-2 gap-3">
                 {(["PAYPAL", "STRIPE"] as const).map((method) => (
                   <button
@@ -157,8 +161,8 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod(method)}
                     className={`rounded-xl py-3 font-medium text-sm transition-all ${
                       paymentMethod === method
-                        ? "bg-purple-600/10 border border-purple-600 text-purple-400"
-                        : "bg-[#141420] border border-[#1e1e2e] text-[#a1a1aa] hover:border-purple-600/50"
+                        ? "bg-[#1F8A5B]/10 border border-[#1F8A5B] text-[#2ECC71]"
+                        : "bg-[#16221B] border border-[#1F8A5B]/30 text-[#A0B5A8] hover:border-[#1F8A5B]/50"
                     }`}
                   >
                     {method === "PAYPAL" ? "PayPal F&F" : "Stripe"}
@@ -170,15 +174,14 @@ export default function CheckoutPage() {
             {/* Continue button */}
             <button
               type="submit"
-              disabled={!paymentMethod || !isValid || isProcessing}
-              className="mt-5 bg-purple-600 hover:bg-purple-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl py-3 w-full font-semibold transition-colors"
+              disabled={!isValid || !paymentMethod || isProcessing}
+              className="w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl py-3 font-semibold transition-colors"
             >
               {isProcessing ? "Processing..." : "Continue to Payment"}
             </button>
 
-            {/* SSL */}
-            <p className="text-[#52525b] text-xs text-center mt-4 leading-relaxed px-2">
-              Your data is secured by extended validation SSL certificates (256-bit encryption).
+            <p className="text-xs text-[#A0B5A8]/70 text-center leading-relaxed">
+              🔒 Your data is secured by extended validation SSL certificates (256-bit encryption).
               This complies with the strongest payment security standard available today.
             </p>
           </form>

@@ -1,8 +1,12 @@
 export function StatsCard({ label, value, highlight }: { label: string; value: string | number; highlight?: boolean }) {
   return (
-    <div className={`bg-[#0d0d18] border rounded-2xl p-6 ${highlight ? "border-purple-600/50" : "border-[#1e1e2e]"}`}>
-      <p className="text-[#a1a1aa] text-sm font-medium mb-2">{label}</p>
-      <p className={`font-rajdhani text-3xl font-bold ${highlight ? "text-purple-400" : "text-white"}`}>{value}</p>
+    <div
+      className={`bg-[#16221B] rounded-2xl p-6 border ${
+        highlight ? "border-[#1F8A5B]" : "border-[#1F8A5B]/30"
+      }`}
+    >
+      <p className="text-sm text-[#A0B5A8]">{label}</p>
+      <p className="text-3xl font-bold text-[#E8F5EE] mt-2">{value}</p>
     </div>
   );
 }

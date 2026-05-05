@@ -39,7 +39,7 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <span className="text-[#a1a1aa] text-sm">Qty:</span>
+        <span className="text-[#A0B5A8] text-sm">Qty:</span>
         <QuantityControl
           value={quantity}
           onIncrement={() => setQuantity((q) => Math.min(q + 1, stock))}
@@ -53,7 +53,7 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
         type="button"
         onClick={handleAddToCart}
         disabled={isOutOfStock}
-        className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl py-3 font-semibold transition-colors"
+        className="w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white disabled:opacity-50 rounded-xl py-3 font-semibold transition-colors"
       >
         {isOutOfStock ? "Out of Stock" : "Add to Cart"}
       </button>
@@ -62,7 +62,7 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
         type="button"
         onClick={handleBuyNow}
         disabled={isOutOfStock}
-        className="w-full bg-transparent border border-[#1e1e2e] hover:border-purple-600/50 text-white rounded-xl py-3 font-semibold transition-colors disabled:opacity-50"
+        className="w-full border border-[#2ECC71] text-[#2ECC71] hover:bg-[#2ECC71]/10 rounded-xl py-3 font-semibold transition-colors disabled:opacity-50"
       >
         Buy Now
       </button>

@@ -14,10 +14,11 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-56 min-h-screen bg-[#0d0d18] border-r border-[#1e1e2e] flex flex-col">
+    <aside className="w-64 bg-[#16221B] border-r border-[#1F8A5B]/30 flex flex-col h-full">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-[#1e1e2e]">
-        <h1 className="font-rajdhani text-lg font-bold text-white">🔐 PremiumVault</h1>
+      <div className="p-6 border-b border-[#1F8A5B]/30">
+        <h1 className="text-xl font-bold text-[#E8F5EE] tracking-tight">PremiumVault</h1>
+        <p className="text-xs text-[#A0B5A8] mt-0.5">Admin Panel</p>
       </div>
 
       {/* Navigation */}
@@ -33,8 +34,8 @@ export function AdminSidebar() {
               href={href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-purple-600/10 text-purple-400"
-                  : "text-[#a1a1aa] hover:text-white hover:bg-[#141420]"
+                  ? "bg-[#1F8A5B]/10 text-[#6ED3A3] font-semibold border border-[#1F8A5B]"
+                  : "text-[#A0B5A8] hover:text-[#7DFFB2] hover:bg-[#1F8A5B]/10"
               }`}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -45,8 +46,8 @@ export function AdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-4 border-t border-[#1e1e2e]">
-        <p className="text-[#52525b] text-xs">v0.1.0 · development</p>
+      <div className="p-4 border-t border-[#1F8A5B]/30">
+        <p className="text-xs text-[#A0B5A8]/60">v0.1.0 · development</p>
       </div>
     </aside>
   );

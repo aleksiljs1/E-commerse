@@ -41,10 +41,10 @@ type CredentialFormData = z.infer<typeof credentialSchema>;
 
 function LoadingScreen() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
+    <div className="min-h-screen bg-[#0F1412] text-white flex items-center justify-center">
       <div className="text-center space-y-4">
-        <div className="w-10 h-10 border-4 border-zinc-700 border-t-indigo-500 rounded-full animate-spin mx-auto" />
-        <p className="text-zinc-400 text-sm">Loading your order...</p>
+        <div className="w-10 h-10 border-4 border-[#16221B] border-t-[#2ECC71] rounded-full animate-spin mx-auto" />
+        <p className="text-[#A0B5A8] text-sm">Loading your order...</p>
       </div>
     </div>
   );
@@ -52,14 +52,14 @@ function LoadingScreen() {
 
 function ErrorScreen({ message }: { message: string }) {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#0F1412] text-white flex items-center justify-center p-6">
       <div className="max-w-md text-center space-y-6">
         <div className="text-5xl">&#x26A0;&#xFE0F;</div>
         <h1 className="text-2xl font-bold">Something went wrong</h1>
-        <p className="text-zinc-400">{message}</p>
+        <p className="text-[#A0B5A8]">{message}</p>
         <Button
           variant="outline"
-          className="border-zinc-700"
+          className="border-[#1F8A5B]/30"
           onClick={() => (window.location.href = "/")}
         >
           Return to Home
@@ -175,14 +175,14 @@ function SubmitCredentialsContent() {
   // Filling stage — show one item at a time
   const currentItem = expandedItems[currentItemIndex];
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-[#0F1412] text-white flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-md">
         {/* Progress */}
-        <p className="text-sm text-zinc-500 text-center mb-6">
+        <p className="text-sm text-[#A0B5A8]/70 text-center mb-6">
           Step {currentItemIndex + 1} of {expandedItems.length}
         </p>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+        <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl p-8">
           {/* Service icon + title */}
           <div className="flex flex-col items-center gap-3 mb-6">
             <ServiceIcon
@@ -193,7 +193,7 @@ function SubmitCredentialsContent() {
             <h2 className="text-xl font-bold text-center">
               {currentItem.product.title}{currentItem.instanceLabel}
             </h2>
-            <p className="text-sm text-zinc-400 text-center">
+            <p className="text-sm text-[#A0B5A8] text-center">
               Enter the account credentials you want us to upgrade.
             </p>
           </div>
@@ -203,7 +203,7 @@ function SubmitCredentialsContent() {
               <Label>Email / Username</Label>
               <Input
                 placeholder="your@email.com or username"
-                className="bg-zinc-800 border-zinc-700 mt-1"
+                className="bg-[#0F1412] border-[#1F8A5B]/30 mt-1"
                 {...register("username")}
               />
               {errors.username && (
@@ -216,7 +216,7 @@ function SubmitCredentialsContent() {
               <Input
                 type="password"
                 placeholder="••••••••"
-                className="bg-zinc-800 border-zinc-700 mt-1"
+                className="bg-[#0F1412] border-[#1F8A5B]/30 mt-1"
                 {...register("password")}
               />
               {errors.password && (
@@ -229,7 +229,7 @@ function SubmitCredentialsContent() {
               <Input
                 type="password"
                 placeholder="••••••••"
-                className="bg-zinc-800 border-zinc-700 mt-1"
+                className="bg-[#0F1412] border-[#1F8A5B]/30 mt-1"
                 {...register("confirmPassword")}
               />
               {errors.confirmPassword && (

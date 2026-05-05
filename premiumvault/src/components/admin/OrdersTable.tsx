@@ -19,45 +19,45 @@ type Props = {
 
 export function OrdersTable({ orders }: Props) {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+    <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="border-zinc-800 hover:bg-transparent">
-            <TableHead className="text-zinc-400">Order #</TableHead>
-            <TableHead className="text-zinc-400">Customer Email</TableHead>
-            <TableHead className="text-zinc-400">Items</TableHead>
-            <TableHead className="text-zinc-400">Total</TableHead>
-            <TableHead className="text-zinc-400">Payment</TableHead>
-            <TableHead className="text-zinc-400">Status</TableHead>
-            <TableHead className="text-zinc-400">Date</TableHead>
-            <TableHead className="text-zinc-400">Actions</TableHead>
+          <TableRow className="border-[#1F8A5B]/20 hover:bg-transparent">
+            <TableHead className="text-[#A0B5A8]">Order #</TableHead>
+            <TableHead className="text-[#A0B5A8]">Customer Email</TableHead>
+            <TableHead className="text-[#A0B5A8]">Items</TableHead>
+            <TableHead className="text-[#A0B5A8]">Total</TableHead>
+            <TableHead className="text-[#A0B5A8]">Payment</TableHead>
+            <TableHead className="text-[#A0B5A8]">Status</TableHead>
+            <TableHead className="text-[#A0B5A8]">Date</TableHead>
+            <TableHead className="text-[#A0B5A8]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {orders.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center text-zinc-500 py-8">
+              <TableCell colSpan={8} className="text-center text-[#A0B5A8] py-8">
                 No orders found.
               </TableCell>
             </TableRow>
           )}
           {orders.map((order) => (
-            <TableRow key={order.id} className="border-zinc-800 hover:bg-zinc-800/50">
-              <TableCell className="font-mono text-xs text-zinc-300 max-w-[160px] truncate">
+            <TableRow key={order.id} className="border-[#1F8A5B]/20 hover:bg-[#1F8A5B]/10">
+              <TableCell className="font-mono text-xs text-[#A0B5A8] max-w-[160px] truncate">
                 {order.orderNumber}
               </TableCell>
-              <TableCell className="text-zinc-300">{order.customerEmail}</TableCell>
-              <TableCell className="text-zinc-400">
+              <TableCell className="text-[#A0B5A8]">{order.customerEmail}</TableCell>
+              <TableCell className="text-[#A0B5A8]">
                 {order.items?.length ?? 0} item{(order.items?.length ?? 0) !== 1 ? "s" : ""}
               </TableCell>
-              <TableCell className="text-zinc-300">
+              <TableCell className="text-[#A0B5A8]">
                 £{Number(order.totalAmount).toFixed(2)}
               </TableCell>
               <TableCell>
                 <span
                   className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
                     order.paymentMethod === "STRIPE"
-                      ? "bg-violet-500/20 text-violet-400 border-violet-500/30"
+                      ? "bg-[#1F8A5B]/20 text-[#6ED3A3] border-[#1F8A5B]/30"
                       : "bg-blue-500/20 text-blue-400 border-blue-500/30"
                   }`}
                 >
@@ -67,7 +67,7 @@ export function OrdersTable({ orders }: Props) {
               <TableCell>
                 <StatusBadge status={order.status} />
               </TableCell>
-              <TableCell className="text-zinc-400 text-xs whitespace-nowrap">
+              <TableCell className="text-[#A0B5A8] text-xs whitespace-nowrap">
                 {order.createdAt
                   ? format(new Date(order.createdAt), "dd MMM yyyy HH:mm")
                   : "—"}

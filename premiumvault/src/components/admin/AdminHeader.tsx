@@ -27,17 +27,19 @@ export function AdminHeader({ user }: Props) {
   const initial = (user?.name ?? user?.email ?? "A")[0].toUpperCase();
 
   return (
-    <header className="h-14 border-b border-[#1e1e2e] bg-[#0d0d18] flex items-center justify-between px-6 shrink-0">
-      <h2 className="text-sm font-semibold text-white">{title}</h2>
+    <header className="h-14 bg-[#16221B] border-b border-[#1F8A5B]/30 flex items-center justify-between px-6 shrink-0">
+      <h2 className="text-sm font-semibold text-[#E8F5EE]">{title}</h2>
 
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-          {initial}
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#1F8A5B] to-[#6ED3A3] flex items-center justify-center text-white text-sm font-bold">
+            {initial}
+          </div>
+          <span className="text-sm text-[#A0B5A8] hidden sm:block">{user?.email}</span>
         </div>
-        <span className="text-[#a1a1aa] text-sm hidden sm:block">{user?.email}</span>
         <button
           onClick={() => signOut({ callbackUrl: "/admin/login" })}
-          className="text-[#a1a1aa] hover:text-white text-sm transition-colors flex items-center gap-1.5"
+          className="text-[#A0B5A8] hover:text-[#7DFFB2] text-sm transition-colors flex items-center gap-1.5"
         >
           <LogOut className="w-4 h-4" />
           Sign Out

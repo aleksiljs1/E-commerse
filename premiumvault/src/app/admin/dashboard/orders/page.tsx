@@ -51,7 +51,7 @@ function OrdersContent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">Orders</h1>
+      <h1 className="text-2xl font-bold text-[#E8F5EE]">Orders</h1>
 
       {/* Filter Tabs */}
       <div className="flex flex-wrap gap-2">
@@ -61,8 +61,8 @@ function OrdersContent() {
             onClick={() => setStatus(tab.value)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               activeStatus === tab.value
-                ? "bg-indigo-500 text-white"
-                : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                ? "bg-[#1F8A5B] text-white"
+                : "bg-[#16221B] text-[#A0B5A8] hover:text-[#7DFFB2] hover:bg-[#1F8A5B]/20"
             }`}
           >
             {tab.label}
@@ -71,7 +71,7 @@ function OrdersContent() {
       </div>
 
       {loading ? (
-        <div className="text-zinc-500 text-sm">Loading orders...</div>
+        <div className="text-[#A0B5A8] text-sm">Loading orders...</div>
       ) : (
         <OrdersTable orders={orders} />
       )}
@@ -81,7 +81,7 @@ function OrdersContent() {
 
 export default function OrdersPage() {
   return (
-    <Suspense fallback={<div className="text-zinc-500 text-sm">Loading...</div>}>
+    <Suspense fallback={<div className="text-[#A0B5A8] text-sm">Loading...</div>}>
       <OrdersContent />
     </Suspense>
   );

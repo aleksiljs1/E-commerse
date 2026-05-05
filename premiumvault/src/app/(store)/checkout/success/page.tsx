@@ -14,28 +14,15 @@ function SuccessContent() {
   }, [clearCart]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
-      <div className="bg-[#0d0d18] border border-[#1e1e2e] rounded-2xl p-10 max-w-md w-full text-center space-y-4">
-        {/* Check circle */}
-        <div className="flex items-center justify-center">
-          <div className="w-16 h-16 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-            <span className="text-2xl text-green-400">✓</span>
-          </div>
-        </div>
-
-        <h1 className="font-rajdhani text-3xl font-bold text-white">Payment Successful!</h1>
-
-        <p className="text-[#a1a1aa]">
-          Check your email — we&apos;ve sent you a link to submit your account credentials.
-        </p>
-
-        {orderId && (
-          <p className="text-[#52525b] text-sm font-mono">Order: {orderId}</p>
-        )}
-
+    <div className="min-h-screen bg-[#0F1412] text-[#E8F5EE] flex items-center justify-center p-6">
+      <div className="max-w-md text-center space-y-6">
+        <div className="text-6xl">🎉</div>
+        <h1 className="text-3xl font-bold text-[#E8F5EE]">Payment Successful!</h1>
+        <p className="text-[#A0B5A8]">Check your email — we&apos;ve sent you a secure link to submit your account credentials.</p>
+        {orderId && <p className="text-sm text-[#A0B5A8]/70 font-mono">Order: {orderId}</p>}
         <Link
           href="/"
-          className="border border-[#1e1e2e] hover:border-purple-600 text-white rounded-xl px-6 py-2.5 inline-block text-sm font-medium transition-colors"
+          className="inline-block border border-[#1F8A5B]/30 text-[#E8F5EE] hover:bg-[#1F8A5B]/10 rounded-xl px-6 py-2.5 text-sm font-medium transition-colors"
         >
           Return to Home
         </Link>

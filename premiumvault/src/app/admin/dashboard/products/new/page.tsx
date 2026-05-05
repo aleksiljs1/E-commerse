@@ -25,8 +25,8 @@ export default function NewProductPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold text-white">New Product</h1>
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+      <h1 className="text-2xl font-bold text-[#E8F5EE]">New Product</h1>
+      <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl p-6">
         <ProductForm onSubmit={handleSubmit} isLoading={isLoading} mode="create" />
       </div>
     </div>

@@ -39,14 +39,14 @@ export default function ProductsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Products</h1>
+        <h1 className="text-2xl font-bold text-[#E8F5EE]">Products</h1>
         <Link href="/admin/dashboard/products/new">
           <Button>+ Add Product</Button>
         </Link>
       </div>
 
       {loading ? (
-        <div className="text-zinc-500 text-sm">Loading products...</div>
+        <div className="text-[#A0B5A8] text-sm">Loading products...</div>
       ) : (
         <ProductTable products={products} onDeactivate={handleDeactivate} />
       )}

@@ -32,10 +32,19 @@ export function ProductCard({ product }: Props) {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-[#0d0d18] border border-[#1e1e2e] rounded-2xl hover:border-purple-600/50 hover:shadow-[0_0_20px_rgba(124,58,237,0.15)] transition-all cursor-pointer flex flex-col overflow-hidden group"
+      className="rounded-2xl border border-[#1F8A5B]/30 bg-[#16221B] hover:border-[#1F8A5B] transition-all cursor-pointer flex flex-col overflow-hidden"
     >
-      {/* Icon area */}
-      <div className="flex items-center justify-center py-10 px-6 bg-[#141420]">
+      {/* Featured badge */}
+      {product.featured && (
+        <div className="px-4 pt-3 flex justify-end">
+          <span className="bg-[#2ECC71] text-white text-xs px-2 py-0.5 rounded-full">
+            Featured
+          </span>
+        </div>
+      )}
+
+      {/* Top — icon */}
+      <div className="flex items-center justify-center py-8 px-4">
         <ServiceIcon
           serviceType={product.serviceType}
           logoUrl={product.logoUrl}
@@ -43,31 +52,29 @@ export function ProductCard({ product }: Props) {
         />
       </div>
 
-      {/* Body */}
-      <div className="p-4 flex flex-col gap-2 flex-1">
-        <p className="text-sm font-semibold text-white leading-snug">{product.title}</p>
-        <p className="text-purple-400 font-bold text-lg">£{product.price.toFixed(2)}</p>
+      {/* Title */}
+      <p className="font-semibold text-[#E8F5EE] text-sm text-center px-4 pb-1">
+        {product.title}
+      </p>
 
-        {product.stock < 5 && (
-          <p className="text-orange-400 text-xs font-medium">
-            Only {product.stock} left
-          </p>
-        )}
+      {/* Price */}
+      <p className="text-[#6ED3A3] font-bold text-lg text-center pb-2">
+        £{product.price.toFixed(2)}
+      </p>
 
-        {product.featured && (
-          <span className="inline-block w-fit bg-purple-600/20 text-purple-400 text-xs px-2 py-0.5 rounded-full border border-purple-600/30">
-            Featured
-          </span>
-        )}
+      {product.stock < 5 && (
+        <p className="text-orange-400 text-xs font-medium text-center pb-2">
+          Only {product.stock} left
+        </p>
+      )}
 
-        <div className="flex-1" />
-      </div>
+      <div className="flex-1" />
 
       {/* Footer */}
       <div className="p-4 pt-0">
         <button
           onClick={handleAddToCart}
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
+          className="w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:opacity-90 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
         >
           Add to Cart
         </button>

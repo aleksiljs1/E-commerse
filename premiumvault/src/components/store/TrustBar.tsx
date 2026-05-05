@@ -11,11 +11,11 @@ export function TrustBar() {
       {trustItems.map((item) => (
         <div
           key={item.title}
-          className="bg-[#141420] border border-[#1e1e2e] rounded-2xl py-7 px-5 text-center transition-all hover:border-purple-600 hover:-translate-y-1"
+          className="bg-[#16221B] border border-zinc-800 rounded-2xl py-7 px-5 text-center transition-all hover:border-[#1F8A5B] hover:-translate-y-1"
         >
           <div className="text-4xl mb-3">{item.icon}</div>
-          <div className="text-base font-semibold text-white mb-1">{item.title}</div>
-          <div className="text-xs text-[#a1a1aa]">{item.desc}</div>
+          <div className="text-base font-semibold text-[#E8F5EE] mb-1">{item.title}</div>
+          <div className="text-xs text-[#A0B5A8]">{item.desc}</div>
         </div>
       ))}
     </div>
