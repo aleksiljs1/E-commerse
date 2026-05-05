@@ -10,7 +10,7 @@ const productSchema = z.object({
   price: z.number().positive(),
   stock: z.number().int().min(0),
   serviceType: z.string().min(1),
-  logoUrl: z.string().url().optional().or(z.literal("")).transform((val) => val === "" ? undefined : val),
+  logoUrl: z.string().optional().or(z.literal("")).transform((val) => val === "" ? undefined : val),
   featured: z.boolean().default(false),
   active: z.boolean().default(true),
 });

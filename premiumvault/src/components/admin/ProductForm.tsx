@@ -87,7 +87,7 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
           name="serviceType"
           control={control}
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select value={field.value ?? ""} onValueChange={field.onChange}>
               <SelectTrigger className="w-full bg-[#0F1412] border-[#1F8A5B]/30 text-white">
                 <SelectValue placeholder="Select service..." />
               </SelectTrigger>
