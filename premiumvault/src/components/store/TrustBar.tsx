@@ -1,23 +1,31 @@
-const trustItems = [
-  { icon: "⚡", title: "Fast Delivery", desc: "Upgrade delivered within 4–5 business days" },
-  { icon: "🛡️", title: "Warranty Included", desc: "Full replacement guarantee on all accounts" },
-  { icon: "🔒", title: "Secure Payment", desc: "Encrypted transactions & multiple methods" },
-  { icon: "💬", title: "24/7 Support", desc: "Round-the-clock customer assistance" },
+import { Zap, Shield, Lock, MessageCircle } from "lucide-react";
+
+const items = [
+  { icon: Zap, label: "Instant Delivery", desc: "Accounts activated within minutes" },
+  { icon: Shield, label: "Lifetime Warranty", desc: "Full replacement if any issues arise" },
+  { icon: Lock, label: "Secure Payment", desc: "256-bit SSL encryption on all orders" },
+  { icon: MessageCircle, label: "24/7 Support", desc: "Always here when you need us" },
 ];
 
 export function TrustBar() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 px-5 md:px-10 py-10 max-w-[1200px] mx-auto">
-      {trustItems.map((item) => (
-        <div
-          key={item.title}
-          className="bg-[#16221B] border border-zinc-800 rounded-2xl py-7 px-5 text-center transition-all hover:border-[#1F8A5B] hover:-translate-y-1"
-        >
-          <div className="text-4xl mb-3">{item.icon}</div>
-          <div className="text-base font-semibold text-[#E8F5EE] mb-1">{item.title}</div>
-          <div className="text-xs text-[#A0B5A8]">{item.desc}</div>
-        </div>
-      ))}
-    </div>
+    <section className="py-10 px-6 md:px-10">
+      <div className="max-w-[1200px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {items.map(({ icon: Icon, label, desc }) => (
+          <div
+            key={label}
+            className="bg-[#16221B] border border-[#1F8A5B]/20 rounded-2xl p-4 flex items-start gap-3"
+          >
+            <div className="w-9 h-9 rounded-xl bg-[#1F8A5B]/10 border border-[#1F8A5B]/20 flex items-center justify-center shrink-0">
+              <Icon className="w-4 h-4 text-[#2ECC71]" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#E8F5EE]">{label}</p>
+              <p className="text-xs text-[#A0B5A8] mt-0.5 leading-relaxed">{desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
