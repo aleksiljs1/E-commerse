@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -31,11 +31,43 @@ export function FeaturedProducts({ products }: Props) {
   const addItem = useCartStore((s) => s.addItem);
   const [active, setActive] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isPaused = useRef(false);
 
   if (featured.length === 0) return null;
 
-  const prev = () => setActive((i) => (i - 1 + featured.length) % featured.length);
-  const next = () => setActive((i) => (i + 1) % featured.length);
+  const getInterval = () =>
+    typeof window !== "undefined" && window.innerWidth < 768 ? 4000 : 6000;
+
+  const startAutoplay = useCallback(() => {
+    if (autoplayRef.current) clearInterval(autoplayRef.current);
+    autoplayRef.current = setInterval(() => {
+      if (!isPaused.current) {
+        setActive((i) => (i + 1) % featured.length);
+      }
+    }, getInterval());
+  }, [featured.length]);
+
+  useEffect(() => {
+    startAutoplay();
+    return () => {
+      if (autoplayRef.current) clearInterval(autoplayRef.current);
+      if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    };
+  }, [startAutoplay]);
+
+  // Pause autoplay for 6s after user interaction, then resume
+  const pauseAndResume = useCallback(() => {
+    isPaused.current = true;
+    if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    pauseTimer.current = setTimeout(() => {
+      isPaused.current = false;
+    }, 6000);
+  }, []);
+
+  const prev = () => { setActive((i) => (i - 1 + featured.length) % featured.length); pauseAndResume(); };
+  const next = () => { setActive((i) => (i + 1) % featured.length); pauseAndResume(); };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -43,7 +75,7 @@ export function FeaturedProducts({ products }: Props) {
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
+    if (Math.abs(diff) > 40) { diff > 0 ? next() : prev(); }
     touchStartX.current = null;
   };
 
@@ -93,7 +125,7 @@ export function FeaturedProducts({ products }: Props) {
           return (
             <div
               key={product.id}
-              onClick={() => isActive ? null : setActive(i)}
+              onClick={() => { if (!isActive) { setActive(i); pauseAndResume(); } }}
               style={{
                 position: "absolute",
                 width: "260px",
@@ -198,7 +230,7 @@ export function FeaturedProducts({ products }: Props) {
           {featured.map((_, i) => (
             <button
               key={i}
-              onClick={() => setActive(i)}
+              onClick={() => { setActive(i); pauseAndResume(); }}
               className={`rounded-full transition-all duration-300 ${
                 i === active
                   ? "w-6 h-2 bg-[#2ECC71]"
