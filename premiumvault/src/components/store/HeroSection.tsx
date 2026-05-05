@@ -7,7 +7,7 @@ export function HeroSection() {
         Premium Accounts & Digital Subscriptions
       </h1>
       <p className="text-lg text-[#A0B5A8] mb-9 max-w-[600px] mx-auto">
-        Get instant access to premium digital accounts with lifetime warranty, instant delivery, and 24/7 customer support. Save up to 70% on all subscriptions.
+        Get premium digital account upgrades with lifetime warranty, fast 4–5 day delivery, and 24/7 customer support. Save up to 70% on all subscriptions.
       </p>
       <div className="flex gap-4 justify-center mb-14 flex-wrap">
         <Link
@@ -17,10 +17,10 @@ export function HeroSection() {
           Shop Now
         </Link>
         <Link
-          href="/products"
+          href="/#products"
           className="bg-transparent text-[#2ECC71] px-8 py-3.5 rounded-xl font-semibold text-base border border-[#2ECC71] transition-all hover:border-[#7DFFB2] hover:shadow-[0_0_15px_rgba(31,138,91,0.4)] hover:-translate-y-0.5"
         >
-          View Deals
+          Browse Categories
         </Link>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

@@ -19,18 +19,18 @@ type Props = {
 
 export function OrdersTable({ orders }: Props) {
   return (
-    <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl overflow-hidden">
+    <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-xl overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="border-[#1F8A5B]/20 hover:bg-transparent">
-            <TableHead className="text-[#A0B5A8]">Order #</TableHead>
-            <TableHead className="text-[#A0B5A8]">Customer Email</TableHead>
-            <TableHead className="text-[#A0B5A8]">Items</TableHead>
-            <TableHead className="text-[#A0B5A8]">Total</TableHead>
-            <TableHead className="text-[#A0B5A8]">Payment</TableHead>
-            <TableHead className="text-[#A0B5A8]">Status</TableHead>
-            <TableHead className="text-[#A0B5A8]">Date</TableHead>
-            <TableHead className="text-[#A0B5A8]">Actions</TableHead>
+          <TableRow className="border-[#1F8A5B]/20 hover:bg-transparent bg-[#0F1412]/60">
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Order #</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Customer Email</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Items</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Total</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Payment</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Status</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Date</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -55,11 +55,11 @@ export function OrdersTable({ orders }: Props) {
               </TableCell>
               <TableCell>
                 <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                  className={
                     order.paymentMethod === "STRIPE"
-                      ? "bg-[#1F8A5B]/20 text-[#6ED3A3] border-[#1F8A5B]/30"
-                      : "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                  }`}
+                      ? "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-violet-500/20 text-violet-400"
+                      : "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-500/20 text-blue-400"
+                  }
                 >
                   {order.paymentMethod === "STRIPE" ? "Stripe" : "PayPal F&F"}
                 </span>

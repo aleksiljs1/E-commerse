@@ -67,13 +67,17 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Logo Upload */}
+      {/* Title */}
       <div>
-        <Label className="text-[#A0B5A8] mb-2 block">Product Logo</Label>
-        <ImageUpload
-          value={logoUrl}
-          onChange={(url) => setValue("logoUrl", url)}
+        <Label className="text-[#A0B5A8] mb-2 block">Title</Label>
+        <Input
+          className="bg-[#0F1412] border-[#1F8A5B]/30 text-white"
+          placeholder="e.g. Spotify Premium — Personal"
+          {...register("title")}
         />
+        {errors.title && (
+          <p className="text-red-400 text-xs mt-1">{errors.title.message}</p>
+        )}
       </div>
 
       {/* Service Type */}
@@ -99,19 +103,6 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
         />
         {errors.serviceType && (
           <p className="text-red-400 text-xs mt-1">{errors.serviceType.message}</p>
-        )}
-      </div>
-
-      {/* Title */}
-      <div>
-        <Label className="text-[#A0B5A8] mb-2 block">Title</Label>
-        <Input
-          className="bg-[#0F1412] border-[#1F8A5B]/30 text-white"
-          placeholder="e.g. Spotify Premium — Personal"
-          {...register("title")}
-        />
-        {errors.title && (
-          <p className="text-red-400 text-xs mt-1">{errors.title.message}</p>
         )}
       </div>
 
@@ -158,6 +149,15 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
             <p className="text-red-400 text-xs mt-1">{errors.stock.message}</p>
           )}
         </div>
+      </div>
+
+      {/* Logo Upload */}
+      <div>
+        <Label className="text-[#A0B5A8] mb-2 block">Product Logo</Label>
+        <ImageUpload
+          value={logoUrl}
+          onChange={(url) => setValue("logoUrl", url)}
+        />
       </div>
 
       {/* Checkboxes */}

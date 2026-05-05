@@ -154,7 +154,7 @@ export default function CheckoutPage() {
               <label className="text-base font-semibold text-[#E8F5EE]">Payment Method</label>
               <p className="text-sm text-[#A0B5A8]">Select payment method</p>
               <div className="grid grid-cols-2 gap-3">
-                {(["PAYPAL", "STRIPE"] as const).map((method) => (
+                {(["STRIPE", "PAYPAL"] as const).map((method) => (
                   <button
                     key={method}
                     type="button"
@@ -169,6 +169,11 @@ export default function CheckoutPage() {
                   </button>
                 ))}
               </div>
+              {paymentMethod === "PAYPAL" && (
+                <p className="text-xs text-amber-400/80 bg-amber-400/5 border border-amber-400/20 rounded-lg px-3 py-2 leading-relaxed">
+                  PayPal Friends &amp; Family has no buyer protection. Only use this if you trust the seller. Stripe is recommended for new customers.
+                </p>
+              )}
             </div>
 
             {/* Continue button */}

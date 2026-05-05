@@ -17,8 +17,12 @@ export function AdminSidebar() {
     <aside className="w-64 bg-[#16221B] border-r border-[#1F8A5B]/30 flex flex-col h-full">
       {/* Logo */}
       <div className="p-6 border-b border-[#1F8A5B]/30">
-        <h1 className="text-xl font-bold text-[#E8F5EE] tracking-tight">PremiumVault</h1>
-        <p className="text-xs text-[#A0B5A8] mt-0.5">Admin Panel</p>
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center shrink-0">
+            <span className="text-[#0d0d18] text-[10px] font-black leading-none tracking-tight">PV</span>
+          </div>
+          <span className="font-rajdhani text-base font-bold text-white tracking-wide">PremiumVault</span>
+        </div>
       </div>
 
       {/* Navigation */}
@@ -45,10 +49,7 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-[#1F8A5B]/30">
-        <p className="text-xs text-[#A0B5A8]/60">v0.1.0 · development</p>
-      </div>
+
     </aside>
   );
 }

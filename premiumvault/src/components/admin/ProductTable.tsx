@@ -57,33 +57,33 @@ export function ProductTable({ products, onDeactivate }: Props) {
   }
 
   return (
-    <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl overflow-hidden">
+    <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-xl overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="border-[#1F8A5B]/20 hover:bg-transparent">
-            <TableHead className="text-[#A0B5A8] w-12">Logo</TableHead>
+          <TableRow className="border-[#1F8A5B]/20 hover:bg-transparent bg-[#0F1412]/60">
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium w-12">Logo</TableHead>
             <TableHead
-              className="text-[#A0B5A8] cursor-pointer select-none"
+              className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium cursor-pointer select-none"
               onClick={() => toggleSort("title")}
             >
               Title <SortIcon col="title" />
             </TableHead>
-            <TableHead className="text-[#A0B5A8]">Service</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Service</TableHead>
             <TableHead
-              className="text-[#A0B5A8] cursor-pointer select-none"
+              className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium cursor-pointer select-none"
               onClick={() => toggleSort("price")}
             >
               Price <SortIcon col="price" />
             </TableHead>
             <TableHead
-              className="text-[#A0B5A8] cursor-pointer select-none"
+              className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium cursor-pointer select-none"
               onClick={() => toggleSort("stock")}
             >
               Stock <SortIcon col="stock" />
             </TableHead>
-            <TableHead className="text-[#A0B5A8]">Status</TableHead>
-            <TableHead className="text-[#A0B5A8]">Orders</TableHead>
-            <TableHead className="text-[#A0B5A8]">Actions</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Status</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Orders</TableHead>
+            <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,7 +105,7 @@ export function ProductTable({ products, onDeactivate }: Props) {
               </TableCell>
               <TableCell className="font-medium text-[#E8F5EE]">{product.title}</TableCell>
               <TableCell>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#0F1412] text-[#A0B5A8] capitalize">
+                <span className="text-zinc-500 text-xs capitalize">
                   {product.serviceType}
                 </span>
               </TableCell>
@@ -113,11 +113,13 @@ export function ProductTable({ products, onDeactivate }: Props) {
               <TableCell className="text-[#A0B5A8]">{product.stock}</TableCell>
               <TableCell>
                 {product.active ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-green-500/10 text-green-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
                     Active
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-red-500/10 text-red-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
                     Inactive
                   </span>
                 )}

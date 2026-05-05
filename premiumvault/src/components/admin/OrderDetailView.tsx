@@ -16,20 +16,16 @@ type Props = {
 export function OrderDetailView({ order: initialOrder }: Props) {
   const [order, setOrder] = useState(initialOrder);
   const [loading, setLoading] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const router = useRouter();
 
   async function handleStatusChange(status: string) {
-    const confirmed =
-      status === "CANCELLED"
-        ? window.confirm("Are you sure you want to cancel this order?")
-        : true;
-    if (!confirmed) return;
-
     setLoading(true);
     try {
       await api.patch(`/api/admin/orders/${order.id}/status`, { status });
       setOrder((prev: any) => ({ ...prev, status }));
       toast.success(`Order marked as ${status.toLowerCase().replace(/_/g, " ")}`);
+      setConfirmCancel(false);
       router.refresh();
     } catch {
       toast.error("Failed to update order status");
@@ -131,7 +127,7 @@ export function OrderDetailView({ order: initialOrder }: Props) {
       </div>
 
       {/* Status Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         {order.status === "CREDENTIALS_SUBMITTED" && (
           <Button
             onClick={() => handleStatusChange("COMPLETED")}
@@ -141,13 +137,36 @@ export function OrderDetailView({ order: initialOrder }: Props) {
           </Button>
         )}
         {order.status !== "COMPLETED" && order.status !== "CANCELLED" && (
-          <Button
-            variant="destructive"
-            onClick={() => handleStatusChange("CANCELLED")}
-            disabled={loading}
-          >
-            Cancel Order
-          </Button>
+          confirmCancel ? (
+            <div className="flex items-center gap-2 bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-2">
+              <span className="text-red-300 text-sm font-medium">Cancel this order?</span>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => handleStatusChange("CANCELLED")}
+                disabled={loading}
+              >
+                {loading ? "Cancelling..." : "Yes, cancel"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirmCancel(false)}
+                disabled={loading}
+                className="border-red-800/50 text-red-300 hover:bg-red-900/30"
+              >
+                Keep order
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="destructive"
+              onClick={() => setConfirmCancel(true)}
+              disabled={loading}
+            >
+              Cancel Order
+            </Button>
+          )
         )}
       </div>
     </div>

@@ -22,9 +22,8 @@ export function Footer() {
           <h4 className="font-rajdhani text-lg mb-4 text-[#E8F5EE]">Quick Links</h4>
           <ul className="space-y-2.5">
             <li><Link href="/products" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Shop All</Link></li>
-            <li><Link href="#" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Flash Deals</Link></li>
-            <li><Link href="#" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">New Arrivals</Link></li>
-            <li><Link href="#" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Best Sellers</Link></li>
+            <li><Link href="/#products" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Browse Categories</Link></li>
+            <li><Link href="/#reviews" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Customer Reviews</Link></li>
           </ul>
         </div>
 
@@ -32,10 +31,8 @@ export function Footer() {
         <div>
           <h4 className="font-rajdhani text-lg mb-4 text-[#E8F5EE]">Support</h4>
           <ul className="space-y-2.5">
-            <li><Link href="#" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Help Center</Link></li>
-            <li><Link href="#" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Contact Us</Link></li>
-            <li><Link href="#" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Refund Policy</Link></li>
-            <li><Link href="#" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Terms of Service</Link></li>
+            <li><Link href="/refund-policy" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Refund Policy</Link></li>
+            <li><Link href="/terms" className="text-[#A0B5A8] text-sm hover:text-[#7DFFB2] transition-colors">Terms of Service</Link></li>
           </ul>
         </div>
 
@@ -43,7 +40,7 @@ export function Footer() {
         <div>
           <h4 className="font-rajdhani text-lg mb-4 text-[#E8F5EE]">Payment Methods</h4>
           <div className="flex gap-2.5 flex-wrap mt-2">
-            {["💳 Stripe", "🅿️ PayPal", "₿ Bitcoin", "💎 USDT", "⟠ Ethereum"].map((method) => (
+            {["💳 Stripe", "🅿️ PayPal F&F"].map((method) => (
               <span
                 key={method}
                 className="bg-[#0F1412] border border-zinc-800 rounded-lg px-3.5 py-2 text-xs font-medium text-[#A0B5A8]"
@@ -56,7 +53,7 @@ export function Footer() {
       </div>
 
       <div className="text-center pt-7 border-t border-zinc-800 text-[#A0B5A8] text-xs max-w-[1200px] mx-auto">
-        <p>&copy; 2024 Premium Vault. All rights reserved.</p>
+        <p>&copy; 2026 Premium Vault. All rights reserved.</p>
       </div>
     </footer>
   );

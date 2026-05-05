@@ -1,5 +1,5 @@
 const trustItems = [
-  { icon: "⚡", title: "Fast Delivery", desc: "Instant account delivery after payment" },
+  { icon: "⚡", title: "Fast Delivery", desc: "Upgrade delivered within 4–5 business days" },
   { icon: "🛡️", title: "Warranty Included", desc: "Full replacement guarantee on all accounts" },
   { icon: "🔒", title: "Secure Payment", desc: "Encrypted transactions & multiple methods" },
   { icon: "💬", title: "24/7 Support", desc: "Round-the-clock customer assistance" },
