@@ -36,7 +36,7 @@ export default function CheckoutPage() {
           <div className="hidden lg:block bg-zinc-800" />
 
           {/* Right: Checkout Form */}
-          <CheckoutForm items={items} clearCart={clearCart} />
+          <CheckoutForm items={items} />
         </div>
       </main>
     </div>

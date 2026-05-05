@@ -14,25 +14,43 @@ const productSchema = z.object({
   active: z.boolean().default(true),
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || (session.user as any).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { _count: { select: { orderItems: true } } },
-  });
-  return NextResponse.json(products);
+  try {
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "50")));
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        orderBy: { createdAt: "desc" },
+        include: { _count: { select: { orderItems: true } } },
+        take: limit,
+        skip: (page - 1) * limit,
+      }),
+      prisma.product.count(),
+    ]);
+
+    return NextResponse.json({ data: products, total, page, totalPages: Math.ceil(total / limit) });
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || (session.user as any).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const body = await req.json();
-  const parsed = productSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  try {
+    const body = await req.json();
+    const parsed = productSchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const product = await prisma.product.create({ data: parsed.data });
-  return NextResponse.json(product, { status: 201 });
+    const product = await prisma.product.create({ data: parsed.data });
+    return NextResponse.json(product, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

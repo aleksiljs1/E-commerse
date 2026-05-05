@@ -21,10 +21,9 @@ type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 type Props = {
   items: CartItem[];
-  clearCart: () => void;
 };
 
-export function CheckoutForm({ items, clearCart }: Props) {
+export function CheckoutForm({ items }: Props) {
   const [paymentMethod, setPaymentMethod] = useState<"STRIPE" | "PAYPAL" | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();

@@ -20,18 +20,62 @@ export async function POST(req: NextRequest) {
     const productIds = items.map((i) => i.productId);
     const products = await prisma.product.findMany({ where: { id: { in: productIds }, active: true } });
     if (products.length !== productIds.length) return NextResponse.json({ error: "One or more products not found" }, { status: 404 });
+
+    // Stock validation
+    for (const item of items) {
+      const product = products.find((p) => p.id === item.productId)!;
+      if (product.stock < item.quantity) {
+        return NextResponse.json({ error: `Insufficient stock for "${product.title}"` }, { status: 400 });
+      }
+    }
+
+    // Double-submit protection: check for duplicate pending order in last 60 seconds
+    const sixtySecondsAgo = new Date(Date.now() - 60 * 1000);
+    const existingOrder = await prisma.order.findFirst({
+      where: {
+        customerEmail: email,
+        status: "PENDING",
+        createdAt: { gte: sixtySecondsAgo },
+        items: { every: { productId: { in: productIds } } },
+      },
+      include: { items: true },
+    });
+    if (existingOrder && existingOrder.items.length === items.length) {
+      const isSameItems = items.every((item) =>
+        existingOrder.items.some((ei) => ei.productId === item.productId && ei.quantity === item.quantity)
+      );
+      if (isSameItems) {
+        if (paymentMethod === "STRIPE") {
+          return NextResponse.json({ orderId: existingOrder.id, url: null, duplicate: true });
+        }
+        return NextResponse.json({ orderId: existingOrder.id, approveUrl: null, duplicate: true });
+      }
+    }
+
     const orderItems = items.map((item) => {
       const product = products.find((p) => p.id === item.productId)!;
       return { productId: item.productId, quantity: item.quantity, priceAtPurchase: Number(product.price), lineTotal: Number(product.price) * item.quantity };
     });
     const totalAmount = orderItems.reduce((sum, i) => sum + i.lineTotal, 0);
     const orderNumber = `PV-${Date.now().toString(36).toUpperCase()}-${uuidv4().slice(0, 6).toUpperCase()}`;
-    const order = await prisma.order.create({
-      data: {
-        orderNumber, customerEmail: email, totalAmount, paymentMethod, status: "PENDING",
-        items: { create: orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity, priceAtPurchase: i.priceAtPurchase })) },
-      },
+
+    // Use transaction for order creation + stock decrement
+    const order = await prisma.$transaction(async (tx) => {
+      const newOrder = await tx.order.create({
+        data: {
+          orderNumber, customerEmail: email, totalAmount, paymentMethod, status: "PENDING",
+          items: { create: orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity, priceAtPurchase: i.priceAtPurchase })) },
+        },
+      });
+      for (const item of items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { decrement: item.quantity } },
+        });
+      }
+      return newOrder;
     });
+
     if (paymentMethod === "STRIPE") {
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
