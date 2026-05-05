@@ -1,56 +1,58 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/store/cart";
-import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   const { totalItems, openCart } = useCartStore();
   const count = totalItems();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-zinc-950/80 border-b border-zinc-800">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Left: Logo */}
-        <Link href="/" className="text-xl font-bold text-white">
-          PremiumVault
-        </Link>
+    <nav className="sticky top-0 z-[1000] bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-[#1e1e2e] px-5 md:px-10 py-4 flex items-center justify-between">
+      {/* Logo */}
+      <Link href="/" className="font-rajdhani text-2xl font-bold flex items-center gap-2">
+        <span>🔐</span>
+        <span className="bg-gradient-to-br from-purple-600 to-purple-400 bg-clip-text text-transparent">
+          Premium Vault
+        </span>
+      </Link>
 
-        {/* Center: Nav links */}
-        <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <Link href="/products" className="hover:text-white transition-colors">Products</Link>
-          <Link href="#reviews" className="hover:text-white transition-colors">Reviews</Link>
-          <Link href="#contact" className="hover:text-white transition-colors">Contact Us</Link>
-          <Link href="#faq" className="hover:text-white transition-colors">FAQ</Link>
-        </div>
-
-        {/* Far Right: Browse Products + Cart */}
-        <div className="flex items-center gap-3">
-          <Link href="/products">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-zinc-700 text-zinc-300 hover:text-white hidden sm:flex"
-            >
-              Browse Products
-            </Button>
+      {/* Nav Links */}
+      <ul className="hidden md:flex items-center gap-8 list-none">
+        <li>
+          <Link href="/products" className="text-[#a1a1aa] font-medium text-[0.95rem] hover:text-white transition-colors">
+            Shop
           </Link>
-          <button
-            onClick={openCart}
-            className="relative p-2 text-zinc-400 hover:text-white transition-colors"
-            aria-label="Open basket"
-          >
-            <ShoppingCart className="w-5 h-5" />
-            {count > 0 && (
-              <span className="absolute -top-1 -right-1 bg-indigo-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                {count}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
+        </li>
+        <li>
+          <Link href="#reviews" className="text-[#a1a1aa] font-medium text-[0.95rem] hover:text-white transition-colors">
+            Reviews
+          </Link>
+        </li>
+        <li>
+          <Link href="#" className="text-[#a1a1aa] font-medium text-[0.95rem] hover:text-white transition-colors">
+            Blog
+          </Link>
+        </li>
+        <li>
+          <Link href="#support" className="text-[#a1a1aa] font-medium text-[0.95rem] hover:text-white transition-colors">
+            Support
+          </Link>
+        </li>
+      </ul>
+
+      {/* Cart Button */}
+      <button
+        onClick={openCart}
+        className="relative bg-[#141420] border border-[#1e1e2e] rounded-xl px-4 py-2.5 text-white font-medium text-[0.95rem] cursor-pointer transition-all hover:border-purple-600 hover:shadow-[0_0_15px_rgba(124,58,237,0.4)]"
+      >
+        🛒 Cart
+        {count > 0 && (
+          <span className="absolute -top-1.5 -right-1.5 bg-purple-600 text-white text-[0.7rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+            {count}
+          </span>
+        )}
+      </button>
     </nav>
   );
 }

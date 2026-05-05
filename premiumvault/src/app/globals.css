@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@700&display=swap');
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -117,6 +119,15 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+:root {
+  --purple: #7c3aed;
+  --purple-glow: rgba(124, 58, 237, 0.4);
+  --store-bg: #0a0a0f;
+  --store-card-bg: #141420;
+  --store-border: #1e1e2e;
+  --store-text-muted: #a1a1aa;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -127,4 +138,18 @@
   html {
     @apply font-sans;
   }
+}
+
+@layer utilities {
+  .font-rajdhani {
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
 }
