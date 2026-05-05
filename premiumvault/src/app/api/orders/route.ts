@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { createPayPalOrder } from "@/lib/paypal";
+import { apiError } from "@/lib/api-error";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
@@ -11,44 +12,49 @@ const orderSchema = z.object({
   items: z.array(z.object({ productId: z.string(), quantity: z.number().int().positive() })).min(1),
 });
 
+async function rollbackOrder(orderId: string, items: { productId: string; quantity: number }[]) {
+  await prisma.$transaction(async (tx) => {
+    await tx.order.update({ where: { id: orderId }, data: { status: "CANCELLED" } });
+    for (const item of items) {
+      await tx.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } });
+    }
+  }).catch((e) => console.error("[orders/rollback] Failed to roll back order", orderId, e));
+}
+
 export async function POST(req: NextRequest) {
+  let body: unknown;
   try {
-    const body = await req.json();
-    const parsed = orderSchema.safeParse(body);
-    if (!parsed.success) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-    const { email, paymentMethod, items } = parsed.data;
+    body = await req.json();
+  } catch {
+    return apiError("Invalid JSON body", 400);
+  }
+
+  const parsed = orderSchema.safeParse(body);
+  if (!parsed.success) return apiError("Invalid request", 400);
+  const { email, paymentMethod, items } = parsed.data;
+
+  try {
     const productIds = items.map((i) => i.productId);
     const products = await prisma.product.findMany({ where: { id: { in: productIds }, active: true } });
-    if (products.length !== productIds.length) return NextResponse.json({ error: "One or more products not found" }, { status: 404 });
+    if (products.length !== productIds.length) return apiError("One or more products not found", 404);
 
-    // Stock validation
     for (const item of items) {
       const product = products.find((p) => p.id === item.productId)!;
       if (product.stock < item.quantity) {
-        return NextResponse.json({ error: `Insufficient stock for "${product.title}"` }, { status: 400 });
+        return apiError(`Insufficient stock for "${product.title}"`, 400);
       }
     }
 
-    // Double-submit protection: check for duplicate pending order in last 60 seconds
+    // Double-submit protection
     const sixtySecondsAgo = new Date(Date.now() - 60 * 1000);
     const existingOrder = await prisma.order.findFirst({
-      where: {
-        customerEmail: email,
-        status: "PENDING",
-        createdAt: { gte: sixtySecondsAgo },
-        items: { every: { productId: { in: productIds } } },
-      },
+      where: { customerEmail: email, status: "PENDING", createdAt: { gte: sixtySecondsAgo }, items: { every: { productId: { in: productIds } } } },
       include: { items: true },
     });
     if (existingOrder && existingOrder.items.length === items.length) {
-      const isSameItems = items.every((item) =>
-        existingOrder.items.some((ei) => ei.productId === item.productId && ei.quantity === item.quantity)
-      );
-      if (isSameItems) {
-        if (paymentMethod === "STRIPE") {
-          return NextResponse.json({ orderId: existingOrder.id, url: null, duplicate: true });
-        }
-        return NextResponse.json({ orderId: existingOrder.id, approveUrl: null, duplicate: true });
+      const isSame = items.every((item) => existingOrder.items.some((ei) => ei.productId === item.productId && ei.quantity === item.quantity));
+      if (isSame) {
+        return NextResponse.json({ orderId: existingOrder.id, ...(paymentMethod === "STRIPE" ? { url: null } : { approveUrl: null }), duplicate: true });
       }
     }
 
@@ -59,7 +65,6 @@ export async function POST(req: NextRequest) {
     const totalAmount = orderItems.reduce((sum, i) => sum + i.lineTotal, 0);
     const orderNumber = `PV-${Date.now().toString(36).toUpperCase()}-${uuidv4().slice(0, 6).toUpperCase()}`;
 
-    // Use transaction for order creation + stock decrement
     const order = await prisma.$transaction(async (tx) => {
       const newOrder = await tx.order.create({
         data: {
@@ -68,40 +73,42 @@ export async function POST(req: NextRequest) {
         },
       });
       for (const item of items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { decrement: item.quantity } },
-        });
+        await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } });
       }
       return newOrder;
     });
 
     if (paymentMethod === "STRIPE") {
-      const session = await stripe.checkout.sessions.create({
-        mode: "payment",
-        customer_email: email,
-        line_items: orderItems.map((item) => {
-          const product = products.find((p) => p.id === item.productId)!;
-          return {
-            price_data: {
-              currency: "gbp",
-              product_data: { name: product.title },
-              unit_amount: Math.round(item.priceAtPurchase * 100),
-            },
-            quantity: item.quantity,
-          };
-        }),
-        metadata: { orderId: order.id, orderNumber },
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?orderId=${order.id}`,
-        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
-      });
-      return NextResponse.json({ orderId: order.id, url: session.url });
+      try {
+        const session = await stripe.checkout.sessions.create({
+          mode: "payment",
+          customer_email: email,
+          line_items: orderItems.map((item) => {
+            const product = products.find((p) => p.id === item.productId)!;
+            return { price_data: { currency: "gbp", product_data: { name: product.title }, unit_amount: Math.round(item.priceAtPurchase * 100) }, quantity: item.quantity };
+          }),
+          metadata: { orderId: order.id, orderNumber },
+          success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?orderId=${order.id}`,
+          cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
+        });
+        return NextResponse.json({ orderId: order.id, url: session.url });
+      } catch (err) {
+        console.error("[orders/POST] Stripe session creation failed:", err);
+        await rollbackOrder(order.id, items);
+        return apiError("Payment provider unavailable. Please try again.", 502);
+      }
     }
-    const { id: paypalOrderId, approveUrl } = await createPayPalOrder(totalAmount);
-    await prisma.order.update({ where: { id: order.id }, data: { paymentId: paypalOrderId } });
-    return NextResponse.json({ orderId: order.id, approveUrl });
-  } catch (error) {
-    console.error("[orders/POST]", error);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+
+    try {
+      const { id: paypalOrderId, approveUrl } = await createPayPalOrder(totalAmount);
+      await prisma.order.update({ where: { id: order.id }, data: { paymentId: paypalOrderId } });
+      return NextResponse.json({ orderId: order.id, approveUrl });
+    } catch (err) {
+      console.error("[orders/POST] PayPal order creation failed:", err);
+      await rollbackOrder(order.id, items);
+      return apiError("Payment provider unavailable. Please try again.", 502);
+    }
+  } catch (err) {
+    return apiError("Internal error", 500, "orders/POST", err);
   }
 }

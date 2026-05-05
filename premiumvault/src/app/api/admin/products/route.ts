@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
     const product = await prisma.product.create({ data: parsed.data });
-    revalidateTag('products');
+    revalidateTag('products', 'minutes');
     return NextResponse.json(product, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

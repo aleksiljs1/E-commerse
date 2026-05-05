@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ShieldCheck, Package, BarChart3 } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -47,7 +48,7 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left panel — branding */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-[#0F1412] p-12">
+      <div className="hidden lg:flex flex-col gap-16 w-1/2 bg-[#0F1412] p-12">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -57,19 +58,20 @@ export default function AdminLoginPage() {
           <span className="font-rajdhani text-white font-bold text-lg">PremiumVault</span>
         </div>
 
-        <div>
-          <blockquote className="text-[#A0B5A8] text-lg leading-relaxed mb-6">
-            "Manage your premium subscriptions, track orders, and deliver value to your customers — all in one place."
-          </blockquote>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#16221B] flex items-center justify-center text-white text-sm font-semibold">
-              A
-            </div>
-            <div>
-              <p className="text-[#E8F5EE] text-sm font-medium">Admin Portal</p>
-              <p className="text-[#A0B5A8] text-xs">PremiumVault Operations</p>
-            </div>
-          </div>
+        <div className="space-y-5">
+          <p className="text-[#52525b] text-xs uppercase tracking-widest font-medium">Admin portal</p>
+          <ul className="space-y-4">
+            {[
+              { Icon: Package, text: "Manage products and pricing" },
+              { Icon: BarChart3, text: "Track and fulfil customer orders" },
+              { Icon: ShieldCheck, text: "Control access and credentials" },
+            ].map(({ Icon, text }) => (
+              <li key={text} className="flex items-center gap-3">
+                <Icon className="w-4 h-4 text-[#52525b] shrink-0" />
+                <span className="text-[#a1a1aa] text-sm">{text}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 

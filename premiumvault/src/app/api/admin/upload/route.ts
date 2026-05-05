@@ -1,31 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
 import { auth } from "@/lib/auth";
+import { apiError } from "@/lib/api-error";
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
-const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_TYPES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/svg+xml": "svg",
+};
+const MAX_BYTES = 5 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || (session.user as any).role !== "ADMIN") {
+    return apiError("Forbidden", 403);
+  }
 
-  const formData = await req.formData();
+  let formData: FormData;
+  try {
+    formData = await req.formData();
+  } catch {
+    return apiError("Invalid form data", 400);
+  }
+
   const file = formData.get("file") as File | null;
+  if (!file) return apiError("No file provided", 400);
 
-  if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
-  if (!ALLOWED_TYPES.includes(file.type))
-    return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
-  if (file.size > MAX_BYTES)
-    return NextResponse.json({ error: "File too large (max 5 MB)" }, { status: 400 });
+  const ext = ALLOWED_TYPES[file.type];
+  if (!ext) return apiError("Invalid file type. Allowed: JPEG, PNG, WebP, GIF, SVG", 400);
+  if (file.size > MAX_BYTES) return apiError("File too large (max 5 MB)", 400);
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-  const filename = `${randomUUID()}.${ext}`;
-  const bytes = await file.arrayBuffer();
-
-  const uploadDir = join(process.cwd(), "public", "uploads", "products");
-  await writeFile(join(uploadDir, filename), Buffer.from(bytes));
-
-  return NextResponse.json({ url: `/uploads/products/${filename}` });
+  try {
+    const filename = `${randomUUID()}.${ext}`;
+    const uploadDir = join(process.cwd(), "public", "uploads", "products");
+    await mkdir(uploadDir, { recursive: true });
+    const bytes = await file.arrayBuffer();
+    await writeFile(join(uploadDir, filename), Buffer.from(bytes));
+    return NextResponse.json({ url: `/uploads/products/${filename}` });
+  } catch (err) {
+    return apiError("Failed to save file", 500, "upload/POST", err);
+  }
 }

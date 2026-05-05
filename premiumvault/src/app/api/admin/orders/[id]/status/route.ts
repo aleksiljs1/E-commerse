@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { apiError } from "@/lib/api-error";
 import { z } from "zod";
 
 const ORDER_STATUSES = ["PENDING", "PAID", "CREDENTIALS_SUBMITTED", "COMPLETED", "CANCELLED"] as const;
@@ -16,25 +17,33 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session || (session.user as any).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session || (session.user as any).role !== "ADMIN") return apiError("Forbidden", 403);
 
   try {
     const { id } = await params;
-    const body = await req.json();
+
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return apiError("Invalid JSON body", 400);
+    }
+
     const parsed = statusSchema.safeParse(body);
-    if (!parsed.success) return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
+    if (!parsed.success) return apiError("Invalid status value", 400);
 
     const order = await prisma.order.findUnique({ where: { id }, select: { status: true } });
-    if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!order) return apiError("Not found", 404);
 
-    const allowedTransitions = VALID_TRANSITIONS[order.status] || [];
-    if (!allowedTransitions.includes(parsed.data.status)) {
-      return NextResponse.json({ error: `Invalid transition from ${order.status} to ${parsed.data.status}` }, { status: 400 });
+    const allowed = VALID_TRANSITIONS[order.status] ?? [];
+    if (!allowed.includes(parsed.data.status)) {
+      return apiError(`Cannot transition from ${order.status} to ${parsed.data.status}`, 400);
     }
 
     const updated = await prisma.order.update({ where: { id }, data: { status: parsed.data.status } });
     return NextResponse.json(updated);
-  } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: any) {
+    if (err?.code === "P2025") return apiError("Not found", 404);
+    return apiError("Internal server error", 500, "admin/orders/[id]/status PATCH", err);
   }
 }

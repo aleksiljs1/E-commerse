@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { apiError } from "@/lib/api-error";
 
 const VALID_STATUSES = ["PENDING", "PAID", "CREDENTIALS_SUBMITTED", "COMPLETED", "CANCELLED"] as const;
 
 export async function GET(req: NextRequest) {
   const session = await auth();
-  if (!session || (session.user as any).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session || (session.user as any).role !== "ADMIN") return apiError("Forbidden", 403);
 
   try {
     const { searchParams } = new URL(req.url);
@@ -25,9 +26,7 @@ export async function GET(req: NextRequest) {
           items: {
             include: {
               product: { select: { title: true, serviceType: true, logoUrl: true } },
-              credentials: {
-                select: { id: true, serviceType: true, username: true, status: true, submittedAt: true },
-              },
+              credentials: { select: { id: true, serviceType: true, username: true, status: true, submittedAt: true } },
             },
           },
         },
@@ -38,7 +37,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     return NextResponse.json({ data: orders, total, page, totalPages: Math.ceil(total / limit) });
-  } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err) {
+    return apiError("Internal server error", 500, "admin/orders GET", err);
   }
 }

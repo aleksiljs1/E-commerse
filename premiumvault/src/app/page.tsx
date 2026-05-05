@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/store/HeroSection";
 import { FeaturedProducts } from "@/components/store/FeaturedProducts";
 import { Navbar } from "@/components/store/Navbar";
 import { CartPopup } from "@/components/store/CartPopup";
+import { ShieldCheck, Zap, BadgeCheck } from "lucide-react";
 
 export default async function HomePage() {
   const products = await getActiveProducts();
