@@ -1,21 +1,15 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
-import { ServiceIcon } from "./ServiceIcon";
+import { Layers } from "lucide-react";
 import type { SerializedProduct } from "@/types";
+import Image from "next/image";
 
-type Props = {
-  product: SerializedProduct;
-};
+type Props = { product: SerializedProduct };
 
 export function ProductCard({ product }: Props) {
   const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
-
-  const handleCardClick = () => {
-    router.push(`/products/${product.id}`);
-  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -31,50 +25,50 @@ export function ProductCard({ product }: Props) {
 
   return (
     <div
-      onClick={handleCardClick}
-      className="rounded-2xl border border-[#1F8A5B]/30 bg-[#16221B] hover:border-[#1F8A5B] transition-all cursor-pointer flex flex-col overflow-hidden"
+      onClick={() => router.push(`/products/${product.id}`)}
+      className="relative bg-[#16221B] border border-[#1F8A5B]/25 rounded-2xl cursor-pointer flex flex-col overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:border-[#1F8A5B]/70 hover:shadow-[0_0_24px_rgba(31,138,91,0.15)]"
     >
-      {/* Featured badge */}
+      {/* Featured badge — absolute, doesn't affect layout */}
       {product.featured && (
-        <div className="px-4 pt-3 flex justify-end">
-          <span className="bg-[#2ECC71] text-white text-xs px-2 py-0.5 rounded-full">
-            Featured
-          </span>
-        </div>
+        <span className="absolute top-3 left-3 z-10 bg-[#1F8A5B]/20 border border-[#1F8A5B]/40 text-[#2ECC71] text-xs font-semibold px-2.5 py-1 rounded-full">
+          Featured
+        </span>
       )}
 
-      {/* Top — icon */}
-      <div className="flex items-center justify-center py-8 px-4">
-        <ServiceIcon
-          serviceType={product.serviceType}
-          logoUrl={product.logoUrl}
-          size="lg"
-        />
+      {/* Icon / Image area — always h-36, consistent across all cards */}
+      <div className="h-36 bg-[#0F1412] flex items-center justify-center">
+        {product.logoUrl ? (
+          <Image
+            src={product.logoUrl}
+            alt={product.title}
+            width={80}
+            height={80}
+            unoptimized
+            className="w-20 h-20 object-contain rounded-xl"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-2xl bg-[#16221B] border border-[#1F8A5B]/20 flex items-center justify-center">
+            <Layers className="w-7 h-7 text-[#1F8A5B]" />
+          </div>
+        )}
       </div>
 
-      {/* Title */}
-      <p className="font-semibold text-[#E8F5EE] text-sm text-center px-4 pb-1">
-        {product.title}
-      </p>
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-4">
+        <p className="text-base font-semibold text-[#E8F5EE] leading-snug mb-1">{product.title}</p>
+        <p className="text-xs text-[#A0B5A8] line-clamp-2 mb-3 flex-1">{product.description}</p>
+        {product.stock < 5 && product.stock > 0 && (
+          <p className="text-xs text-orange-400 mb-2">Only {product.stock} left</p>
+        )}
+        <p className="font-rajdhani text-2xl font-bold text-[#2ECC71] mb-3">£{product.price.toFixed(2)}</p>
+      </div>
 
-      {/* Price */}
-      <p className="text-[#6ED3A3] font-bold text-lg text-center pb-2">
-        £{product.price.toFixed(2)}
-      </p>
-
-      {product.stock < 5 && (
-        <p className="text-orange-400 text-xs font-medium text-center pb-2">
-          Only {product.stock} left
-        </p>
-      )}
-
-      <div className="flex-1" />
-
-      {/* Footer */}
-      <div className="p-4 pt-0">
+      {/* Button — outside content padding, spans full width minus margin */}
+      <div className="px-4 pb-4">
         <button
+          type="button"
           onClick={handleAddToCart}
-          className="w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:opacity-90 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
+          className="w-full py-2.5 bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:opacity-90 text-white text-sm font-semibold rounded-xl transition-opacity"
         >
           Add to Cart
         </button>

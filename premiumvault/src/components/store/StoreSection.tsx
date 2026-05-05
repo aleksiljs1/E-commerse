@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Layers } from "lucide-react";
 import { ProductGrid } from "./ProductGrid";
 import type { SerializedProduct } from "@/types";
 
@@ -30,7 +31,7 @@ export function StoreSection({ products }: { products: SerializedProduct[] }) {
         });
 
   return (
-    <section id="products" className="max-w-[1200px] mx-auto px-5 md:px-10 py-10">
+    <section id="products" className="max-w-[1200px] mx-auto px-6 md:px-10 py-10">
       <div className="flex gap-2.5 overflow-x-auto scrollbar-hide mb-8 pb-1">
         {CATEGORIES.map((cat) => (
           <button
@@ -38,8 +39,8 @@ export function StoreSection({ products }: { products: SerializedProduct[] }) {
             onClick={() => setActive(cat)}
             className={`px-5 py-2 rounded-full text-[0.85rem] font-medium whitespace-nowrap transition-all border cursor-pointer shrink-0 ${
               active === cat
-                ? "bg-purple-600 border-purple-600 text-white"
-                : "bg-[#141420] border-[#1e1e2e] text-[#a1a1aa] hover:border-purple-600 hover:text-white"
+                ? "bg-[#1F8A5B]/20 border-[#1F8A5B] text-[#2ECC71]"
+                : "bg-transparent border-[#1F8A5B]/25 text-[#A0B5A8] hover:border-[#1F8A5B]/50 hover:text-[#E8F5EE]"
             }`}
           >
             {cat}
@@ -48,12 +49,15 @@ export function StoreSection({ products }: { products: SerializedProduct[] }) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-          <p className="text-white font-semibold text-lg">No services in this category yet</p>
-          <p className="text-[#a1a1aa] text-sm">Check back soon or browse everything we have.</p>
+        <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
+          <div className="w-16 h-16 rounded-xl bg-[#16221B] border border-[#1F8A5B]/25 flex items-center justify-center">
+            <Layers className="w-8 h-8 text-[#1F8A5B]" />
+          </div>
+          <p className="text-[#E8F5EE] font-semibold text-lg">No services in this category yet</p>
+          <p className="text-[#A0B5A8] text-sm">Check back soon or browse everything we have.</p>
           <button
             onClick={() => setActive("All")}
-            className="text-purple-400 text-sm hover:text-purple-300 transition-colors mt-1"
+            className="text-[#2ECC71] text-sm hover:opacity-80 transition-opacity mt-1"
           >
             View all services →
           </button>
