@@ -18,13 +18,12 @@ type Props = {
 export function ProductActions({ price, productId, title, description, logoUrl, serviceType, stock }: Props) {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
-  const { addItem, openCart } = useCartStore();
+  const { addItem } = useCartStore();
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addItem({ productId, title, description, price, logoUrl, serviceType });
     }
-    openCart();
   };
 
   const handleBuyNow = () => {

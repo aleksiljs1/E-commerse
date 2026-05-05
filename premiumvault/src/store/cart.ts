@@ -32,7 +32,6 @@ export const useCartStore = create<CartState>()(
         } else {
           set({ items: [...get().items, { ...item, quantity: 1 }] });
         }
-        set({ isOpen: true });
       },
 
       removeItem: (productId) => {

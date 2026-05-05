@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Menu, X, KeyRound, ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/store/cart";
@@ -14,7 +14,19 @@ const NAV_LINKS = [
 export function Navbar() {
   const { totalItems, openCart } = useCartStore();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [bump, setBump] = useState(false);
   const count = totalItems();
+  const prevCount = useRef(count);
+
+  useEffect(() => {
+    if (count > prevCount.current) {
+      setBump(true);
+      const t = setTimeout(() => setBump(false), 400);
+      prevCount.current = count;
+      return () => clearTimeout(t);
+    }
+    prevCount.current = count;
+  }, [count]);
 
   return (
     <>
@@ -44,7 +56,8 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <button
             onClick={openCart}
-            className="relative bg-[#16221B] border border-[#1F8A5B]/30 rounded-xl px-4 py-2.5 text-[#E8F5EE] font-medium text-[0.95rem] cursor-pointer transition-all hover:border-[#1F8A5B] hover:shadow-[0_0_15px_rgba(31,138,91,0.4)] flex items-center gap-2"
+            className={`relative bg-[#16221B] border border-[#1F8A5B]/30 rounded-xl px-4 py-2.5 text-[#E8F5EE] font-medium text-[0.95rem] cursor-pointer transition-all hover:border-[#1F8A5B] hover:shadow-[0_0_15px_rgba(31,138,91,0.4)] flex items-center gap-2 ${bump ? "scale-125" : "scale-100"} transition-transform duration-200`}
+            aria-label="Open basket"
           >
             <ShoppingCart className="w-4 h-4" /> Cart
             {count > 0 && (
