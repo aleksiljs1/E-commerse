@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Layers, ArrowRight, ChevronLeft, ChevronRight, Clock } from "lucide-react";
-import { useCartStore } from "@/store/cart";
 import type { SerializedProduct } from "@/types";
 
 type Props = { products: SerializedProduct[] };
@@ -28,7 +27,6 @@ function getGradient(serviceType: string) {
 export function FeaturedProducts({ products }: Props) {
   const featured = products.filter((p) => p.featured);
   const router = useRouter();
-  const addItem = useCartStore((s) => s.addItem);
   const [active, setActive] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -188,35 +186,6 @@ export function FeaturedProducts({ products }: Props) {
                     4–5 Day Delivery
                   </div>
 
-                  {/* CTA — only on active card */}
-                  {isActive && (
-                    <div className="flex flex-col gap-2 w-full mt-auto">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addItem({
-                            productId: product.id,
-                            title: product.title,
-                            description: product.description,
-                            price: product.price,
-                            logoUrl: product.logoUrl,
-                            serviceType: product.serviceType,
-                          });
-                        }}
-                        className="w-full py-3 bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white font-semibold text-sm rounded-xl transition-all hover:shadow-[0_4px_20px_rgba(46,204,113,0.4)] flex items-center justify-center gap-2"
-                      >
-                        Purchase Now <ArrowRight className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); router.push(`/products/${product.id}`); }}
-                        className="w-full py-2 text-[#A0B5A8] hover:text-[#E8F5EE] text-xs transition-colors"
-                      >
-                        View Details
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
