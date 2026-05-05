@@ -35,20 +35,20 @@ export function ProductCard({ product }: Props) {
         </span>
       )}
 
-      {/* Icon / Image area — always h-36, consistent across all cards */}
-      <div className="h-36 bg-[#0F1412] flex items-center justify-center">
+      {/* Image area — square, fills full width */}
+      <div className="aspect-square w-full overflow-hidden bg-[#0F1412]">
         {product.logoUrl ? (
           <Image
             src={product.logoUrl}
             alt={product.title}
-            width={80}
-            height={80}
+            width={500}
+            height={500}
             unoptimized
-            className="w-20 h-20 object-contain rounded-xl"
+            className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-16 h-16 rounded-2xl bg-[#16221B] border border-[#1F8A5B]/20 flex items-center justify-center">
-            <Layers className="w-7 h-7 text-[#1F8A5B]" />
+          <div className="w-full h-full flex items-center justify-center">
+            <Layers className="w-10 h-10 text-[#1F8A5B]" />
           </div>
         )}
       </div>
