@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Vault — Premium Digital Accounts Marketplace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --card-bg: #141420;
+            --border: #1e1e2e;
+            --purple: #7c3aed;
+            --purple-glow: rgba(124, 58, 237, 0.4);
+            --text: #ffffff;
+            --text-muted: #a1a1aa;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Announcement Bar */
+        .announcement-bar {
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #7c3aed);
+            text-align: center;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-logo span {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .cart-btn {
+            position: relative;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 18px;
+            color: var(--text);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .cart-btn:hover {
+            border-color: var(--purple);
+            box-shadow: 0 0 15px var(--purple-glow);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--purple);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Category Tabs */
+        .category-bar {
+            padding: 20px 40px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .category-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-pill {
+            padding: 8px 20px;
+            border-radius: 50px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .cat-pill:hover {
+            border-color: var(--purple);
+            color: var(--text);
+        }
+
+        .cat-pill.active {
+            background: var(--purple);
+            border-color: var(--purple);
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 40px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--purple);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--purple-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--purple);
+            box-shadow: 0 0 15px var(--purple-glow);
+            transform: translateY(-2px);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--purple);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Trust Bar */
+        .trust-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .trust-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .trust-card:hover {
+            border-color: var(--purple);
+            transform: translateY(-4px);
+        }
+
+        .trust-icon {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+        }
+
+        .trust-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .trust-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Products Section */
+        .section-title {
+            text-align: center;
+            font-size: 2.4rem;
+            margin-bottom: 40px;
+            padding-top: 40px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            padding: 0 40px 60px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--purple);
+            box-shadow: 0 12px 40px var(--purple-glow);
+        }
+
+        .product-banner {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+        }
+
+        .product-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .product-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .product-pricing {
+            margin-bottom: 10px;
+        }
+
+        .price-old {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-right: 8px;
+        }
+
+        .price-new {
+            color: var(--purple);
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .warranty-badge {
+            font-size: 0.75rem;
+            color: #4ade80;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .btn-add-cart {
+            width: 100%;
+            padding: 12px;
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: auto;
+        }
+
+        .btn-add-cart:hover {
+            background: #6d28d9;
+            box-shadow: 0 4px 15px var(--purple-glow);
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .review-card:hover {
+            border-color: var(--purple);
+            transform: translateY(-4px);
+        }
+
+        .review-stars {
+            color: #fbbf24;
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+        }
+
+        .review-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .review-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .review-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple), #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .review-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .review-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            padding: 60px 40px 30px;
+            margin-top: 60px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 12px;
+            line-height: 1.7;
+        }
+
+        .footer-col h4 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-col ul li a {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--purple);
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .payment-badge {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .trust-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 14px 20px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero {
+                padding: 50px 20px;
+            }
+            .category-bar {
+                padding: 16px 20px;
+            }
+            .products-grid {
+                padding: 0 20px 40px;
+            }
+            .reviews-grid {
+                grid-template-columns: 1fr;
+            }
+            .reviews-section {
+                padding: 40px 20px;
+            }
+            .trust-bar {
+                padding: 20px;
+            }
+            .footer {
+                padding: 40px 20px 20px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            .trust-bar {
+                grid-template-columns: 1fr;
+            }
+            .hero-btns {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+        ⚡ Flash Sale — Up to 70% OFF on All Premium Accounts ⚡
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-logo">🔐 <span>Premium Vault</span></div>
+        <ul class="nav-links">
+            <li><a href="#shop">Shop</a></li>
+            <li><a href="#reviews">Reviews</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#support">Support</a></li>
+        </ul>
+        <button class="cart-btn">
+            🛒 Cart
+            <span class="cart-badge">3</span>
+        </button>
+    </nav>
+
+    <!-- Category Tab Bar -->
+    <div class="category-bar">
+        <span class="cat-pill active">Stream</span>
+        <span class="cat-pill">AI Tools</span>
+        <span class="cat-pill">VPN</span>
+        <span class="cat-pill">Gaming</span>
+        <span class="cat-pill">TV</span>
+        <span class="cat-pill">Sports</span>
+        <span class="cat-pill">EDU</span>
+        <span class="cat-pill">Editing</span>
+        <span class="cat-pill">Keys</span>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Premium Accounts & Digital Subscriptions</h1>
+        <p>Get instant access to premium digital accounts with lifetime warranty, instant delivery, and 24/7 customer support. Save up to 70% on all subscriptions.</p>
+        <div class="hero-btns">
+            <button class="btn-primary">Shop Now</button>
+            <button class="btn-outline">View Deals</button>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <div class="stat-value">10K+</div>
+                <div class="stat-label">Customers</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">50K+</div>
+                <div class="stat-label">Orders</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">4.9</div>
+                <div class="stat-label">Rating</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">Support</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Bar -->
+    <div class="trust-bar">
+        <div class="trust-card">
+            <div class="trust-icon">⚡</div>
+            <div class="trust-title">Fast Delivery</div>
+            <div class="trust-desc">Instant account delivery after payment</div>
+        </div>
+        <div class="trust-card">
+            <div class="trust-icon">🛡️</div>
+            <div class="trust-title">Warranty Included</div>
+            <div class="trust-desc">Full replacement guarantee on all accounts</div>
+        </div>
+        <div class="trust-card">
+            <div class="trust-icon">🔒</div>
+            <div class="trust-title">Secure Payment</div>
+            <div class="trust-desc">Encrypted transactions & multiple methods</div>
+        </div>
+        <div class="trust-card">
+            <div class="trust-icon">💬</div>
+            <div class="trust-title">24/7 Support</div>
+            <div class="trust-desc">Round-the-clock customer assistance</div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <h2 class="section-title" id="shop">Our Products</h2>
+    <div class="products-grid">
+
+        <!-- Netflix -->
+        <div class="product-card">
+            <div class="product-banner" style="background: linear-gradient(135deg, #e50914, #b20710);">🎬</div>
+            <div class="product-body">
+                <div class="product-name">Netflix 4K Ultra HD</div>
+                <div class="product-desc">Premium 4K UHD streaming with full access to all content worldwide.</div>
+                <div class="product-pricing">
+                    <span class="price-old">£15.99</span>
+                    <span class="price-new">£3.99</span>
+                </div>
+                <div class="warranty-badge">✓ Lifetime Warranty</div>
+                <button class="btn-add-cart">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- Spotify -->
+        <div class="product-card">
+            <div class="product-banner" style="background: linear-gradient(135deg, #1db954, #148f3e);">🎵</div>
+            <div class="product-body">
+                <div class="product-name">Spotify Premium</div>
+                <div class="product-desc">Ad-free music streaming with offline downloads and unlimited skips.</div>
+                <div class="product-pricing">
+                    <span class="price-old">£9.99</span>
+                    <span class="price-new">£2.99</span>
+                </div>
+                <div class="warranty-badge">✓ Lifetime Warranty</div>
+                <button class="btn-add-cart">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- Disney+ -->
+        <div class="product-card">
+            <div class="product-banner" style="background: linear-gradient(135deg, #0063e5, #0040a0);">🏰</div>
+            <div class="product-body">
+                <div class="product-name">Disney+ Premium</div>
+                <div class="product-desc">Stream Disney, Marvel, Star Wars, Pixar and National Geographic.</div>
+                <div class="product-pricing">
+                    <span class="price-old">£11.99</span>
+                    <span class="price-new">£3.49</span>
+                </div>
+                <div class="warranty-badge">✓ 1 Year Warranty</div>
+                <button class="btn-add-cart">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- HBO Max -->
+        <div class="product-card">
+            <div class="product-banner" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">🎭</div>
+            <div class="product-body">
+                <div class="product-name">HBO Max</div>
+                <div class="product-desc">Access HBO originals, blockbuster movies, and exclusive series.</div>
+                <div class="product-pricing">
+                    <span class="price-old">£14.99</span>
+                    <span class="price-new">£3.99</span>
+                </div>
+                <div class="warranty-badge">✓ 1 Year Warranty</div>
+                <button class="btn-add-cart">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- ChatGPT Plus -->
+        <div class="product-card">
+            <div class="product-banner" style="background: linear-gradient(135deg, #0d9488, #0f766e);">🤖</div>
+            <div class="product-body">
+                <div class="product-name">ChatGPT Plus</div>
+                <div class="product-desc">GPT-4 access with faster responses, plugins, and priority support.</div>
+                <div class="product-pricing">
+                    <span class="price-old">£20.00</span>
+                    <span class="price-new">£5.99</span>
+                </div>
+                <div class="warranty-badge">✓ Lifetime Warranty</div>
+                <button class="btn-add-cart">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- Adobe Creative Cloud -->
+        <div class="product-card">
+            <div class="product-banner" style="background: linear-gradient(135deg, #1e3a5f, #0f1f3d);">🎨</div>
+            <div class="product-body">
+                <div class="product-name">Adobe Creative Cloud</div>
+                <div class="product-desc">Full suite: Photoshop, Illustrator, Premiere Pro and 20+ apps.</div>
+                <div class="product-pricing">
+                    <span class="price-old">£54.99</span>
+                    <span class="price-new">£7.99</span>
+                </div>
+                <div class="warranty-badge">✓ Lifetime Warranty</div>
+                <button class="btn-add-cart">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- Canva Pro -->
+        <div class="product-card">
+            <div class="product-banner" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">✏️</div>
+            <div class="product-body">
+                <div class="product-name">Canva Pro</div>
+                <div class="product-desc">Premium templates, brand kit, background remover and more.</div>
+                <div class="product-pricing">
+                    <span class="price-old">£12.99</span>
+                    <span class="price-new">£2.49</span>
+                </div>
+                <div class="warranty-badge">✓ 1 Year Warranty</div>
+                <button class="btn-add-cart">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- NordVPN -->
+        <div class="product-card">
+            <div class="product-banner" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);">🛡️</div>
+            <div class="product-body">
+                <div class="product-name">NordVPN Premium</div>
+                <div class="product-desc">Military-grade encryption with 5500+ servers in 60 countries.</div>
+                <div class="product-pricing">
+                    <span class="price-old">£11.99</span>
+                    <span class="price-new">£2.99</span>
+                </div>
+                <div class="warranty-badge">✓ Lifetime Warranty</div>
+                <button class="btn-add-cart">Add to Cart</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Reviews Section -->
+    <section class="reviews-section" id="reviews">
+        <h2 class="section-title" style="padding-top: 0;">What Our Customers Say</h2>
+        <div class="reviews-grid">
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Incredible service! Got my Netflix account within 30 seconds of payment. It's been working flawlessly for 3 months now. Best deal I've ever found online."</p>
+                <div class="review-author">
+                    <div class="review-avatar">JD</div>
+                    <div>
+                        <div class="review-name">James D.</div>
+                        <div class="review-date">March 15, 2024</div>
+                    </div>
+                </div>
+            </div>
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Support team replaced my account within 5 minutes when I had an issue. Absolutely amazing customer service. Already ordered 4 different accounts from them!"</p>
+                <div class="review-author">
+                    <div class="review-avatar">SK</div>
+                    <div>
+                        <div class="review-name">Sarah K.</div>
+                        <div class="review-date">April 2, 2024</div>
+                    </div>
+                </div>
+            </div>
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Fast delivery, working accounts, and unbeatable prices. I've been a customer for 6 months and never had a single problem. Highly recommended to everyone!"</p>
+                <div class="review-author">
+                    <div class="review-avatar">MR</div>
+                    <div>
+                        <div class="review-name">Michael R.</div>
+                        <div class="review-date">April 18, 2024</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="support">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="nav-logo">🔐 <span>Premium Vault</span></div>
+                <p>Your trusted marketplace for premium digital accounts and subscriptions. Instant delivery, lifetime warranty, and unbeatable prices since 2020.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#">Shop All</a></li>
+                    <li><a href="#">Flash Deals</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Best Sellers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Refund Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Payment Methods</h4>
+                <div class="payment-methods">
+                    <span class="payment-badge">💳 Stripe</span>
+                    <span class="payment-badge">🅿️ PayPal</span>
+                    <span class="payment-badge">₿ Bitcoin</span>
+                    <span class="payment-badge">💎 USDT</span>
+                    <span class="payment-badge">⟠ Ethereum</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Premium Vault. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
