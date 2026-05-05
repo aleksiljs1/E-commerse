@@ -42,13 +42,6 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-          <p className="text-sm text-zinc-400">Active Products</p>
-          <p className="text-3xl font-bold text-white mt-2">{totalProducts}</p>
-        </div>
-      </div>
-
       {/* Recent orders mini-table */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
         <h2 className="text-lg font-semibold text-white mb-4">Recent Orders</h2>

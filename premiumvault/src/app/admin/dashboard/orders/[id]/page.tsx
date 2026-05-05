@@ -1,48 +1,35 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { OrderDetailView } from "@/components/admin/OrderDetailView";
-import api from "@/lib/api";
-import { toast } from "sonner";
 
-export default function OrderDetailPage() {
-  const params = useParams();
-  const id = params.id as string;
+export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session) redirect("/admin/login");
 
-  const [order, setOrder] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { id } = await params;
 
-  useEffect(() => {
-    async function fetchOrder() {
-      try {
-        const res = await api.get(`/api/admin/orders/${id}`);
-        setOrder(res.data);
-      } catch {
-        toast.error("Failed to load order");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchOrder();
-  }, [id]);
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: {
+      items: {
+        include: {
+          product: { select: { title: true, serviceType: true, logoUrl: true } },
+          credentials: {
+            select: { id: true, serviceType: true, username: true, status: true, submittedAt: true },
+          },
+        },
+      },
+    },
+  });
 
-  function handleStatusChange(status: string) {
-    setOrder((prev: any) => ({ ...prev, status }));
-  }
-
-  if (loading) {
-    return <div className="text-zinc-500 text-sm">Loading order...</div>;
-  }
-
-  if (!order) {
-    return <div className="text-red-400 text-sm">Order not found.</div>;
-  }
+  if (!order) notFound();
 
   return (
     <div className="max-w-3xl space-y-6">
       <h1 className="text-2xl font-bold text-white">Order Detail</h1>
-      <OrderDetailView order={order} onStatusChange={handleStatusChange} />
+      <OrderDetailView order={JSON.parse(JSON.stringify(order))} />
     </div>
   );
 }

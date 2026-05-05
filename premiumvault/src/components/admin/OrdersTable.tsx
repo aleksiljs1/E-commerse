@@ -75,7 +75,7 @@ export function OrdersTable({ orders }: Props) {
               <TableCell>
                 <Link href={`/admin/dashboard/orders/${order.id}`}>
                   <Button size="sm" variant="outline">
-                    View
+                    View Details
                   </Button>
                 </Link>
               </TableCell>

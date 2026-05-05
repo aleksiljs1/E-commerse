@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./StatusBadge";
@@ -10,11 +11,12 @@ import { toast } from "sonner";
 
 type Props = {
   order: any;
-  onStatusChange: (status: string) => void;
 };
 
-export function OrderDetailView({ order, onStatusChange }: Props) {
+export function OrderDetailView({ order: initialOrder }: Props) {
+  const [order, setOrder] = useState(initialOrder);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   async function handleStatusChange(status: string) {
     const confirmed =
@@ -26,8 +28,9 @@ export function OrderDetailView({ order, onStatusChange }: Props) {
     setLoading(true);
     try {
       await api.patch(`/api/admin/orders/${order.id}/status`, { status });
-      onStatusChange(status);
+      setOrder((prev: any) => ({ ...prev, status }));
       toast.success(`Order marked as ${status.toLowerCase().replace("_", " ")}`);
+      router.refresh();
     } catch {
       toast.error("Failed to update order status");
     } finally {
