@@ -126,7 +126,14 @@ export function FeaturedProducts({ products }: Props) {
           return (
             <div
               key={product.id}
-              onClick={() => { if (!isActive) { setActive(i); pauseAndResume(); } }}
+              onClick={() => {
+                if (isActive) {
+                  router.push(`/products/${product.id}`);
+                } else {
+                  setActive(i);
+                  pauseAndResume();
+                }
+              }}
               style={{
                 position: "absolute",
                 width: isActive ? "clamp(260px, 22vw, 320px)" : "clamp(220px, 18vw, 280px)",
@@ -186,7 +193,8 @@ export function FeaturedProducts({ products }: Props) {
                     <div className="flex flex-col gap-2 w-full mt-auto">
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           addItem({
                             productId: product.id,
                             title: product.title,
@@ -202,7 +210,7 @@ export function FeaturedProducts({ products }: Props) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => router.push(`/products/${product.id}`)}
+                        onClick={(e) => { e.stopPropagation(); router.push(`/products/${product.id}`); }}
                         className="w-full py-2 text-[#A0B5A8] hover:text-[#E8F5EE] text-xs transition-colors"
                       >
                         View Details
