@@ -15,8 +15,11 @@ export function Navbar() {
   const { totalItems, openCart } = useCartStore();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bump, setBump] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const count = totalItems();
   const prevCount = useRef(count);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (count > prevCount.current) {
@@ -60,7 +63,7 @@ export function Navbar() {
             aria-label="Open basket"
           >
             <ShoppingCart className="w-4 h-4" /> Cart
-            {count > 0 && (
+            {mounted && count > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-[#2ECC71] text-white text-[0.7rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                 {count}
               </span>
