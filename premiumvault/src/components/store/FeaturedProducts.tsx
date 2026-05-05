@@ -202,7 +202,7 @@ export function FeaturedProducts({ products }: Props) {
                     paddingBottom: "8px",
                     width: "100%",
                   }}>
-                    <span className="inline-block text-base font-semibold text-white bg-gradient-to-r from-[#2ECC71] to-[#27AE60] rounded-xl px-10 py-4 shadow-[0_3px_12px_rgba(46,204,113,0.25)]">
+                    <span className="inline-block text-sm font-semibold text-white bg-gradient-to-r from-[#2ECC71] to-[#27AE60] rounded-xl px-12 py-2.5 shadow-[0_3px_12px_rgba(46,204,113,0.25)]">
                       View
                     </span>
                   </div>
