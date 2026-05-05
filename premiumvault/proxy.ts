@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
-export default auth((req) => {
+const handler = auth((req) => {
   const { nextUrl, auth: session } = req;
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
   const isAdminLogin = nextUrl.pathname === "/admin/login";
@@ -22,6 +22,9 @@ export default auth((req) => {
 
   return NextResponse.next();
 });
+
+export { handler as proxy };
+export default handler;
 
 export const config = {
   matcher: ["/admin/:path*", "/api/admin/:path*"],
