@@ -169,11 +169,6 @@ export default function CheckoutPage() {
                   </button>
                 ))}
               </div>
-              {paymentMethod === "PAYPAL" && (
-                <p className="text-xs text-amber-400/80 bg-amber-400/5 border border-amber-400/20 rounded-lg px-3 py-2 leading-relaxed">
-                  PayPal Friends &amp; Family has no buyer protection. Only use this if you trust the seller. Stripe is recommended for new customers.
-                </p>
-              )}
             </div>
 
             {/* Continue button */}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const updateSchema = z.object({
@@ -43,7 +43,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
     const product = await prisma.product.update({ where: { id }, data: parsed.data });
-    revalidateTag('products', 'minutes');
+    revalidatePath('/products');
+    revalidatePath('/');
     return NextResponse.json(product);
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -57,7 +58,8 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     await prisma.product.update({ where: { id }, data: { active: false } });
-    revalidateTag('products', 'minutes');
+    revalidatePath('/products');
+    revalidatePath('/');
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
