@@ -26,7 +26,7 @@ function getGradient(s: string) {
 export function FeaturedProducts({ products }: Props) {
   const featured = products.filter((p) => p.featured);
   const router = useRouter();
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(() => Math.floor((products.filter(p => p.featured).length) / 2));
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,7 +114,12 @@ export function FeaturedProducts({ products }: Props) {
         style={{ perspective: "1200px", height: "420px" }}
       >
         {featured.map((product, i) => {
-          const offset = i - active;
+          // Circular offset — always take the shortest path around
+          let offset = i - active;
+          const half = featured.length / 2;
+          if (offset > half) offset -= featured.length;
+          if (offset < -half) offset += featured.length;
+
           if (Math.abs(offset) > 2) return null;
 
           const isActive = offset === 0;
