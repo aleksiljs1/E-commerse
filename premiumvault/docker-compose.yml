@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: premiumvault-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: premiumvault
+      POSTGRES_PASSWORD: premiumvault
+      POSTGRES_DB: premiumvault
+    ports:
+      - "5432:5432"
+    volumes:
+      - premiumvault_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  premiumvault_postgres_data:
