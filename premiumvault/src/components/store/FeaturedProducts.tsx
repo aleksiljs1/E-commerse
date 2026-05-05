@@ -27,12 +27,12 @@ export function FeaturedProducts({ products }: Props) {
   const featured = products.filter((p) => p.featured);
   const router = useRouter();
   const [active, setActive] = useState(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  const isDragging = useRef(false);
   const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
   const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isPaused = useRef(false);
+  const didSwipe = useRef(false);
 
   if (featured.length === 0) return null;
 
@@ -56,15 +56,6 @@ export function FeaturedProducts({ products }: Props) {
     };
   }, [startAutoplay]);
 
-  // Non-passive touchmove on document so e.preventDefault() works during drag
-  useEffect(() => {
-    const onMove = (e: TouchEvent) => {
-      if (isHorizontalDrag.current === true) e.preventDefault();
-    };
-    document.addEventListener("touchmove", onMove, { passive: false });
-    return () => document.removeEventListener("touchmove", onMove);
-  }, []);
-
   const pauseAndResume = useCallback(() => {
     isPaused.current = true;
     if (pauseTimer.current) clearTimeout(pauseTimer.current);
@@ -74,55 +65,28 @@ export function FeaturedProducts({ products }: Props) {
   const prev = () => { setActive((i) => (i - 1 + featured.length) % featured.length); pauseAndResume(); };
   const next = () => { setActive((i) => (i + 1) % featured.length); pauseAndResume(); };
 
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const touchStartY = useRef<number | null>(null);
-  const isHorizontalDrag = useRef<boolean | null>(null);
-
+  // Simple swipe detection — no dragging, no pulling
+  // Fires once on touchEnd, moves exactly one card
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
-    isHorizontalDrag.current = null;
-    isDragging.current = false;
+    didSwipe.current = false;
     isPaused.current = true;
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    const dx = e.touches[0].clientX - touchStartX.current;
-    const dy = e.touches[0].clientY - touchStartY.current;
-
-    // Lock direction on first 8px of movement
-    if (isHorizontalDrag.current === null) {
-      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-      isHorizontalDrag.current = Math.abs(dx) >= Math.abs(dy);
-    }
-
-    // Vertical touch → page scrolls, carousel does nothing
-    if (!isHorizontalDrag.current) return;
-
-    // Horizontal drag locked — only left/right, no vertical involvement
-    e.preventDefault();
-    isDragging.current = true;
-
-    const atStart = active === 0 && dx > 0;
-    const atEnd = active === featured.length - 1 && dx < 0;
-    setDragOffset(atStart || atEnd ? dx * 0.3 : dx);
-  };
-
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
+    if (touchStartX.current === null || touchStartY.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
 
-    if (isDragging.current && Math.abs(dx) > spreadPx * 0.25) {
+    // Only act on clearly horizontal swipes (more horizontal than vertical, > 40px)
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      didSwipe.current = true;
       dx < 0 ? next() : prev();
     }
 
-    setDragOffset(0);
-    isDragging.current = false;
     touchStartX.current = null;
     touchStartY.current = null;
-    isHorizontalDrag.current = null;
-    pauseAndResume();
   };
 
   return (
@@ -146,7 +110,6 @@ export function FeaturedProducts({ products }: Props) {
 
       {/* Carousel */}
       <div
-        ref={carouselRef}
         className="relative flex items-center justify-center select-none"
         style={{ perspective: "1200px", height: "420px" }}
       >
@@ -162,20 +125,15 @@ export function FeaturedProducts({ products }: Props) {
           const zIndex = isActive ? 30 : isAdjacent ? 20 : 10;
           const blur = Math.abs(offset) === 2 ? 2 : 0;
           const gradient = getGradient(product.serviceType);
-
-          // Real-time drag offset only applied on mobile (touch)
-          const tx = offset * spreadPx + (isDragging.current ? dragOffset : 0);
+          const tx = offset * spreadPx;
 
           return (
             <div
               key={product.id}
-              {...(isActive ? {
-                onTouchStart: handleTouchStart,
-                onTouchMove: handleTouchMove,
-                onTouchEnd: handleTouchEnd,
-              } : {})}
+              onTouchStart={isActive ? handleTouchStart : undefined}
+              onTouchEnd={isActive ? handleTouchEnd : undefined}
               onClick={() => {
-                if (isDragging.current) return;
+                if (didSwipe.current) return;
                 if (isActive) router.push(`/products/${product.id}`);
                 else { setActive(i); pauseAndResume(); }
               }}
@@ -186,8 +144,7 @@ export function FeaturedProducts({ products }: Props) {
                 opacity,
                 zIndex,
                 filter: blur > 0 ? `blur(${blur}px)` : "none",
-                // No transition while dragging — instant follow
-                transition: isDragging.current ? "none" : "all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                transition: "all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                 cursor: isActive ? "pointer" : "pointer",
               }}
             >
@@ -235,20 +192,17 @@ export function FeaturedProducts({ products }: Props) {
                     4–5 Day Delivery
                   </div>
 
-                  {/* Spacer */}
                   <div className="flex-1" />
 
-                  {/* View button — fades in when active, fades out otherwise */}
-                  <div
-                    style={{
-                      opacity: isActive ? 1 : 0,
-                      transition: "opacity 0.4s ease",
-                      pointerEvents: isActive ? "auto" : "none",
-                      paddingBottom: "8px",
-                      width: "100%",
-                    }}
-                  >
-                    <span className="inline-block w-full text-center text-sm font-semibold text-white bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] rounded-xl px-6 py-3 transition-all duration-200 shadow-[0_4px_16px_rgba(46,204,113,0.25)]">
+                  {/* View button — fades in on active only */}
+                  <div style={{
+                    opacity: isActive ? 1 : 0,
+                    transition: "opacity 0.4s ease",
+                    pointerEvents: isActive ? "auto" : "none",
+                    paddingBottom: "8px",
+                    width: "100%",
+                  }}>
+                    <span className="inline-block w-full text-center text-sm font-semibold text-white bg-gradient-to-r from-[#2ECC71] to-[#27AE60] rounded-xl px-6 py-3 shadow-[0_4px_16px_rgba(46,204,113,0.25)]">
                       View
                     </span>
                   </div>
@@ -262,29 +216,19 @@ export function FeaturedProducts({ products }: Props) {
 
       {/* Controls */}
       <div className="flex items-center justify-center gap-6 mt-8">
-        <button
-          onClick={prev}
-          className="w-10 h-10 rounded-full bg-[#16221B] border border-[#1F8A5B]/30 hover:border-[#1F8A5B] text-[#A0B5A8] hover:text-[#2ECC71] flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(31,138,91,0.3)]"
-        >
+        <button onClick={prev} className="w-10 h-10 rounded-full bg-[#16221B] border border-[#1F8A5B]/30 hover:border-[#1F8A5B] text-[#A0B5A8] hover:text-[#2ECC71] flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(31,138,91,0.3)]">
           <ChevronLeft className="w-5 h-5" />
         </button>
 
         <div className="flex gap-2">
           {featured.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setActive(i); pauseAndResume(); }}
-              className={`rounded-full transition-all duration-300 ${
-                i === active ? "w-6 h-2 bg-[#2ECC71]" : "w-2 h-2 bg-[#1F8A5B]/30 hover:bg-[#1F8A5B]/60"
-              }`}
+            <button key={i} onClick={() => { setActive(i); pauseAndResume(); }}
+              className={`rounded-full transition-all duration-300 ${i === active ? "w-6 h-2 bg-[#2ECC71]" : "w-2 h-2 bg-[#1F8A5B]/30 hover:bg-[#1F8A5B]/60"}`}
             />
           ))}
         </div>
 
-        <button
-          onClick={next}
-          className="w-10 h-10 rounded-full bg-[#16221B] border border-[#1F8A5B]/30 hover:border-[#1F8A5B] text-[#A0B5A8] hover:text-[#2ECC71] flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(31,138,91,0.3)]"
-        >
+        <button onClick={next} className="w-10 h-10 rounded-full bg-[#16221B] border border-[#1F8A5B]/30 hover:border-[#1F8A5B] text-[#A0B5A8] hover:text-[#2ECC71] flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(31,138,91,0.3)]">
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
