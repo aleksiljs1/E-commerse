@@ -3,12 +3,14 @@ import { HeroSection } from "@/components/store/HeroSection";
 import { FeaturedProducts } from "@/components/store/FeaturedProducts";
 import { Navbar } from "@/components/store/Navbar";
 import { CartPopup } from "@/components/store/CartPopup";
+import type { SerializedProduct } from "@/types";
 
 export default async function HomePage() {
-  const products = await prisma.product.findMany({
+  const raw = await prisma.product.findMany({
     where: { active: true },
     orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
   });
+  const products: SerializedProduct[] = raw.map((p) => ({ ...p, price: Number(p.price) }));
 
   return (
     <>

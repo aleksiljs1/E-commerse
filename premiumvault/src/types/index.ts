@@ -2,6 +2,9 @@ import type { Product, Order, OrderItem, Credential, User } from "@prisma/client
 
 export type { Product, Order, OrderItem, Credential, User };
 
+// Product with Decimal price serialized to number (safe to pass to client components)
+export type SerializedProduct = Omit<Product, "price"> & { price: number };
+
 export type ProductWithItems = Product & { orderItems: OrderItem[] };
 
 export type OrderWithItems = Order & {

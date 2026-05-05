@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/db";
 import { ProductGrid } from "@/components/store/ProductGrid";
+import type { SerializedProduct } from "@/types";
 
 export default async function ProductsPage() {
-  const products = await prisma.product.findMany({
+  const raw = await prisma.product.findMany({
     where: { active: true },
     orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
   });
+  const products: SerializedProduct[] = raw.map((p) => ({ ...p, price: Number(p.price) }));
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white px-4 py-12 max-w-7xl mx-auto">

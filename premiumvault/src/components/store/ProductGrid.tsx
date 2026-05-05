@@ -1,10 +1,10 @@
 "use client";
 
-import type { Product } from "@/types";
+import type { SerializedProduct } from "@/types";
 import { ProductCard } from "./ProductCard";
 
 type Props = {
-  products: Product[];
+  products: SerializedProduct[];
 };
 
 export function ProductGrid({ products }: Props) {

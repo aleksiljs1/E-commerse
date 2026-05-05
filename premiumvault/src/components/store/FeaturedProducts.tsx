@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import type { Product } from "@/types";
+import type { SerializedProduct } from "@/types";
 import { ProductCard } from "./ProductCard";
 
 type Props = {
-  products: Product[];
+  products: SerializedProduct[];
 };
 
 export function FeaturedProducts({ products }: Props) {
@@ -13,7 +13,7 @@ export function FeaturedProducts({ products }: Props) {
 
   return (
     <section className="py-16 px-4 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-bold text-white mb-8">Featured Services</h2>
+      <h2 className="text-2xl font-bold text-white text-center mb-8">Featured Services</h2>
 
       {featured.length === 0 ? (
         <p className="text-zinc-500 text-sm">No featured products at the moment.</p>
