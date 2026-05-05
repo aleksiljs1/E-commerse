@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
           return {
             price_data: {
               currency: "gbp",
-              product_data: { name: product.name },
+              product_data: { name: product.title },
               unit_amount: Math.round(item.priceAtPurchase * 100),
             },
             quantity: item.quantity,

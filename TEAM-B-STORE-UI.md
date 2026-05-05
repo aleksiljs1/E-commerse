@@ -6,7 +6,7 @@ You are building all public-facing store pages and the cart system for **Premium
 
 ## Context — What You're Building
 
-The store front. Clients land on a homepage with a hero phrase and featured product cards (Spotify, Netflix, YouTube, etc. with logo icons). They can browse all products, view a product detail page, add items to a cart, and open a cart sheet (slide-over from the right). The cart sheet shows items, quantity controls, subtotal, and a "Checkout" button. Checkout page is Team C's responsibility — your cart just navigates there.
+The store front. Clients land on a homepage with a hero phrase and featured product cards (Spotify, Netflix, YouTube, etc. with logo icons). They can browse all products, view a product detail page, add items to a cart, and open a cart popup (a rectangular pop-up that appears on screen anchored to the basket icon — NOT a side drawer). The cart popup shows items, quantity controls, subtotal, and a "Checkout" button. Checkout page is Team C's responsibility — your cart just navigates there.
 
 ---
 
@@ -19,8 +19,8 @@ src/
   components/
     store/
       Navbar.tsx                     ← Top navigation
-      CartSheet.tsx                  ← Slide-over cart
-      CartItem.tsx                   ← Single item in cart sheet
+      CartPopup.tsx                  ← Rectangular popup cart (NOT a side drawer)
+      CartItem.tsx                   ← Single item in cart popup
       ProductCard.tsx                ← Featured/listing card
       FeaturedProducts.tsx           ← Featured grid on home
       ProductGrid.tsx                ← Full product listing
@@ -198,12 +198,13 @@ export function ServiceIcon({ serviceType, logoUrl, size = "md" }: Props) {
 `src/components/store/Navbar.tsx`:
 
 Design requirements:
-- Fixed at top, full width, subtle background blur (`backdrop-blur-sm bg-white/80 dark:bg-zinc-950/80`)
-- Left: logo mark + "PremiumVault" text
-- Center: nav links — Home, Products, Reviews, Contact, FAQ (all anchor/link elements, styled minimally)
-- Right: shopping basket icon (`ShoppingCart` from lucide-react) with a badge showing `totalItems()`. Clicking the icon opens the cart sheet via `useCartStore().openCart()`
+- Fixed at top, full width, subtle background blur (`backdrop-blur-sm bg-zinc-950/80 border-b border-zinc-800`)
+- **Left:** logo mark + "PremiumVault" text
+- **Center:** nav links — Home, Products, Reviews, Contact Us, FAQ (plain `<Link>` elements, minimal styling)
+- **Far Right (in this order, left to right):** "Browse Products" button (outline style, small) → `/products`, then the basket icon (`ShoppingCart` from lucide-react) with a count badge
+- Clicking the basket icon calls `useCartStore().openCart()` which toggles the cart popup
 - All links are `<Link>` from next/link
-- Responsive: on mobile hide center links, show a hamburger or just the logo + cart icon
+- Responsive: on mobile collapse center links; keep logo + browse button + cart icon visible
 
 ```typescript
 "use client";
@@ -216,43 +217,137 @@ import { Button } from "@/components/ui/button";
 export function Navbar() {
   const { totalItems, openCart } = useCartStore();
   const count = totalItems();
-  // ...render
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-zinc-950/80 border-b border-zinc-800">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Left: Logo */}
+        <Link href="/" className="text-xl font-bold text-white">PremiumVault</Link>
+
+        {/* Center: Nav links */}
+        <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
+          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <Link href="/products" className="hover:text-white transition-colors">Products</Link>
+          <Link href="#reviews" className="hover:text-white transition-colors">Reviews</Link>
+          <Link href="#contact" className="hover:text-white transition-colors">Contact Us</Link>
+          <Link href="#faq" className="hover:text-white transition-colors">FAQ</Link>
+        </div>
+
+        {/* Far Right: Browse Products + Cart */}
+        <div className="flex items-center gap-3">
+          <Link href="/products">
+            <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300 hover:text-white hidden sm:flex">
+              Browse Products
+            </Button>
+          </Link>
+          <button
+            onClick={openCart}
+            className="relative p-2 text-zinc-400 hover:text-white transition-colors"
+            aria-label="Open basket"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 bg-indigo-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                {count}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
 }
 ```
 
 ---
 
-## Cart Sheet Component
+## Cart Popup Component
 
-`src/components/store/CartSheet.tsx`:
+`src/components/store/CartPopup.tsx`:
 
-Uses shadcn `Sheet` component. Triggered by `isOpen` from Zustand store.
+**This is a rectangular pop-up that appears on screen — NOT a slide-in drawer/sheet.** It is a fixed-position box that appears in the upper-right area of the screen when `isOpen` is true, visually anchored near the basket icon. Use a backdrop overlay behind it (semi-transparent) that closes the popup when clicked.
 
-Layout of the sheet (slides in from the right, medium width ~400px):
-- Header: "Your Basket" title + close button (X icon)
-- Body: scrollable list of `CartItem` components. If empty: centered message "Your basket is empty"
-- Footer (sticky at bottom):
-  - "Subtotal" label + `£{subtotal().toFixed(2)}`
-  - Full-width "Checkout" Button (primary) → navigates to `/checkout`
+Layout (fixed position, top-right, width ~380px, max-height ~70vh, scrollable body):
+- **Header:** "Your Basket" title (left) + X close button (right)
+- **Body (scrollable):** list of `CartItemRow` components. If empty: centered text "Your basket is empty 🛒"
+- **Footer (sticky at bottom of popup):**
+  - Separator line
+  - "Subtotal" label on left, `£{subtotal().toFixed(2)}` bold on right
+  - Full-width "Checkout" button (primary, indigo) → navigates to `/checkout`
 
 ```typescript
 "use client";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCartStore } from "@/store/cart";
 import { CartItemRow } from "./CartItem";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export function CartSheet() {
+export function CartPopup() {
   const { isOpen, closeCart, items, subtotal } = useCartStore();
   const router = useRouter();
+
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") closeCart(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [closeCart]);
+
+  if (!isOpen) return null;
 
   const handleCheckout = () => {
     closeCart();
     router.push("/checkout");
   };
-  // render Sheet with items mapped to CartItemRow
+
+  return (
+    <>
+      {/* Backdrop — click to close */}
+      <div
+        className="fixed inset-0 z-40 bg-black/40"
+        onClick={closeCart}
+      />
+
+      {/* Popup box */}
+      <div className="fixed top-16 right-4 z-50 w-[380px] max-h-[70vh] bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
+          <h2 className="text-base font-semibold text-white">Your Basket</h2>
+          <button onClick={closeCart} className="text-zinc-400 hover:text-white transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-3">
+          {items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 text-zinc-500">
+              <span className="text-3xl mb-2">🛒</span>
+              <p className="text-sm">Your basket is empty</p>
+            </div>
+          ) : (
+            items.map((item) => <CartItemRow key={item.productId} item={item} />)
+          )}
+        </div>
+
+        {/* Footer */}
+        {items.length > 0 && (
+          <div className="border-t border-zinc-800 px-5 py-4 space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-zinc-400">Subtotal</span>
+              <span className="text-white font-bold text-base">£{subtotal().toFixed(2)}</span>
+            </div>
+            <Button onClick={handleCheckout} className="w-full bg-indigo-600 hover:bg-indigo-500" size="lg">
+              Checkout
+            </Button>
+          </div>
+        )}
+      </div>
+    </>
+  );
 }
 ```
 
@@ -262,11 +357,13 @@ export function CartSheet() {
 
 `src/components/store/CartItem.tsx`:
 
-Each item in the cart sheet:
-- Left: `ServiceIcon` (sm size)
-- Middle: product title (truncated), price per unit `£X.XX`
-- Right: quantity controls (`-` | `N` | `+`) using `QuantityControl` + trash icon to remove
-- Line total: `£{(price * quantity).toFixed(2)}` shown below title in muted text
+Each item in the cart popup:
+- **Left:** `ServiceIcon` (sm size)
+- **Middle:** product title (1 line truncated), short description (1 line, muted, smaller text), price per unit `£X.XX`
+- **Right:** quantity controls (`-` | `N` | `+`) using `QuantityControl` + trash icon to remove
+- Line total: `£{(price * quantity).toFixed(2)}` shown below the description in muted text
+
+The `CartItem` type must include a `description` field (short, passed when calling `addItem` from the product page). Add `description: string` to the `CartItem` type in `src/types/index.ts`.
 
 ---
 
@@ -361,24 +458,24 @@ Server component. Fetches single product by ID.
 
 Layout (two-column on desktop):
 
-**Left column:**
-- Service logo (large, centered or top-left) using `ServiceIcon` (lg size)
-- Product title (2xl–3xl, bold): e.g. "YouTube Premium — Personal Account Upgrade"
-- Warranty/Terms explanation (below title in muted text):
-  - "Upgrade guaranteed within 4–5 business days"
-  - "Secure credential encryption"
-  - "If upgrade fails, full refund guaranteed"
-- Full description (`product.description`) in readable body text
-- "What we require from you" section: bullet points explaining they need to submit account credentials via the link sent to their email after payment
+**Left column (top to bottom in this exact order):**
+1. Product title (2xl–3xl, bold): e.g. "YouTube Premium — Personal Account Upgrade Lifetime"
+2. Full service logo below the title — use `ServiceIcon` (lg size, or if `logoUrl` exists render it large, ~160px)
+3. Full description (`product.description`) in readable body text
+4. "What We Require From You" section — bulleted list explaining the client needs to submit their account email and password via the secure link sent after payment
+5. "Warranty & Terms" section — each product has its own terms, display:
+   - "Upgrade guaranteed within 4–5 business days"
+   - "If upgrade fails for any reason, full refund guaranteed"
+   - "Your credentials are encrypted and never stored in plain text"
+   - "Do not change your password during the upgrade window"
 
-**Right column (sticky on desktop):**
-- Service logo repeated (medium)
-- Price: large bold `£{price}`
-- Stock indicator: "X in stock" (green if > 10, orange if < 10, red if < 3)
-- `QuantityControl` component (default 1, max = stock)
-- "Add to Cart" button (full width, primary)
-- "Buy Now" button (full width, secondary outline) → adds to cart then navigates to `/checkout`
-- Small lock icon + "Secure checkout with 256-bit SSL" text below buttons
+**Right column (sticky on desktop — NO logo here, only purchase controls):**
+- Price: large bold `£{price}` (2xl or larger)
+- Stock indicator: `{stock} in stock` — green text if > 10, amber if < 10, red if < 3
+- `QuantityControl` component (default 1, max = stock value)
+- "Add to Cart" button (full width, primary indigo)
+- "Buy Now" button (full width, secondary outline) → calls `addItem` then `router.push("/checkout")`
+- Below buttons: small lock icon + muted text "Secure checkout with 256-bit SSL encryption"
 
 ---
 
@@ -388,13 +485,13 @@ Layout (two-column on desktop):
 
 ```typescript
 import { Navbar } from "@/components/store/Navbar";
-import { CartSheet } from "@/components/store/CartSheet";
+import { CartPopup } from "@/components/store/CartPopup";
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <CartSheet />
+      <CartPopup />
       <main className="pt-16">{children}</main>
     </>
   );
@@ -444,4 +541,4 @@ const products = await prisma.product.findMany({ where: { active: true } });
 - Payment processing
 - Stripe or PayPal integration
 
-Your job ends when the home page, product listing, product detail, and cart sheet are fully functional with real data from the DB (or API) and the cart persists in localStorage.
+Your job ends when the home page, product listing, product detail, and cart popup are fully functional with real data from the DB (or API) and the cart persists in localStorage.

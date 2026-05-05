@@ -10,26 +10,27 @@ type Props = {
   price: number;
   productId: string;
   title: string;
+  description: string;
   logoUrl: string | null;
   serviceType: string;
   stock: number;
 };
 
-export function ProductActions({ price, productId, title, logoUrl, serviceType, stock }: Props) {
+export function ProductActions({ price, productId, title, description, logoUrl, serviceType, stock }: Props) {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
   const { addItem, openCart } = useCartStore();
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
-      addItem({ productId, title, price, logoUrl, serviceType });
+      addItem({ productId, title, description, price, logoUrl, serviceType });
     }
     openCart();
   };
 
   const handleBuyNow = () => {
     for (let i = 0; i < quantity; i++) {
-      addItem({ productId, title, price, logoUrl, serviceType });
+      addItem({ productId, title, description, price, logoUrl, serviceType });
     }
     router.push("/checkout");
   };

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { HeroSection } from "@/components/store/HeroSection";
 import { FeaturedProducts } from "@/components/store/FeaturedProducts";
 import { Navbar } from "@/components/store/Navbar";
-import { CartSheet } from "@/components/store/CartSheet";
+import { CartPopup } from "@/components/store/CartPopup";
 
 export default async function HomePage() {
   const products = await prisma.product.findMany({
@@ -13,7 +13,7 @@ export default async function HomePage() {
   return (
     <>
       <Navbar />
-      <CartSheet />
+      <CartPopup />
       <main className="pt-16 bg-zinc-950 text-white min-h-screen">
         <HeroSection />
 

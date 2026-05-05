@@ -15,6 +15,7 @@ export type OrderWithItems = Order & {
 export type CartItem = {
   productId: string;
   title: string;
+  description: string;
   price: number;
   logoUrl: string | null;
   serviceType: string;

@@ -24,6 +24,7 @@ export function ProductCard({ product }: Props) {
     addItem({
       productId: product.id,
       title: product.title,
+      description: product.description,
       price: Number(product.price),
       logoUrl: product.logoUrl,
       serviceType: product.serviceType,
