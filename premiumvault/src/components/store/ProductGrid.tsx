@@ -21,7 +21,8 @@ type Props = {
 export function ProductGrid({ products }: Props) {
   const addItem = useCartStore((s) => s.addItem);
 
-  if (products.length === 0) {
+  // Show real products if available, otherwise show fallback
+  if (products.length > 0) {
     return (
       <section id="shop">
         <h2 className="font-rajdhani text-center text-4xl mb-10 pt-10 text-[#E8F5EE]">Our Products</h2>

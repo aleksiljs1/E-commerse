@@ -32,5 +32,5 @@ function SuccessContent() {
 }
 
 export default function CheckoutSuccessPage() {
-  return <Suspense><SuccessContent /></Suspense>;
+  return <Suspense fallback={<div className="min-h-screen bg-[#0F1412]" />}><SuccessContent /></Suspense>;
 }

@@ -56,6 +56,13 @@ export function Navbar() {
             )}
           </button>
 
+          <Link
+            href="/admin/login"
+            className="hidden sm:inline-flex text-[#E8F5EE] font-medium text-[0.9rem] border border-[#1F8A5B] rounded-xl px-4 py-2 hover:bg-[#1F8A5B]/20 transition-colors"
+          >
+            Sign In
+          </Link>
+
           <button
             onClick={() => setMobileOpen((o) => !o)}
             className="md:hidden text-[#A0B5A8] hover:text-[#7DFFB2] transition-colors p-1"
