@@ -9,7 +9,6 @@ import type { SerializedProduct } from "@/types";
 
 type Props = { products: SerializedProduct[] };
 
-// Gradient backgrounds per service type
 const SERVICE_GRADIENTS: Record<string, string> = {
   spotify:    "from-[#1DB954]/30 via-[#0a1a0f] to-[#0d1a11]",
   netflix:    "from-[#E50914]/30 via-[#1a0a0d] to-[#0d1010]",
@@ -20,14 +19,16 @@ const SERVICE_GRADIENTS: Record<string, string> = {
   default:    "from-[#1F8A5B]/25 via-[#0d1a11] to-[#0d1410]",
 };
 
-function getGradient(serviceType: string) {
-  return SERVICE_GRADIENTS[serviceType] ?? SERVICE_GRADIENTS.default;
+function getGradient(s: string) {
+  return SERVICE_GRADIENTS[s] ?? SERVICE_GRADIENTS.default;
 }
 
 export function FeaturedProducts({ products }: Props) {
   const featured = products.filter((p) => p.featured);
   const router = useRouter();
   const [active, setActive] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const isDragging = useRef(false);
   const touchStartX = useRef<number | null>(null);
   const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -35,15 +36,15 @@ export function FeaturedProducts({ products }: Props) {
 
   if (featured.length === 0) return null;
 
+  const spreadPx = typeof window !== "undefined" && window.innerWidth >= 768 ? 290 : 190;
+
   const getInterval = () =>
     typeof window !== "undefined" && window.innerWidth < 768 ? 4000 : 6000;
 
   const startAutoplay = useCallback(() => {
     if (autoplayRef.current) clearInterval(autoplayRef.current);
     autoplayRef.current = setInterval(() => {
-      if (!isPaused.current) {
-        setActive((i) => (i + 1) % featured.length);
-      }
+      if (!isPaused.current) setActive((i) => (i + 1) % featured.length);
     }, getInterval());
   }, [featured.length]);
 
@@ -55,32 +56,53 @@ export function FeaturedProducts({ products }: Props) {
     };
   }, [startAutoplay]);
 
-  // Pause autoplay for 6s after user interaction, then resume
   const pauseAndResume = useCallback(() => {
     isPaused.current = true;
     if (pauseTimer.current) clearTimeout(pauseTimer.current);
-    pauseTimer.current = setTimeout(() => {
-      isPaused.current = false;
-    }, 6000);
+    pauseTimer.current = setTimeout(() => { isPaused.current = false; }, 6000);
   }, []);
 
   const prev = () => { setActive((i) => (i - 1 + featured.length) % featured.length); pauseAndResume(); };
   const next = () => { setActive((i) => (i + 1) % featured.length); pauseAndResume(); };
 
+  // Mobile drag handlers — cards follow finger in real time
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    isDragging.current = true;
+    isPaused.current = true;
   };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current || touchStartX.current === null) return;
+    const diff = e.touches[0].clientX - touchStartX.current;
+    // Apply resistance at edges
+    const resistance = 0.4;
+    const atStart = active === 0 && diff > 0;
+    const atEnd = active === featured.length - 1 && diff < 0;
+    setDragOffset(atStart || atEnd ? diff * resistance : diff);
+  };
+
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) { diff > 0 ? next() : prev(); }
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+
+    // Snap based on how far they dragged (threshold = 30% of spread)
+    if (Math.abs(diff) > spreadPx * 0.3) {
+      if (diff < 0) next(); else prev();
+    } else {
+      // Snap back
+      setActive((i) => i);
+    }
+
+    setDragOffset(0);
+    isDragging.current = false;
     touchStartX.current = null;
+    pauseAndResume();
   };
 
   return (
     <section className="py-16 overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
-        {/* Header */}
         <div className="flex items-end justify-between mb-10">
           <div>
             <p className="text-xs uppercase tracking-widest text-[#1F8A5B] font-semibold mb-2">Top Picks</p>
@@ -99,48 +121,46 @@ export function FeaturedProducts({ products }: Props) {
 
       {/* Carousel */}
       <div
-        className="relative flex items-center justify-center"
+        className="relative flex items-center justify-center select-none"
         style={{ perspective: "1200px", height: "420px" }}
         onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         {featured.map((product, i) => {
           const offset = i - active;
-          // Only render visible cards (-2 to +2)
           if (Math.abs(offset) > 2) return null;
 
           const isActive = offset === 0;
           const isAdjacent = Math.abs(offset) === 1;
-          const isFar = Math.abs(offset) === 2;
 
           const scale = isActive ? 1 : isAdjacent ? 0.78 : 0.62;
-          const spreadPx = typeof window !== "undefined" && window.innerWidth >= 768 ? 290 : 190;
-          const translateX = offset * spreadPx;
           const opacity = isActive ? 1 : isAdjacent ? 0.55 : 0.25;
           const zIndex = isActive ? 30 : isAdjacent ? 20 : 10;
-          const blur = isActive ? 0 : isAdjacent ? 0 : 2;
+          const blur = Math.abs(offset) === 2 ? 2 : 0;
           const gradient = getGradient(product.serviceType);
+
+          // Real-time drag offset only applied on mobile (touch)
+          const tx = offset * spreadPx + (isDragging.current ? dragOffset : 0);
 
           return (
             <div
               key={product.id}
               onClick={() => {
-                if (isActive) {
-                  router.push(`/products/${product.id}`);
-                } else {
-                  setActive(i);
-                  pauseAndResume();
-                }
+                if (isDragging.current) return;
+                if (isActive) router.push(`/products/${product.id}`);
+                else { setActive(i); pauseAndResume(); }
               }}
               style={{
                 position: "absolute",
                 width: isActive ? "clamp(260px, 22vw, 320px)" : "clamp(220px, 18vw, 280px)",
-                transform: `translateX(${translateX}px) scale(${scale})`,
+                transform: `translateX(${tx}px) scale(${scale})`,
                 opacity,
                 zIndex,
                 filter: blur > 0 ? `blur(${blur}px)` : "none",
-                transition: "all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                cursor: isActive ? "default" : "pointer",
+                // No transition while dragging — instant follow
+                transition: isDragging.current ? "none" : "all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                cursor: isActive ? "pointer" : "pointer",
               }}
             >
               <div
@@ -148,13 +168,14 @@ export function FeaturedProducts({ products }: Props) {
                   relative rounded-3xl overflow-hidden
                   bg-gradient-to-b ${gradient}
                   border border-[#1F8A5B]/25
-                  ${isActive ? "shadow-[0_24px_64px_rgba(0,0,0,0.7),0_0_40px_rgba(31,138,91,0.2)]" : "shadow-[0_8px_24px_rgba(0,0,0,0.5)]"}
+                  ${isActive
+                    ? "shadow-[0_24px_64px_rgba(0,0,0,0.7),0_0_40px_rgba(31,138,91,0.2)]"
+                    : "shadow-[0_8px_24px_rgba(0,0,0,0.5)]"}
                 `}
               >
-                {/* Card inner */}
                 <div className="p-6 flex flex-col items-center text-center" style={{ minHeight: "340px" }}>
 
-                  {/* Logo / Icon */}
+                  {/* Logo */}
                   <div className="w-24 h-24 rounded-2xl overflow-hidden mb-5 mt-2 flex items-center justify-center bg-black/20 border border-white/10">
                     {product.logoUrl ? (
                       <Image
@@ -181,9 +202,27 @@ export function FeaturedProducts({ products }: Props) {
                   </p>
 
                   {/* Delivery */}
-                  <div className="flex items-center gap-1.5 text-[#A0B5A8] text-xs mb-5">
+                  <div className="flex items-center gap-1.5 text-[#A0B5A8] text-xs">
                     <Clock className="w-3 h-3" />
                     4–5 Day Delivery
+                  </div>
+
+                  {/* Spacer */}
+                  <div className="flex-1" />
+
+                  {/* View button — fades in when active, fades out otherwise */}
+                  <div
+                    style={{
+                      opacity: isActive ? 1 : 0,
+                      transition: "opacity 0.4s ease",
+                      pointerEvents: isActive ? "auto" : "none",
+                      paddingBottom: "4px",
+                      width: "100%",
+                    }}
+                  >
+                    <span className="inline-block text-[#A0B5A8] hover:text-[#E8F5EE] text-xs font-medium border border-[#1F8A5B]/25 hover:border-[#1F8A5B]/60 rounded-lg px-4 py-2 transition-all duration-200 bg-black/10">
+                      View
+                    </span>
                   </div>
 
                 </div>
@@ -198,23 +237,18 @@ export function FeaturedProducts({ products }: Props) {
         <button
           onClick={prev}
           className="w-10 h-10 rounded-full bg-[#16221B] border border-[#1F8A5B]/30 hover:border-[#1F8A5B] text-[#A0B5A8] hover:text-[#2ECC71] flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(31,138,91,0.3)]"
-          aria-label="Previous"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        {/* Dots */}
         <div className="flex gap-2">
           {featured.map((_, i) => (
             <button
               key={i}
               onClick={() => { setActive(i); pauseAndResume(); }}
               className={`rounded-full transition-all duration-300 ${
-                i === active
-                  ? "w-6 h-2 bg-[#2ECC71]"
-                  : "w-2 h-2 bg-[#1F8A5B]/30 hover:bg-[#1F8A5B]/60"
+                i === active ? "w-6 h-2 bg-[#2ECC71]" : "w-2 h-2 bg-[#1F8A5B]/30 hover:bg-[#1F8A5B]/60"
               }`}
-              aria-label={`Go to slide ${i + 1}`}
             />
           ))}
         </div>
@@ -222,18 +256,13 @@ export function FeaturedProducts({ products }: Props) {
         <button
           onClick={next}
           className="w-10 h-10 rounded-full bg-[#16221B] border border-[#1F8A5B]/30 hover:border-[#1F8A5B] text-[#A0B5A8] hover:text-[#2ECC71] flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(31,138,91,0.3)]"
-          aria-label="Next"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Mobile: View all */}
       <div className="sm:hidden px-6 mt-8 flex justify-center">
-        <Link
-          href="/products"
-          className="flex items-center gap-1.5 text-[#2ECC71] text-sm font-medium"
-        >
+        <Link href="/products" className="flex items-center gap-1.5 text-[#2ECC71] text-sm font-medium">
           View all services <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
