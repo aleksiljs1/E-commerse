@@ -33,11 +33,25 @@ export async function POST(req: NextRequest) {
       },
     });
     if (paymentMethod === "STRIPE") {
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(totalAmount * 100), currency: "gbp",
-        metadata: { orderId: order.id, orderNumber }, receipt_email: email,
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        customer_email: email,
+        line_items: orderItems.map((item) => {
+          const product = products.find((p) => p.id === item.productId)!;
+          return {
+            price_data: {
+              currency: "gbp",
+              product_data: { name: product.name },
+              unit_amount: Math.round(item.priceAtPurchase * 100),
+            },
+            quantity: item.quantity,
+          };
+        }),
+        metadata: { orderId: order.id, orderNumber },
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?orderId=${order.id}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
       });
-      return NextResponse.json({ orderId: order.id, clientSecret: paymentIntent.client_secret });
+      return NextResponse.json({ orderId: order.id, url: session.url });
     }
     const { id: paypalOrderId, approveUrl } = await createPayPalOrder(totalAmount);
     await prisma.order.update({ where: { id: order.id }, data: { paymentId: paypalOrderId } });
