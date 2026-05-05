@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
 import { QuantityControl } from "@/components/store/QuantityControl";
-import { Button } from "@/components/ui/button";
 
 type Props = {
   price: number;
@@ -40,7 +39,7 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <span className="text-zinc-400 text-sm">Qty:</span>
+        <span className="text-[#a1a1aa] text-sm">Qty:</span>
         <QuantityControl
           value={quantity}
           onIncrement={() => setQuantity((q) => Math.min(q + 1, stock))}
@@ -50,24 +49,23 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
         />
       </div>
 
-      <Button
+      <button
+        type="button"
         onClick={handleAddToCart}
         disabled={isOutOfStock}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-        size="lg"
+        className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl py-3 font-semibold transition-colors"
       >
         {isOutOfStock ? "Out of Stock" : "Add to Cart"}
-      </Button>
+      </button>
 
-      <Button
+      <button
+        type="button"
         onClick={handleBuyNow}
         disabled={isOutOfStock}
-        variant="outline"
-        className="w-full border-zinc-700 text-white hover:bg-zinc-800"
-        size="lg"
+        className="w-full bg-transparent border border-[#1e1e2e] hover:border-purple-600/50 text-white rounded-xl py-3 font-semibold transition-colors disabled:opacity-50"
       >
         Buy Now
-      </Button>
+      </button>
     </div>
   );
 }

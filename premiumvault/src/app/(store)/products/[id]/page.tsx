@@ -20,96 +20,114 @@ export default async function ProductDetailPage({
   const price = Number(product.price);
   const stock = product.stock;
 
-  let stockColor = "text-green-400";
+  let stockBg = "bg-green-500/10 text-green-400 border-green-500/20";
   if (stock < 3) {
-    stockColor = "text-red-400";
+    stockBg = "bg-red-500/10 text-red-400 border-red-500/20";
   } else if (stock < 10) {
-    stockColor = "text-amber-400";
+    stockBg = "bg-amber-500/10 text-amber-400 border-amber-500/20";
   }
-  const stockLabel = `${stock} in stock`;
 
   return (
-    <div className="bg-zinc-950 text-white min-h-screen px-4 py-12">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <div className="min-h-screen bg-[#0a0a0f] text-white">
+      <div className="max-w-6xl mx-auto px-5 md:px-10 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 items-start">
 
-        {/* Left column */}
-        <div className="flex flex-col gap-6">
-          {/* 1. Title */}
-          <h1 className="text-3xl font-bold text-white">{product.title}</h1>
-
-          {/* 2. Logo */}
-          <div className="flex justify-start">
-            <ServiceIcon
-              serviceType={product.serviceType}
-              logoUrl={product.logoUrl}
-              size="lg"
-            />
-          </div>
-
-          {/* 3. Description */}
-          <p className="text-zinc-300 text-sm leading-relaxed">
-            {product.description}
-          </p>
-
-          {/* 4. What we require */}
+          {/* LEFT column */}
           <div>
-            <h2 className="text-lg font-semibold text-white mb-2">What We Require From You</h2>
-            <ul className="space-y-1.5">
-              {[
-                "Your account email address",
-                "Your account password (submitted via secure encrypted link after payment)",
-                "Do not change your password during the upgrade process",
-              ].map((req) => (
-                <li key={req} className="flex items-start gap-2 text-zinc-300 text-sm">
-                  <span className="text-indigo-400 mt-0.5">•</span>
-                  {req}
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* 1. Title */}
+            <h1 className="font-rajdhani text-3xl md:text-4xl font-bold text-white mb-6">
+              {product.title}
+            </h1>
 
-          {/* 5. Warranty & Terms */}
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-2">Warranty &amp; Terms</h2>
-            <ul className="space-y-1.5">
-              {[
-                "Upgrade guaranteed within 4–5 business days",
-                "If upgrade fails for any reason, full refund guaranteed",
-                "Your credentials are encrypted and never stored in plain text",
-                "Do not change your password during the upgrade window",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-2 text-zinc-300 text-sm">
-                  <span className="text-green-400 mt-0.5">✓</span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+            {/* 2. Logo card */}
+            <div className="bg-[#0d0d18] border border-[#1e1e2e] rounded-2xl p-10 flex items-center justify-center mb-6">
+              {product.logoUrl ? (
+                <img
+                  src={product.logoUrl}
+                  alt={product.title}
+                  className="w-[120px] h-[120px] object-contain"
+                />
+              ) : (
+                <ServiceIcon serviceType={product.serviceType} logoUrl={product.logoUrl} size="lg" />
+              )}
+            </div>
 
-        {/* Right column — sticky purchase panel, NO logo */}
-        <div className="lg:sticky lg:top-20 h-fit">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 flex flex-col gap-5">
+            {/* 3. Description */}
+            <p className="text-[#a1a1aa] text-sm leading-relaxed mb-6">
+              {product.description}
+            </p>
+
+            {/* 4. What We Require */}
+            <div className="mb-6">
+              <h2 className="text-white font-semibold text-base mb-3">What We Require</h2>
+              <ul className="space-y-2">
+                {[
+                  "Your account email address",
+                  "Your account password (submitted via secure encrypted link after payment)",
+                  "Do not change your password during the upgrade process",
+                ].map((req) => (
+                  <li key={req} className="flex gap-2">
+                    <span className="text-purple-400 mt-0.5">•</span>
+                    <span className="text-[#a1a1aa] text-sm">{req}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 5. Warranty & Terms */}
             <div>
-              <p className="text-3xl font-bold text-white">£{price.toFixed(2)}</p>
-              <p className={`text-sm mt-1 font-medium ${stockColor}`}>{stockLabel}</p>
-            </div>
-
-            <ProductActions
-              price={price}
-              productId={product.id}
-              title={product.title}
-              description={product.description}
-              logoUrl={product.logoUrl}
-              serviceType={product.serviceType}
-              stock={stock}
-            />
-
-            <div className="flex items-center gap-2 text-zinc-500 text-xs pt-1 border-t border-zinc-800">
-              <Lock className="w-3.5 h-3.5 shrink-0" />
-              Secure checkout with 256-bit SSL encryption
+              <h2 className="text-white font-semibold text-base mb-3">Warranty &amp; Terms</h2>
+              <ul className="space-y-2">
+                {[
+                  "Upgrade guaranteed within 4–5 business days",
+                  "If upgrade fails for any reason, full refund guaranteed",
+                  "Your credentials are encrypted and never stored in plain text",
+                  "Do not change your password during the upgrade window",
+                ].map((t) => (
+                  <li key={t} className="flex gap-2">
+                    <span className="text-green-400 mt-0.5">✓</span>
+                    <span className="text-[#a1a1aa] text-sm">{t}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+
+          {/* RIGHT column — sticky purchase panel */}
+          <div className="lg:sticky lg:top-24 h-fit">
+            <div className="bg-[#0d0d18] border border-[#1e1e2e] rounded-2xl p-6 space-y-5">
+              {/* Price */}
+              <p className="font-rajdhani text-4xl font-bold text-white">
+                £{price.toFixed(2)}
+              </p>
+
+              {/* Stock pill */}
+              <span className={`text-xs font-medium px-2.5 py-1 rounded-full border inline-block ${stockBg}`}>
+                {stock} in stock
+              </span>
+
+              {/* Actions */}
+              <ProductActions
+                price={price}
+                productId={product.id}
+                title={product.title}
+                description={product.description}
+                logoUrl={product.logoUrl}
+                serviceType={product.serviceType}
+                stock={stock}
+              />
+
+              {/* Divider */}
+              <hr className="border-[#1e1e2e]" />
+
+              {/* SSL */}
+              <div className="flex items-center gap-1.5 text-[#52525b] text-xs">
+                <Lock className="w-3.5 h-3.5 shrink-0" />
+                Secured by 256-bit SSL
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
