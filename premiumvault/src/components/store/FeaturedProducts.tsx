@@ -82,6 +82,7 @@ export function FeaturedProducts({ products }: Props) {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     isHorizontalDrag.current = null;
+    isDragging.current = false;
     isPaused.current = true;
   };
 
@@ -90,20 +91,22 @@ export function FeaturedProducts({ products }: Props) {
     const dx = e.touches[0].clientX - touchStartX.current;
     const dy = e.touches[0].clientY - touchStartY.current;
 
-    // Decide once on first meaningful movement
-    if (isHorizontalDrag.current === null && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
-      isHorizontalDrag.current = Math.abs(dx) > Math.abs(dy);
+    // Lock direction on first 8px of movement
+    if (isHorizontalDrag.current === null) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      isHorizontalDrag.current = Math.abs(dx) >= Math.abs(dy);
     }
 
-    // Only drag cards if horizontal — let vertical scroll pass through
+    // Vertical touch → page scrolls, carousel does nothing
     if (!isHorizontalDrag.current) return;
+
+    // Horizontal drag locked — only left/right, no vertical involvement
     e.preventDefault();
     isDragging.current = true;
 
-    const resistance = 0.4;
     const atStart = active === 0 && dx > 0;
     const atEnd = active === featured.length - 1 && dx < 0;
-    setDragOffset(atStart || atEnd ? dx * resistance : dx);
+    setDragOffset(atStart || atEnd ? dx * 0.3 : dx);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
@@ -166,9 +169,11 @@ export function FeaturedProducts({ products }: Props) {
           return (
             <div
               key={product.id}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
+              {...(isActive ? {
+                onTouchStart: handleTouchStart,
+                onTouchMove: handleTouchMove,
+                onTouchEnd: handleTouchEnd,
+              } : {})}
               onClick={() => {
                 if (isDragging.current) return;
                 if (isActive) router.push(`/products/${product.id}`);
