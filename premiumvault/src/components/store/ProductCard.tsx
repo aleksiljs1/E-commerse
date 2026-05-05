@@ -2,8 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ServiceIcon } from "./ServiceIcon";
 import type { SerializedProduct } from "@/types";
 
@@ -34,19 +32,10 @@ export function ProductCard({ product }: Props) {
   return (
     <div
       onClick={handleCardClick}
-      className="rounded-2xl border border-zinc-800 bg-zinc-900 hover:border-indigo-500 transition-all cursor-pointer flex flex-col overflow-hidden"
+      className="bg-[#0d0d18] border border-[#1e1e2e] rounded-2xl hover:border-purple-600/50 hover:shadow-[0_0_20px_rgba(124,58,237,0.15)] transition-all cursor-pointer flex flex-col overflow-hidden group"
     >
-      {/* Featured badge */}
-      {product.featured && (
-        <div className="px-4 pt-3 flex justify-end">
-          <Badge className="bg-indigo-600 hover:bg-indigo-600 text-white text-xs px-2 py-0.5">
-            Featured
-          </Badge>
-        </div>
-      )}
-
-      {/* Top — icon */}
-      <div className="flex items-center justify-center py-8 px-4">
+      {/* Icon area */}
+      <div className="flex items-center justify-center py-10 px-6 bg-[#141420]">
         <ServiceIcon
           serviceType={product.serviceType}
           logoUrl={product.logoUrl}
@@ -54,35 +43,34 @@ export function ProductCard({ product }: Props) {
         />
       </div>
 
-      {/* Title */}
-      <p className="font-semibold text-white text-sm text-center px-4 pb-1">
-        {product.title}
-      </p>
+      {/* Body */}
+      <div className="p-4 flex flex-col gap-2 flex-1">
+        <p className="text-sm font-semibold text-white leading-snug">{product.title}</p>
+        <p className="text-purple-400 font-bold text-lg">£{product.price.toFixed(2)}</p>
 
-      {/* Price */}
-      <p className="text-indigo-400 font-bold text-lg text-center pb-2">
-        £{product.price.toFixed(2)}
-      </p>
+        {product.stock < 5 && (
+          <p className="text-orange-400 text-xs font-medium">
+            Only {product.stock} left
+          </p>
+        )}
 
-      {/* Low stock warning */}
-      {product.stock < 5 && (
-        <p className="text-orange-400 text-xs font-medium text-center pb-2">
-          Only {product.stock} left
-        </p>
-      )}
+        {product.featured && (
+          <span className="inline-block w-fit bg-purple-600/20 text-purple-400 text-xs px-2 py-0.5 rounded-full border border-purple-600/30">
+            Featured
+          </span>
+        )}
 
-      {/* Spacer to push button to bottom */}
-      <div className="flex-1" />
+        <div className="flex-1" />
+      </div>
 
-      {/* Add to Cart button */}
-      <div className="px-4 pb-4 pt-2">
-        <Button
+      {/* Footer */}
+      <div className="p-4 pt-0">
+        <button
           onClick={handleAddToCart}
-          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
-          size="sm"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
         >
           Add to Cart
-        </Button>
+        </button>
       </div>
     </div>
   );

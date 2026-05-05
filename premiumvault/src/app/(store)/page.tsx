@@ -26,7 +26,7 @@ export default async function StoreHomePage() {
       <CategoryTabs />
       <HeroSection />
       <TrustBar />
-      <ProductGrid products={products.length > 0 ? products : undefined} />
+      <ProductGrid products={products} />
       <ReviewsSection />
       <Footer />
     </>
