@@ -25,21 +25,16 @@ export function HeroSection() {
 
         {/* CTA buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
-          <Button
-            asChild
-            size="lg"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8"
-          >
-            <Link href="/products">Browse Products</Link>
-          </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="border-zinc-700 text-white hover:bg-zinc-800 px-8"
-          >
-            <Link href="#how-it-works">How It Works</Link>
-          </Button>
+          <Link href="/products">
+            <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8">
+              Browse Products
+            </Button>
+          </Link>
+          <Link href="#how-it-works">
+            <Button size="lg" variant="outline" className="border-zinc-700 text-white hover:bg-zinc-800 px-8">
+              How It Works
+            </Button>
+          </Link>
         </div>
 
         {/* Trust row */}

@@ -18,9 +18,7 @@ import { ImageUpload } from "./ImageUpload";
 const productFormSchema = z.object({
   title: z.string().min(2, "Min 2 characters"),
   description: z.string().min(10, "Min 10 characters"),
-  price: z
-    .number({ invalid_type_error: "Must be a number" })
-    .positive("Must be positive"),
+  price: z.number().positive("Must be positive"),
   stock: z.number().int().min(0),
   serviceType: z.string().min(1, "Required"),
   logoUrl: z.string().optional(),
