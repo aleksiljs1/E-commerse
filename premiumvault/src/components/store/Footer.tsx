@@ -55,7 +55,7 @@ export function Footer() {
         </div>
 
         <div className="text-center pt-7 border-t border-[#1F8A5B]/20 text-[#A0B5A8] text-xs">
-          <p>&copy; 2026 PremiumVault. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} PremiumVault. All rights reserved.</p>
         </div>
       </div>
     </footer>

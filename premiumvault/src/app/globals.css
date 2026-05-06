@@ -8,7 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -82,6 +82,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --accent-glow: rgba(31, 138, 91, 0.4);
+  --store-bg: #0F1412;
+  --store-card-bg: #16221B;
+  --store-border: #1F8A5B;
+  --store-text-muted: #A0B5A8;
 }
 
 .dark {
@@ -118,14 +123,6 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-:root {
-  --accent: #1F8A5B;
-  --accent-glow: rgba(31, 138, 91, 0.4);
-  --store-bg: #0F1412;
-  --store-card-bg: #16221B;
-  --store-border: #1F8A5B;
-  --store-text-muted: #A0B5A8;
-}
 
 @layer base {
   * {
@@ -141,10 +138,10 @@
 
 @layer utilities {
   .font-rajdhani {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: var(--font-rajdhani), sans-serif;
   }
   .font-inter {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
   }
   .scrollbar-hide {
     -ms-overflow-style: none;

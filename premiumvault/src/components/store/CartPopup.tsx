@@ -29,12 +29,12 @@ export function CartPopup() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/60"
+        className="fixed inset-0 z-[1001] bg-black/60"
         onClick={closeCart}
       />
 
       {/* Popup box */}
-      <div className="fixed top-16 right-4 z-50 w-[380px] max-h-[70vh] bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="fixed top-16 right-4 z-[1002] w-[380px] max-w-[calc(100vw-2rem)] max-h-[70vh] bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#1F8A5B]/30">
           <h2 className="text-base font-semibold text-[#E8F5EE]">Your Basket</h2>
