@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Menu, X, ShoppingCart } from "lucide-react";
-import Image from "next/image";
 import { useCartStore } from "@/store/cart";
 
 const NAV_LINKS = [
@@ -40,7 +39,6 @@ export function Navbar() {
           className="font-rajdhani text-xl font-bold flex items-center gap-2 text-[#E8F5EE]"
           onClick={() => setMobileOpen(false)}
         >
-          <Image src="/logo.png" alt="PremiumVault" width={48} height={48} className="rounded-md" />
           PremiumVault
         </Link>
 
