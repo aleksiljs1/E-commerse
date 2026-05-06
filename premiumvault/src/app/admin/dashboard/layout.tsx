@@ -24,7 +24,7 @@ async function AdminAuthGuard({ children }: { children: React.ReactNode }) {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen bg-[#0F1412] text-white overflow-hidden">
+    <div className="flex h-screen bg-[#0e0c1a] text-white overflow-hidden">
       <Suspense fallback={
         <div className="flex-1 flex items-center justify-center">
           <div className="text-[#a1a1aa] text-sm">Loading...</div>

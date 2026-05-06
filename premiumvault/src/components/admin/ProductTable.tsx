@@ -50,17 +50,17 @@ export function ProductTable({ products, onDeactivate }: Props) {
   function SortIcon({ col }: { col: SortKey }) {
     if (sortKey !== col) return <ChevronUp className="w-3 h-3 opacity-30 inline ml-1" />;
     return sortDir === "asc" ? (
-      <ChevronUp className="w-3 h-3 inline ml-1 text-[#6ED3A3]" />
+      <ChevronUp className="w-3 h-3 inline ml-1 text-rose-400" />
     ) : (
-      <ChevronDown className="w-3 h-3 inline ml-1 text-[#6ED3A3]" />
+      <ChevronDown className="w-3 h-3 inline ml-1 text-rose-400" />
     );
   }
 
   return (
-    <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-xl overflow-hidden">
+    <div className="bg-white/[0.04] border border-white/[0.1] rounded-xl overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="border-[#1F8A5B]/20 hover:bg-transparent bg-[#0F1412]/60">
+          <TableRow className="border-white/[0.1] hover:bg-transparent bg-[#0e0c1a]/60">
             <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium w-12">Logo</TableHead>
             <TableHead
               className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium cursor-pointer select-none"
@@ -89,13 +89,13 @@ export function ProductTable({ products, onDeactivate }: Props) {
         <TableBody>
           {sorted.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center text-[#A0B5A8] py-8">
+              <TableCell colSpan={8} className="text-center text-gray-400 py-8">
                 No products found.
               </TableCell>
             </TableRow>
           )}
           {sorted.map((product) => (
-            <TableRow key={product.id} className="border-[#1F8A5B]/20 hover:bg-[#1F8A5B]/10">
+            <TableRow key={product.id} className="border-white/[0.1] hover:bg-white/[0.05]">
               <TableCell>
                 <ServiceIcon
                   serviceType={product.serviceType}
@@ -103,14 +103,14 @@ export function ProductTable({ products, onDeactivate }: Props) {
                   size="sm"
                 />
               </TableCell>
-              <TableCell className="font-medium text-[#E8F5EE]">{product.title}</TableCell>
+              <TableCell className="font-medium text-white">{product.title}</TableCell>
               <TableCell>
                 <span className="text-zinc-500 text-xs capitalize">
                   {product.serviceType}
                 </span>
               </TableCell>
-              <TableCell className="text-[#A0B5A8]">£{Number(product.price).toFixed(2)}</TableCell>
-              <TableCell className="text-[#A0B5A8]">{product.stock}</TableCell>
+              <TableCell className="text-gray-400">£{Number(product.price).toFixed(2)}</TableCell>
+              <TableCell className="text-gray-400">{product.stock}</TableCell>
               <TableCell>
                 {product.active ? (
                   <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-green-500/10 text-green-400">
@@ -124,7 +124,7 @@ export function ProductTable({ products, onDeactivate }: Props) {
                   </span>
                 )}
               </TableCell>
-              <TableCell className="text-[#A0B5A8]">
+              <TableCell className="text-gray-400">
                 {product._count?.orderItems ?? 0}
               </TableCell>
               <TableCell>

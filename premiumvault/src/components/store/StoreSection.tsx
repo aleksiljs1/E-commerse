@@ -32,6 +32,7 @@ export function StoreSection({ products }: { products: SerializedProduct[] }) {
 
   return (
     <section id="products" className="max-w-[1200px] mx-auto px-6 md:px-10 py-10">
+      <h2 className="font-rajdhani text-3xl font-bold text-white mb-6">Featured Deals</h2>
       <div className="flex gap-2.5 overflow-x-auto scrollbar-hide mb-8 pb-1">
         {CATEGORIES.map((cat) => (
           <button
@@ -39,8 +40,8 @@ export function StoreSection({ products }: { products: SerializedProduct[] }) {
             onClick={() => setActive(cat)}
             className={`px-5 py-2 rounded-full text-[0.85rem] font-medium whitespace-nowrap transition-all border cursor-pointer shrink-0 ${
               active === cat
-                ? "bg-[#1F8A5B]/20 border-[#1F8A5B] text-[#2ECC71]"
-                : "bg-transparent border-[#1F8A5B]/25 text-[#A0B5A8] hover:border-[#1F8A5B]/50 hover:text-[#E8F5EE]"
+                ? "bg-orange-500/10 border-orange-500/50 text-orange-400"
+                : "bg-white/[0.03] border-white/[0.08] text-gray-400 hover:border-white/[0.15] hover:text-white"
             }`}
           >
             {cat}
@@ -50,20 +51,20 @@ export function StoreSection({ products }: { products: SerializedProduct[] }) {
 
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-          <div className="w-16 h-16 rounded-xl bg-[#16221B] border border-[#1F8A5B]/25 flex items-center justify-center">
-            <Layers className="w-8 h-8 text-[#1F8A5B]" />
+          <div className="w-16 h-16 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
+            <Layers className="w-8 h-8 text-gray-500" />
           </div>
-          <p className="text-[#E8F5EE] font-semibold text-lg">No services in this category yet</p>
-          <p className="text-[#A0B5A8] text-sm">Check back soon or browse everything we have.</p>
+          <p className="text-white font-semibold text-lg">No services in this category yet</p>
+          <p className="text-gray-400 text-sm">Check back soon or browse everything we have.</p>
           <button
             onClick={() => setActive("All")}
-            className="text-[#2ECC71] text-sm hover:opacity-80 transition-opacity mt-1"
+            className="text-orange-400 text-sm hover:opacity-80 transition-opacity mt-1"
           >
             View all services →
           </button>
         </div>
       ) : (
-        <ProductGrid products={filtered} />
+        <ProductGrid products={filtered} carousel />
       )}
     </section>
   );

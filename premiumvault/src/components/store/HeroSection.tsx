@@ -1,45 +1,51 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Lock, Shield, Clock, MessageCircle } from "lucide-react";
+import { Lock, Shield, Clock, MessageCircle, ClipboardList, Headphones, Star } from "lucide-react";
+
+const trustItems = [
+  { icon: ClipboardList, value: "9,083+", label: "Orders Delivered" },
+  { icon: Lock, value: "Secure", label: "Payment Protection" },
+  { icon: Headphones, value: "24h", label: "Support Response" },
+  { icon: Star, value: "Trustpilot", label: "Verified Reviews", highlight: true },
+];
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden -mt-[65px] pt-[71px] pb-[50px] px-6 md:px-10 text-center">
+    <section className="relative overflow-hidden min-h-[calc(100vh-97px)] flex flex-col justify-between text-center">
       {/* Cosmic background image */}
       <Image
-        src="/cosmic-bg.png"
+        src="/cosmic-bg.webp"
         alt=""
         fill
         priority
         className="object-cover pointer-events-none scale-110"
       />
       {/* Bottom fade to blend into page */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-[1]" style={{ background: "linear-gradient(to bottom, transparent, #0e0c1a)" }} />
+      <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-[1]" style={{ background: "linear-gradient(to bottom, transparent, #0a0a0f)" }} />
 
-      <div className="relative max-w-[860px] mx-auto">
+      {/* Main content — centered vertically */}
+      <div className="relative z-10 max-w-[860px] mx-auto flex-1 flex flex-col justify-center py-10 px-6 md:px-10">
         {/* Brand name */}
-        <p className="text-sm font-medium text-gray-400 tracking-widest uppercase mb-4">PremiumVault</p>
+        <p className="text-sm font-semibold text-purple-300/80 tracking-widest uppercase mb-4">Personal Account Upgrades</p>
 
         {/* Headline */}
         <h1 className="font-rajdhani text-5xl md:text-7xl font-bold leading-[1.1] mb-6">
-          <span className="text-white">Digital subscriptions,</span>
-          <br />
+          <span className="text-white">Elevate Every </span>
           <span className="bg-gradient-to-r from-orange-400 via-rose-400 to-pink-400 bg-clip-text text-transparent">
-            delivered fast
+            Subscription
           </span>
         </h1>
 
         {/* Subtext */}
         <p className="text-base text-gray-400 mb-10 max-w-[600px] mx-auto leading-relaxed">
-          Secure checkout. Verified delivery. Clear policies. Get premium
-          accounts and services delivered within 12-24 hours.
+          Upgrade your personal accounts with premium subscriptions at a lowered cost
         </p>
 
         {/* CTAs */}
         <div className="flex gap-3 justify-center flex-wrap mb-10">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2.5 text-white px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(249,115,22,0.3)]"
+            className="relative z-20 inline-flex items-center gap-2.5 text-white px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(249,115,22,0.3)]"
             style={{ background: "linear-gradient(to right, #f97316 2%, #f43f5e 50%, #9333ea 98%)" }}
           >
             <Lock className="w-4 h-4" />
@@ -47,7 +53,7 @@ export function HeroSection() {
           </Link>
           <Link
             href="/products"
-            className="inline-flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.15] hover:bg-white/[0.08] hover:border-white/[0.25] text-gray-200 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all backdrop-blur-md"
+            className="relative z-20 inline-flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.15] hover:bg-white/[0.08] hover:border-white/[0.25] text-gray-200 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all backdrop-blur-md"
           >
             <Lock className="w-4 h-4" />
             Shop Services
@@ -55,7 +61,7 @@ export function HeroSection() {
         </div>
 
         {/* Stats pills */}
-        <div className="flex gap-3 justify-center flex-wrap mb-8">
+        <div className="relative z-20 flex gap-3 justify-center flex-wrap mb-8">
           <div className="inline-flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-full px-5 py-2.5 backdrop-blur-sm">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-gray-400">
               <path d="M2 12L5 5L8 8L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -86,6 +92,26 @@ export function HeroSection() {
             <MessageCircle className="w-3.5 h-3.5" />
             <span>Response within 24h</span>
           </div>
+        </div>
+      </div>
+
+      {/* Trust Bar — pinned to bottom */}
+      <div className="relative z-20 w-full border-y border-white/[0.12] bg-[#0c0a18]/90 backdrop-blur-md">
+        <div className="max-w-[1200px] mx-auto px-6 md:px-10 py-5 grid grid-cols-2 gap-4 lg:flex lg:items-center lg:justify-between lg:py-7">
+          {trustItems.map(({ icon: Icon, value, label, highlight }, i) => (
+            <div key={label} className="flex items-center lg:flex-row">
+              {i > 0 && (
+                <div className="hidden lg:block w-px h-12 bg-white/[0.1] mr-8" />
+              )}
+              <div className="flex items-center gap-3 py-1 lg:gap-3.5 lg:py-2">
+                <Icon className={`w-5 h-5 lg:w-6 lg:h-6 shrink-0 ${highlight ? "text-emerald-400" : "text-gray-400"}`} />
+                <div className="text-left">
+                  <p className={`text-sm lg:text-base font-bold leading-tight ${highlight ? "text-emerald-400" : "text-white"}`}>{value}</p>
+                  <p className="text-xs lg:text-sm text-gray-500 leading-tight">{label}</p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

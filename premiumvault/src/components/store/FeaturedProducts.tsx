@@ -16,7 +16,7 @@ const SERVICE_GRADIENTS: Record<string, string> = {
   disney:     "from-[#113CCF]/30 via-[#0a0f1a] to-[#0d1118]",
   applemusic: "from-[#FC3C44]/25 via-[#1a0a0f] to-[#0d1010]",
   hulu:       "from-[#1CE783]/25 via-[#0a1a0f] to-[#0d1410]",
-  default:    "from-[#1F8A5B]/25 via-[#0d1a11] to-[#0d1410]",
+  default:    "from-orange-400/25 via-[#0d0d14] to-[#0a0a0f]",
 };
 
 function getGradient(s: string) {
@@ -94,14 +94,14 @@ export function FeaturedProducts({ products }: Props) {
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
         <div className="flex items-end justify-between mb-10">
           <div>
-            <p className="text-xs uppercase tracking-widest text-[#1F8A5B] font-semibold mb-2">Top Picks</p>
-            <h2 className="font-rajdhani text-3xl md:text-4xl font-bold text-[#E8F5EE]">
+            <p className="text-xs uppercase tracking-widest text-orange-400 font-semibold mb-2">Top Picks</p>
+            <h2 className="font-rajdhani text-3xl md:text-4xl font-bold text-white">
               Featured Services
             </h2>
           </div>
           <Link
             href="/products"
-            className="hidden sm:flex items-center gap-1.5 text-[#2ECC71] hover:text-[#27AE60] transition-colors text-sm font-medium"
+            className="hidden sm:flex items-center gap-1.5 text-orange-400 hover:text-rose-500 transition-colors text-sm font-medium"
           >
             View all <ArrowRight className="w-4 h-4" />
           </Link>
@@ -157,9 +157,9 @@ export function FeaturedProducts({ products }: Props) {
                 className={`
                   relative rounded-3xl overflow-hidden
                   bg-gradient-to-b ${gradient}
-                  border border-[#1F8A5B]/25
+                  border border-white/[0.1]
                   ${isActive
-                    ? "shadow-[0_24px_64px_rgba(0,0,0,0.7),0_0_40px_rgba(31,138,91,0.2)]"
+                    ? "shadow-[0_24px_64px_rgba(0,0,0,0.7),0_0_40px_rgba(251,146,60,0.2)]"
                     : "shadow-[0_8px_24px_rgba(0,0,0,0.5)]"}
                 `}
               >
@@ -177,22 +177,22 @@ export function FeaturedProducts({ products }: Props) {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <Layers className="w-10 h-10 text-[#2ECC71]" />
+                      <Layers className="w-10 h-10 text-orange-400" />
                     )}
                   </div>
 
                   {/* Title */}
-                  <p className="text-[#E8F5EE] font-semibold text-sm leading-snug line-clamp-2 mb-2">
+                  <p className="text-white font-semibold text-sm leading-snug line-clamp-2 mb-2">
                     {product.title}
                   </p>
 
                   {/* Price */}
-                  <p className="font-rajdhani text-3xl font-bold text-[#2ECC71] mb-2">
+                  <p className="font-rajdhani text-3xl font-bold text-orange-400 mb-2">
                     £{product.price.toFixed(2)}
                   </p>
 
                   {/* Delivery */}
-                  <div className="flex items-center gap-1.5 text-[#A0B5A8] text-xs">
+                  <div className="flex items-center gap-1.5 text-gray-400 text-xs">
                     <Clock className="w-3 h-3" />
                     4–5 Day Delivery
                   </div>
@@ -207,7 +207,7 @@ export function FeaturedProducts({ products }: Props) {
                     paddingBottom: "8px",
                     width: "100%",
                   }}>
-                    <span className="inline-block text-sm font-semibold text-white bg-gradient-to-r from-[#2ECC71] to-[#27AE60] rounded-xl px-12 py-2.5 shadow-[0_3px_12px_rgba(46,204,113,0.25)]">
+                    <span className="inline-block text-sm font-semibold text-white bg-gradient-to-r from-orange-400 to-rose-500 rounded-xl px-12 py-2.5 shadow-[0_3px_12px_rgba(251,146,60,0.25)]">
                       View
                     </span>
                   </div>
@@ -221,25 +221,25 @@ export function FeaturedProducts({ products }: Props) {
 
       {/* Controls */}
       <div className="flex items-center justify-center gap-6 mt-8">
-        <button onClick={prev} className="w-10 h-10 rounded-full bg-[#16221B] border border-[#1F8A5B]/30 hover:border-[#1F8A5B] text-[#A0B5A8] hover:text-[#2ECC71] flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(31,138,91,0.3)]">
+        <button onClick={prev} className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/[0.1] hover:border-white/[0.2] text-gray-400 hover:text-orange-400 flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(251,146,60,0.3)]">
           <ChevronLeft className="w-5 h-5" />
         </button>
 
         <div className="flex gap-2">
           {featured.map((_, i) => (
             <button key={i} onClick={() => { setActive(i); pauseAndResume(); }}
-              className={`rounded-full transition-all duration-300 ${i === active ? "w-6 h-2 bg-[#2ECC71]" : "w-2 h-2 bg-[#1F8A5B]/30 hover:bg-[#1F8A5B]/60"}`}
+              className={`rounded-full transition-all duration-300 ${i === active ? "w-6 h-2 bg-orange-400" : "w-2 h-2 bg-white/[0.1] hover:bg-white/[0.2]"}`}
             />
           ))}
         </div>
 
-        <button onClick={next} className="w-10 h-10 rounded-full bg-[#16221B] border border-[#1F8A5B]/30 hover:border-[#1F8A5B] text-[#A0B5A8] hover:text-[#2ECC71] flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(31,138,91,0.3)]">
+        <button onClick={next} className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/[0.1] hover:border-white/[0.2] text-gray-400 hover:text-orange-400 flex items-center justify-center transition-all hover:shadow-[0_0_12px_rgba(251,146,60,0.3)]">
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
       <div className="sm:hidden px-6 mt-8 flex justify-center">
-        <Link href="/products" className="flex items-center gap-1.5 text-[#2ECC71] text-sm font-medium">
+        <Link href="/products" className="flex items-center gap-1.5 text-orange-400 text-sm font-medium">
           View all services <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

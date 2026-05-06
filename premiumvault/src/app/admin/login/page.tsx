@@ -48,10 +48,10 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left panel — branding */}
-      <div className="hidden lg:flex flex-col gap-16 w-1/2 bg-[#0F1412] p-12">
+      <div className="hidden lg:flex flex-col gap-16 w-1/2 bg-[#0e0c1a] p-12">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 bg-white rounded-sm flex items-center justify-center shrink-0">
-            <span className="text-[#0F1412] text-[10px] font-black leading-none tracking-tight">PV</span>
+            <span className="text-[#0e0c1a] text-[10px] font-black leading-none tracking-tight">PV</span>
           </div>
           <span className="font-rajdhani text-white font-bold text-lg tracking-wide">PremiumVault</span>
         </div>
@@ -74,24 +74,24 @@ export default function AdminLoginPage() {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center bg-[#0F1412] p-8">
+      <div className="flex-1 flex items-center justify-center bg-[#0e0c1a] p-8">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="flex items-center gap-2.5 mb-10 lg:hidden">
             <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center shrink-0">
-              <span className="text-[#0F1412] text-[10px] font-black leading-none tracking-tight">PV</span>
+              <span className="text-[#0e0c1a] text-[10px] font-black leading-none tracking-tight">PV</span>
             </div>
             <span className="font-rajdhani text-white font-bold tracking-wide">PremiumVault</span>
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-[#E8F5EE]">Welcome back</h1>
-            <p className="text-[#A0B5A8] text-sm mt-1">Sign in to your admin account</p>
+            <h1 className="text-2xl font-bold text-white">Welcome back</h1>
+            <p className="text-gray-400 text-sm mt-1">Sign in to your admin account</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#A0B5A8]" htmlFor="email">
+              <label className="text-sm font-medium text-gray-400" htmlFor="email">
                 Email address
               </label>
               <input
@@ -99,7 +99,7 @@ export default function AdminLoginPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="admin@example.com"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#16221B] border border-[#1F8A5B]/30 text-white placeholder-[#A0B5A8]/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#1F8A5B] focus:border-[#1F8A5B] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.1] text-white placeholder-gray-400/50 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors"
                 {...register("email")}
               />
               {errors.email && (
@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#A0B5A8]" htmlFor="password">
+              <label className="text-sm font-medium text-gray-400" htmlFor="password">
                 Password
               </label>
               <input
@@ -116,7 +116,7 @@ export default function AdminLoginPage() {
                 type="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#16221B] border border-[#1F8A5B]/30 text-white placeholder-[#A0B5A8]/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#1F8A5B] focus:border-[#1F8A5B] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.1] text-white placeholder-gray-400/50 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors"
                 {...register("password")}
               />
               {errors.password && (
@@ -127,7 +127,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-[#2ECC71] to-[#27AE60] text-white text-sm font-semibold hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-2 cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-orange-500 to-rose-500 text-white text-sm font-semibold hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-2 cursor-pointer"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -143,7 +143,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          <p className="text-[#A0B5A8]/60 text-xs text-center mt-8">
+          <p className="text-gray-400/60 text-xs text-center mt-8">
             Access restricted to authorized administrators only.
           </p>
         </div>

@@ -69,9 +69,9 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Title */}
       <div>
-        <Label className="text-[#A0B5A8] mb-2 block">Title</Label>
+        <Label className="text-gray-400 mb-2 block">Title</Label>
         <Input
-          className="bg-[#0F1412] border-[#1F8A5B]/30 text-white"
+          className="bg-[#0e0c1a] border-white/[0.1] text-white"
           placeholder="e.g. Spotify Premium — Personal"
           {...register("title")}
         />
@@ -82,13 +82,13 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
 
       {/* Service Type */}
       <div>
-        <Label className="text-[#A0B5A8] mb-2 block">Service Type</Label>
+        <Label className="text-gray-400 mb-2 block">Service Type</Label>
         <Controller
           name="serviceType"
           control={control}
           render={({ field }) => (
             <Select value={field.value ?? ""} onValueChange={field.onChange}>
-              <SelectTrigger className="w-full bg-[#0F1412] border-[#1F8A5B]/30 text-white">
+              <SelectTrigger className="w-full bg-[#0e0c1a] border-white/[0.1] text-white">
                 <SelectValue placeholder="Select service..." />
               </SelectTrigger>
               <SelectContent>
@@ -108,9 +108,9 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
 
       {/* Description */}
       <div>
-        <Label className="text-[#A0B5A8] mb-2 block">Description</Label>
+        <Label className="text-gray-400 mb-2 block">Description</Label>
         <textarea
-          className="w-full min-h-[100px] px-3 py-2 rounded-lg bg-[#0F1412] border border-[#1F8A5B]/30 text-white text-sm placeholder:text-[#A0B5A8]/50 focus:outline-none focus:ring-2 focus:ring-[#1F8A5B] resize-y"
+          className="w-full min-h-[100px] px-3 py-2 rounded-lg bg-[#0e0c1a] border border-white/[0.1] text-white text-sm placeholder:text-gray-400/50 focus:outline-none focus:ring-2 focus:ring-orange-400 resize-y"
           placeholder="Describe the product..."
           rows={4}
           {...register("description")}
@@ -123,12 +123,12 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
       {/* Price + Stock */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label className="text-[#A0B5A8] mb-2 block">Price (£)</Label>
+          <Label className="text-gray-400 mb-2 block">Price (£)</Label>
           <Input
             type="number"
             step="0.01"
             min="0"
-            className="bg-[#0F1412] border-[#1F8A5B]/30 text-white"
+            className="bg-[#0e0c1a] border-white/[0.1] text-white"
             placeholder="9.99"
             {...register("price", { valueAsNumber: true })}
           />
@@ -137,11 +137,11 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
           )}
         </div>
         <div>
-          <Label className="text-[#A0B5A8] mb-2 block">Stock</Label>
+          <Label className="text-gray-400 mb-2 block">Stock</Label>
           <Input
             type="number"
             min="0"
-            className="bg-[#0F1412] border-[#1F8A5B]/30 text-white"
+            className="bg-[#0e0c1a] border-white/[0.1] text-white"
             placeholder="100"
             {...register("stock", { valueAsNumber: true })}
           />
@@ -153,7 +153,7 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
 
       {/* Logo Upload */}
       <div>
-        <Label className="text-[#A0B5A8] mb-2 block">Product Logo</Label>
+        <Label className="text-gray-400 mb-2 block">Product Logo</Label>
         <ImageUpload
           value={logoUrl}
           onChange={(url) => setValue("logoUrl", url)}
@@ -165,18 +165,18 @@ export function ProductForm({ defaultValues, onSubmit, isLoading, mode }: Props)
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
-            className="w-4 h-4 rounded border-[#1F8A5B]/30 bg-[#0F1412] accent-[#2ECC71]"
+            className="w-4 h-4 rounded border-white/[0.1] bg-[#0e0c1a] accent-orange-400"
             {...register("featured")}
           />
-          <span className="text-sm text-[#A0B5A8]">Featured</span>
+          <span className="text-sm text-gray-400">Featured</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
-            className="w-4 h-4 rounded border-[#1F8A5B]/30 bg-[#0F1412] accent-[#2ECC71]"
+            className="w-4 h-4 rounded border-white/[0.1] bg-[#0e0c1a] accent-orange-400"
             {...register("active")}
           />
-          <span className="text-sm text-[#A0B5A8]">Active</span>
+          <span className="text-sm text-gray-400">Active</span>
         </label>
       </div>
 

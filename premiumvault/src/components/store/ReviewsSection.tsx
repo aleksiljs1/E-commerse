@@ -25,24 +25,24 @@ const reviews = [
 export function ReviewsSection() {
   return (
     <section id="reviews" className="py-16 px-6 md:px-10 max-w-[1200px] mx-auto">
-      <h2 className="font-rajdhani text-center text-3xl font-bold mb-10 text-[#E8F5EE]">What Our Customers Say</h2>
+      <h2 className="font-rajdhani text-center text-3xl font-bold mb-10 text-white">What Our Customers Say</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {reviews.map((review) => (
           <div
             key={review.name}
-            className="bg-[#16221B] border border-[#1F8A5B]/20 rounded-2xl p-7 transition-all hover:border-[#1F8A5B] hover:-translate-y-1"
+            className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7 transition-all hover:border-white/[0.2] hover:-translate-y-1"
           >
-            <div className="text-[#2ECC71] text-lg mb-3.5">
+            <div className="text-orange-400 text-lg mb-3.5">
               {"★".repeat(review.stars)}
             </div>
-            <p className="text-sm text-[#A0B5A8] mb-5 leading-7">{review.text}</p>
+            <p className="text-sm text-gray-400 mb-5 leading-7">{review.text}</p>
             <div className="flex items-center gap-3">
-              <div className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-[#1F8A5B] to-[#6ED3A3] flex items-center justify-center font-bold text-sm text-white">
+              <div className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-orange-500 to-rose-500 flex items-center justify-center font-bold text-sm text-white">
                 {review.initials}
               </div>
               <div>
-                <div className="font-semibold text-sm text-[#E8F5EE]">{review.name}</div>
-                <div className="text-xs text-[#A0B5A8]">{review.date}</div>
+                <div className="font-semibold text-sm text-white">{review.name}</div>
+                <div className="text-xs text-gray-400">{review.date}</div>
               </div>
             </div>
           </div>

@@ -7,7 +7,12 @@ import Image from "next/image";
 import { useCartStore } from "@/store/cart";
 
 const NAV_LINKS = [
-  { href: "/products", label: "Accounts", hasDropdown: true },
+  { href: "/products", label: "Products", hasDropdown: false },
+  // TODO: Reviews page — link to a dedicated reviews page or section.
+  // Should display verified Trustpilot/customer reviews with ratings,
+  // review text, date, and product purchased. Consider adding filters
+  // (by product, rating) and pagination.
+  { href: "#reviews", label: "Reviews", hasDropdown: false },
 ];
 
 export function Navbar() {
@@ -70,6 +75,7 @@ export function Navbar() {
           <button
             onClick={openCart}
             className={`relative w-9 h-9 rounded-lg bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-gray-400 hover:text-white transition-all ${bump ? "scale-110" : "scale-100"} transition-transform duration-200`}
+            style={{ touchAction: "manipulation" }}
             aria-label="Open basket"
           >
             <ShoppingCart className="w-4 h-4" />
@@ -91,6 +97,7 @@ export function Navbar() {
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen((o) => !o)}
+            style={{ touchAction: "manipulation" }}
             className="lg:hidden text-gray-400 hover:text-white transition-colors p-1"
             aria-label="Toggle navigation"
           >
@@ -100,7 +107,7 @@ export function Navbar() {
       </nav>
 
       {/* Must Read Banner */}
-      <div className="relative w-full py-2.5 flex items-center justify-center overflow-hidden"
+      <div className="relative z-[999] w-full py-2.5 flex items-center justify-center overflow-hidden"
         style={{
           background: "linear-gradient(90deg, #1a0a2e 0%, #2d1b4e 15%, #4a1942 30%, #6b2140 45%, #8b4513 55%, #b8860b 65%, #4a6741 80%, #2d4a7a 90%, #1a0a2e 100%)",
         }}

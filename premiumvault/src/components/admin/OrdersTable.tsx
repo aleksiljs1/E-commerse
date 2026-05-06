@@ -19,10 +19,10 @@ type Props = {
 
 export function OrdersTable({ orders }: Props) {
   return (
-    <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-xl overflow-hidden">
+    <div className="bg-white/[0.04] border border-white/[0.1] rounded-xl overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="border-[#1F8A5B]/20 hover:bg-transparent bg-[#0F1412]/60">
+          <TableRow className="border-white/[0.1] hover:bg-transparent bg-[#0e0c1a]/60">
             <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Order #</TableHead>
             <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Customer Email</TableHead>
             <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium">Items</TableHead>
@@ -36,21 +36,21 @@ export function OrdersTable({ orders }: Props) {
         <TableBody>
           {orders.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center text-[#A0B5A8] py-8">
+              <TableCell colSpan={8} className="text-center text-gray-400 py-8">
                 No orders found.
               </TableCell>
             </TableRow>
           )}
           {orders.map((order) => (
-            <TableRow key={order.id} className="border-[#1F8A5B]/20 hover:bg-[#1F8A5B]/10">
-              <TableCell className="font-mono text-xs text-[#A0B5A8] max-w-[160px] truncate">
+            <TableRow key={order.id} className="border-white/[0.1] hover:bg-white/[0.05]">
+              <TableCell className="font-mono text-xs text-gray-400 max-w-[160px] truncate">
                 {order.orderNumber}
               </TableCell>
-              <TableCell className="text-[#A0B5A8]">{order.customerEmail}</TableCell>
-              <TableCell className="text-[#A0B5A8]">
+              <TableCell className="text-gray-400">{order.customerEmail}</TableCell>
+              <TableCell className="text-gray-400">
                 {order.items?.length ?? 0} item{(order.items?.length ?? 0) !== 1 ? "s" : ""}
               </TableCell>
-              <TableCell className="text-[#A0B5A8]">
+              <TableCell className="text-gray-400">
                 £{Number(order.totalAmount).toFixed(2)}
               </TableCell>
               <TableCell>
@@ -67,7 +67,7 @@ export function OrdersTable({ orders }: Props) {
               <TableCell>
                 <StatusBadge status={order.status} />
               </TableCell>
-              <TableCell className="text-[#A0B5A8] text-xs whitespace-nowrap">
+              <TableCell className="text-gray-400 text-xs whitespace-nowrap">
                 {order.createdAt
                   ? format(new Date(order.createdAt), "dd MMM yyyy HH:mm")
                   : "—"}
