@@ -40,7 +40,7 @@ export function Navbar() {
           className="font-rajdhani text-xl font-bold flex items-center gap-2 text-[#E8F5EE]"
           onClick={() => setMobileOpen(false)}
         >
-          <Image src="/logo.png" alt="PremiumVault" width={32} height={32} className="rounded-md" />
+          <Image src="/logo.png" alt="PremiumVault" width={48} height={48} className="rounded-md" />
           PremiumVault
         </Link>
 
