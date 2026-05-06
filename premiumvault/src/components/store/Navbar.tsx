@@ -36,11 +36,11 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="font-rajdhani text-xl font-bold flex items-center gap-2 text-white shrink-0"
+          className="font-rajdhani text-xl font-bold flex items-center gap-0 text-white shrink-0"
           onClick={() => setMobileOpen(false)}
         >
-          <Image src="/logo.png" alt="PremiumVault" width={42} height={42} className="w-[42px] h-[42px] object-contain" />
-          <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+          <Image src="/logo.png" alt="PremiumVault" width={62} height={62} className="w-[62px] h-[62px] object-contain -my-4" />
+          <span className="font-jakarta bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
             PremiumVaults
           </span>
         </Link>
