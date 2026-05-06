@@ -1,27 +1,29 @@
-import { Zap, Shield, Lock, MessageCircle } from "lucide-react";
+"use client";
+
+import { ClipboardList, Lock, Headphones, Star } from "lucide-react";
 
 const items = [
-  { icon: Zap, label: "Instant Delivery", desc: "Accounts activated within minutes" },
-  { icon: Shield, label: "Lifetime Warranty", desc: "Full replacement if any issues arise" },
-  { icon: Lock, label: "Secure Payment", desc: "256-bit SSL encryption on all orders" },
-  { icon: MessageCircle, label: "24/7 Support", desc: "Always here when you need us" },
+  { icon: ClipboardList, value: "9,083+", label: "Orders Delivered" },
+  { icon: Lock, value: "Secure", label: "Payment Protection" },
+  { icon: Headphones, value: "24h", label: "Support Response" },
+  { icon: Star, value: "Trustpilot", label: "Verified Reviews", highlight: true },
 ];
 
 export function TrustBar() {
   return (
-    <section className="py-10 px-6 md:px-10">
-      <div className="max-w-[1200px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {items.map(({ icon: Icon, label, desc }) => (
-          <div
-            key={label}
-            className="bg-[#16221B] border border-[#1F8A5B]/20 rounded-2xl p-4 flex items-start gap-3"
-          >
-            <div className="w-9 h-9 rounded-xl bg-[#1F8A5B]/10 border border-[#1F8A5B]/20 flex items-center justify-center shrink-0">
-              <Icon className="w-4 h-4 text-[#2ECC71]" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#E8F5EE]">{label}</p>
-              <p className="text-xs text-[#A0B5A8] mt-0.5 leading-relaxed">{desc}</p>
+    <section className="relative z-30 w-full border-y border-white/[0.1] bg-[#0c0a18]/90 backdrop-blur-md">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-10 py-5 flex flex-wrap items-center justify-between">
+        {items.map(({ icon: Icon, value, label, highlight }, i) => (
+          <div key={label} className="flex items-center">
+            {i > 0 && (
+              <div className="hidden lg:block w-px h-10 bg-white/[0.1] mr-8" />
+            )}
+            <div className="flex items-center gap-3 py-2">
+              <Icon className={`w-5 h-5 shrink-0 ${highlight ? "text-emerald-400" : "text-gray-400"}`} />
+              <div>
+                <p className={`text-sm font-bold leading-tight ${highlight ? "text-emerald-400" : "text-white"}`}>{value}</p>
+                <p className="text-xs text-gray-500 leading-tight">{label}</p>
+              </div>
             </div>
           </div>
         ))}
