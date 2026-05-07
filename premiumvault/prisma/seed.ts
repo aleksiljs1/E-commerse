@@ -78,8 +78,11 @@ async function main() {
     },
   ];
 
-  for (const product of products) {
-    await prisma.product.create({ data: product });
+  const existingProducts = await prisma.product.count();
+  if (existingProducts === 0) {
+    for (const product of products) {
+      await prisma.product.create({ data: { ...product, active: true } });
+    }
   }
 
   console.log("Seed complete.");

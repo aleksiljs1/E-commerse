@@ -31,6 +31,11 @@ enum CredentialStatus {
   UPGRADED
 }
 
+enum ProductType {
+  UPGRADE
+  PURCHASE
+}
+
 model User {
   id        String    @id @default(cuid())
   email     String    @unique
@@ -45,33 +50,35 @@ model User {
 }
 
 model Product {
-  id          String      @id @default(cuid())
-  title       String
-  description String      @db.Text
-  price       Decimal     @db.Decimal(10, 2)
-  stock       Int         @default(0)
-  logoUrl     String?
+  id            String        @id @default(cuid())
+  title         String
+  description   String        @db.Text
+  price         Decimal       @db.Decimal(10, 2)
+  stock         Int           @default(0)
+  logoUrl       String?
   serviceType   String
-  requirements  String?     @db.Text
-  warrantyTerms String?     @db.Text
-  featured    Boolean     @default(false)
-  active      Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  orderItems  OrderItem[]
+  requirements  String?       @db.Text
+  warrantyTerms String?       @db.Text
+  featured      Boolean       @default(false)
+  active        Boolean       @default(true)
+  productType   ProductType   @default(UPGRADE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  orderItems    OrderItem[]
+  accountStock  AccountStock[]
 }
 
 model Coupon {
-  id            String    @id @default(cuid())
-  code          String    @unique
-  discountPct   Int
-  maxUses       Int
-  timesUsed     Int       @default(0)
-  expiresAt     DateTime
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  orders        Order[]
+  id          String    @id @default(cuid())
+  code        String    @unique
+  discountPct Int
+  maxUses     Int
+  timesUsed   Int       @default(0)
+  expiresAt   DateTime
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  orders      Order[]
 }
 
 model Order {
@@ -118,6 +125,18 @@ model Credential {
   updatedAt   DateTime         @updatedAt
   order       Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderItem   OrderItem        @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+}
+
+model AccountStock {
+  id        String    @id @default(cuid())
+  productId String
+  username  String
+  password  String
+  isUsed    Boolean   @default(false)
+  usedAt    DateTime?
+  orderId   String?
+  createdAt DateTime  @default(now())
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Account {

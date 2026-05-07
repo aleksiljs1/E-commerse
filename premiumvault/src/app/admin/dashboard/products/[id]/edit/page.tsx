@@ -57,9 +57,18 @@ export default function EditProductPage() {
     stock: product.stock,
     serviceType: product.serviceType,
     logoUrl: product.logoUrl ?? undefined,
+    requirements: product.requirements ?? undefined,
+    warrantyTerms: product.warrantyTerms ?? undefined,
     featured: product.featured,
     active: product.active,
+    productType: product.productType ?? "UPGRADE",
   };
+
+  const initialStock = (product.accountStock ?? []).map((s: any) => ({
+    id: s.id,
+    username: s.username,
+    isUsed: s.isUsed,
+  }));
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -70,6 +79,8 @@ export default function EditProductPage() {
           onSubmit={handleSubmit}
           isLoading={isLoading}
           mode="edit"
+          productId={id}
+          initialStock={initialStock}
         />
       </div>
     </div>

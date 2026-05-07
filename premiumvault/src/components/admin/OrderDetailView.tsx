@@ -27,9 +27,10 @@ const STATUS_LABELS: Record<string, string> = {
 
 type Props = {
   order: any;
+  deliveredStock?: any[];
 };
 
-export function OrderDetailView({ order: initialOrder }: Props) {
+export function OrderDetailView({ order: initialOrder, deliveredStock = [] }: Props) {
   const [order, setOrder] = useState(initialOrder);
   const [loading, setLoading] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -112,35 +113,76 @@ export function OrderDetailView({ order: initialOrder }: Props) {
               </div>
 
               {item.credentials?.length > 0 ? (
-                <div className="space-y-2 pl-2 border-l-2 border-white/[0.1]">
+                <div className="divide-y divide-white/[0.06] mt-2 rounded-lg border border-white/[0.08] overflow-hidden">
                   {item.credentials.map((cred: any, idx: number) => (
-                    <div key={cred.id} className="text-xs text-gray-400">
-                      <span className="text-gray-400/70">Credential #{idx + 1}:</span>{" "}
-                      <span className="text-gray-400">username: {cred.username}</span>
-                      {" | "}
-                      <span>
-                        Status:{" "}
-                        <span className="text-white font-medium">{cred.status}</span>
-                      </span>
-                      {cred.submittedAt && (
-                        <>
-                          {" | "}
-                          <span>
-                            Submitted:{" "}
-                            {format(new Date(cred.submittedAt), "dd MMM HH:mm")}
-                          </span>
-                        </>
-                      )}
+                    <div key={cred.id} className="px-3 py-2.5 text-xs">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-gray-500 uppercase tracking-wider text-[10px]">Account {idx + 1}</span>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                            cred.status === "UPGRADED" ? "bg-green-500/15 text-green-400" :
+                            cred.status === "SUBMITTED" ? "bg-blue-500/15 text-blue-400" :
+                            "bg-white/[0.06] text-gray-500"
+                          }`}>{cred.status}</span>
+                          {cred.submittedAt && (
+                            <span className="text-gray-600">{format(new Date(cred.submittedAt), "dd MMM HH:mm")}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                        <div>
+                          <p className="text-gray-600 text-[10px] mb-0.5">Email / Username</p>
+                          <p className="text-white font-mono select-all">{cred.username}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600 text-[10px] mb-0.5">Password</p>
+                          <p className="text-white font-mono select-all">{cred.password}</p>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-gray-400/50 pl-2 italic">No credentials submitted yet.</p>
+                <p className="text-xs text-gray-400/50 pl-2 italic mt-2">No credentials submitted yet.</p>
               )}
             </div>
           ))}
         </div>
       </div>
+
+      {/* Delivered Accounts (PURCHASE type items) */}
+      {deliveredStock.length > 0 && (
+        <div className="bg-white/[0.04] border border-white/[0.1] rounded-2xl p-6">
+          <h3 className="text-base font-semibold text-white mb-1">Delivered Accounts</h3>
+          <p className="text-xs text-gray-500 mb-4">
+            These credentials were sent to the customer automatically after payment.
+          </p>
+          <div className="space-y-2">
+            {deliveredStock.map((stock: any) => (
+              <div
+                key={stock.id}
+                className="flex items-center gap-4 border border-white/[0.08] rounded-xl px-4 py-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500 mb-0.5">{stock.product?.title}</p>
+                  <p className="text-sm text-white font-mono">{stock.username}</p>
+                  <p className="text-xs text-gray-600">Password on file (delivered via email)</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
+                    Delivered
+                  </span>
+                  {stock.usedAt && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      {format(new Date(stock.usedAt), "dd MMM HH:mm")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Status Actions */}
       <div className="bg-white/[0.04] border border-white/[0.1] rounded-2xl p-6">

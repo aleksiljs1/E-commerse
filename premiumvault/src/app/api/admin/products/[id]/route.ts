@@ -15,17 +15,22 @@ const updateSchema = z.object({
   warrantyTerms: z.string().nullable().optional(),
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
+  productType: z.enum(["UPGRADE", "PURCHASE"]).optional(),
 });
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session || (session.user as any).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session || (session.user as any).role !== "ADMIN")
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     const { id } = await params;
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { _count: { select: { orderItems: true } } },
+      include: {
+        _count: { select: { orderItems: true } },
+        accountStock: { orderBy: { createdAt: "asc" } },
+      },
     });
     if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(product);
@@ -36,7 +41,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session || (session.user as any).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session || (session.user as any).role !== "ADMIN")
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     const { id } = await params;
@@ -54,7 +60,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session || (session.user as any).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!session || (session.user as any).role !== "ADMIN")
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     const { id } = await params;

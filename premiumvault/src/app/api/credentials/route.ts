@@ -4,7 +4,6 @@ import { sendEmail } from "@/lib/email/send";
 import { credentialConfirmationTemplate } from "@/lib/email/templates/credential-confirmation";
 import { getEmailSettings } from "@/lib/email/settings";
 import { apiError } from "@/lib/api-error";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 const submitSchema = z.object({
@@ -46,17 +45,15 @@ export async function POST(req: NextRequest) {
       if (!validItemIds.has(cred.orderItemId)) return apiError("Invalid order item", 400);
     }
 
-    const credentialData = await Promise.all(
-      credentials.map(async (cred) => ({
-        orderId: order.id,
-        orderItemId: cred.orderItemId,
-        serviceType: cred.serviceType,
-        username: cred.username,
-        password: await bcrypt.hash(cred.password, 12),
-        status: "SUBMITTED" as const,
-        submittedAt: new Date(),
-      }))
-    );
+    const credentialData = credentials.map((cred) => ({
+      orderId: order.id,
+      orderItemId: cred.orderItemId,
+      serviceType: cred.serviceType,
+      username: cred.username,
+      password: cred.password,
+      status: "SUBMITTED" as const,
+      submittedAt: new Date(),
+    }));
 
     // Interactive transaction — re-checks status inside the lock so concurrent
     // submissions for the same order can't both succeed
