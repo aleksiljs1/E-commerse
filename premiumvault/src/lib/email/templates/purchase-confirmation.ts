@@ -11,9 +11,18 @@ type PurchaseConfirmationData = {
   totalAmount: number;
   credentialToken: string;
   appUrl: string;
+  heading?: string;
+  body?: string;
+  ctaText?: string;
+  footer?: string;
 };
 
 export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): string {
+  const heading = data.heading ?? "Payment Confirmed &#x2705;";
+  const body = data.body ?? "To complete your upgrade, please submit your account credentials using the secure link below. <strong style=\"color: #ffffff;\">This link expires in 7 days.</strong>";
+  const ctaText = data.ctaText ?? "Submit My Credentials &rarr;";
+  const footer = (data.footer ?? "Your account will be upgraded within 4&ndash;5 business days after credential submission.\nQuestions? Contact our support team.").replace(/\n/g, "<br>");
+
   const itemRows = data.items
     .map(
       (item) =>
@@ -46,7 +55,7 @@ export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): st
     <!-- Card -->
     <div style="background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 32px;">
       <h2 style="color: #ffffff; font-size: 20px; font-weight: 600; margin-top: 0; margin-bottom: 4px;">
-        Payment Confirmed &#x2705;
+        ${heading}
       </h2>
       <p style="color: #71717a; font-size: 14px; margin-top: 0; margin-bottom: 24px;">
         Order <strong style="color: #a1a1aa;">${data.orderNumber}</strong> &mdash; sent to ${data.customerEmail}
@@ -68,15 +77,14 @@ export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): st
 
       <!-- CTA -->
       <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
-        To complete your upgrade, please submit your account credentials using the secure link below.
-        <strong style="color: #ffffff;">This link expires in 7 days.</strong>
+        ${body}
       </p>
 
       <a href="${submitUrl}"
          style="display: block; background: #6366f1; color: #ffffff; text-align: center;
                 padding: 14px 24px; border-radius: 10px; font-weight: 600; font-size: 16px;
                 text-decoration: none; margin-bottom: 16px;">
-        Submit My Credentials &rarr;
+        ${ctaText}
       </a>
 
       <p style="color: #52525b; font-size: 12px; text-align: center; margin: 0;">
@@ -86,8 +94,7 @@ export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): st
 
     <!-- Footer -->
     <p style="text-align: center; color: #52525b; font-size: 12px; margin-top: 24px;">
-      Your account will be upgraded within 4&ndash;5 business days after credential submission.<br>
-      Questions? Contact our support team.
+      ${footer}
     </p>
   </div>
 </body>

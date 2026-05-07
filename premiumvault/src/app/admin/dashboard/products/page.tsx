@@ -36,6 +36,16 @@ export default function ProductsPage() {
     }
   }
 
+  async function handleActivate(id: string) {
+    try {
+      await api.patch(`/api/admin/products/${id}`, { active: true });
+      toast.success("Product activated");
+      fetchProducts();
+    } catch {
+      toast.error("Failed to activate product");
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -48,7 +58,7 @@ export default function ProductsPage() {
       {loading ? (
         <div className="text-gray-400 text-sm">Loading products...</div>
       ) : (
-        <ProductTable products={products} onDeactivate={handleDeactivate} />
+        <ProductTable products={products} onDeactivate={handleDeactivate} onActivate={handleActivate} />
       )}
     </div>
   );

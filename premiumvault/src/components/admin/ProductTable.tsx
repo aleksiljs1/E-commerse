@@ -17,12 +17,13 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 type Props = {
   products: any[];
   onDeactivate: (id: string) => void;
+  onActivate?: (id: string) => void;
 };
 
 type SortKey = "title" | "price" | "stock";
 type SortDir = "asc" | "desc";
 
-export function ProductTable({ products, onDeactivate }: Props) {
+export function ProductTable({ products, onDeactivate, onActivate }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
@@ -134,7 +135,7 @@ export function ProductTable({ products, onDeactivate }: Props) {
                       Edit
                     </Button>
                   </Link>
-                  {product.active && (
+                  {product.active ? (
                     <Button
                       size="sm"
                       variant="destructive"
@@ -149,6 +150,23 @@ export function ProductTable({ products, onDeactivate }: Props) {
                       }}
                     >
                       Deactivate
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-green-400 border-green-400/30 hover:bg-green-400/10"
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `Activate "${product.title}"? This will show it in the store.`
+                          )
+                        ) {
+                          onActivate?.(product.id);
+                        }
+                      }}
+                    >
+                      Activate
                     </Button>
                   )}
                 </div>

@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingBag } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, Ticket, Settings } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/dashboard/products", label: "Products", icon: Package },
   { href: "/admin/dashboard/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/dashboard/coupons", label: "Coupons", icon: Ticket },
+  { href: "/admin/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminSidebar() {

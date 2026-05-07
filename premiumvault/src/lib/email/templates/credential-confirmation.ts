@@ -2,9 +2,17 @@ type CredentialConfirmationData = {
   orderNumber: string;
   customerEmail: string;
   serviceCount: number;
+  heading?: string;
+  body?: string;
+  footer?: string;
 };
 
 export function credentialConfirmationTemplate(data: CredentialConfirmationData): string {
+  const heading = data.heading ?? "Credentials Received!";
+  const body = (data.body ?? "Congratulations! We've received your account credentials for order {orderNumber}.")
+    .replace(/\{orderNumber\}/g, data.orderNumber);
+  const footer = data.footer ?? "Thank you for choosing PremiumVault.";
+
   return `
 <!DOCTYPE html>
 <html>
@@ -18,11 +26,10 @@ export function credentialConfirmationTemplate(data: CredentialConfirmationData)
     <div style="background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 32px; text-align: center;">
       <div style="font-size: 48px; margin-bottom: 16px;">&#x1F389;</div>
       <h2 style="color: #ffffff; font-size: 22px; font-weight: 700; margin-top: 0; margin-bottom: 8px;">
-        Credentials Received!
+        ${heading}
       </h2>
       <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
-        Congratulations! We&apos;ve received your account credentials for order
-        <strong style="color: #ffffff;">${data.orderNumber}</strong>.
+        ${body}
       </p>
       <div style="background: #09090b; border: 1px solid #27272a; border-radius: 10px; padding: 16px; margin-bottom: 24px;">
         <p style="color: #22c55e; font-size: 14px; font-weight: 600; margin: 0;">
@@ -36,7 +43,7 @@ export function credentialConfirmationTemplate(data: CredentialConfirmationData)
       </p>
     </div>
     <p style="text-align: center; color: #52525b; font-size: 12px; margin-top: 24px;">
-      Thank you for choosing PremiumVault.
+      ${footer}
     </p>
   </div>
 </body>

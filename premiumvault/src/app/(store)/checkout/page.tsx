@@ -8,12 +8,15 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/cart";
 import { ServiceIcon } from "@/components/store/ServiceIcon";
+import { Ticket, X, Check, Loader2 } from "lucide-react";
 
 const checkoutSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
+
+type AppliedCoupon = { id: string; code: string; discountPct: number };
 
 const PAYPAL_BOXES = [
   { id: "ff", label: "I agree to send the payment as friends & family" },
@@ -28,6 +31,12 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paypalChecks, setPaypalChecks] = useState({ ff: false, amount: false, nonote: false });
   const [showErrors, setShowErrors] = useState(false);
+  const [discount, setDiscount] = useState(0);
+  const [discountTier, setDiscountTier] = useState("");
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   const {
     register,
@@ -42,10 +51,51 @@ export default function CheckoutPage() {
     if (items.length === 0) router.replace("/");
   }, [items, router]);
 
+  useEffect(() => {
+    fetch("/api/user/discount")
+      .then((r) => r.json())
+      .then((data) => {
+        setDiscount(data.discount);
+        setDiscountTier(data.tier);
+      })
+      .catch(() => {});
+  }, []);
+
   if (items.length === 0) return null;
 
-  const total = subtotal();
+  const rawTotal = subtotal();
+  const effectiveDiscount = Math.max(discount, appliedCoupon?.discountPct ?? 0);
+  const discountAmount = effectiveDiscount > 0 ? rawTotal * (effectiveDiscount / 100) : 0;
+  const total = rawTotal - discountAmount;
   const totalStr = total.toFixed(2);
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setCouponError(data.error); return; }
+      setAppliedCoupon(data);
+      toast.success(`Coupon applied: ${data.discountPct}% off`);
+    } catch {
+      setCouponError("Failed to validate coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
 
   const allPaypalChecked = paypalChecks.ff && paypalChecks.amount && paypalChecks.nonote;
 
@@ -66,6 +116,7 @@ export default function CheckoutPage() {
           email: data.email,
           paymentMethod,
           items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+          ...(appliedCoupon ? { couponCode: appliedCoupon.code } : {}),
         }),
       });
 
@@ -127,7 +178,66 @@ export default function CheckoutPage() {
                 </div>
               ))}
             </div>
-            <div className="flex justify-between pt-4 mt-2">
+            {/* Coupon code input */}
+            <div className="mt-5 pt-4 border-t border-white/[0.08]">
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between bg-emerald-400/[0.06] border border-emerald-400/20 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div>
+                      <span className="text-emerald-400 text-sm font-semibold">{appliedCoupon.code}</span>
+                      <span className="text-emerald-400/70 text-xs ml-2">{appliedCoupon.discountPct}% off</span>
+                    </div>
+                  </div>
+                  <button type="button" onClick={removeCoupon} className="cursor-pointer text-gray-400 hover:text-white transition-colors p-1">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                      <input
+                        type="text"
+                        value={couponInput}
+                        onChange={(e) => { setCouponInput(e.target.value); setCouponError(""); }}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyCoupon(); } }}
+                        placeholder="Coupon code"
+                        className="bg-white/[0.04] border border-white/[0.08] focus:border-orange-400 rounded-xl text-white pl-10 pr-4 py-2.5 w-full outline-none transition-colors text-sm uppercase placeholder:normal-case"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={applyCoupon}
+                      disabled={couponLoading || !couponInput.trim()}
+                      className="cursor-pointer bg-white/[0.06] border border-white/[0.08] hover:border-orange-400 hover:text-orange-400 text-gray-400 px-4 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                    >
+                      {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                    </button>
+                  </div>
+                  {couponError && <p className="text-red-400 text-xs mt-1.5">{couponError}</p>}
+                </div>
+              )}
+            </div>
+
+            {effectiveDiscount > 0 && (
+              <>
+                <div className="flex justify-between pt-4 mt-2">
+                  <span className="text-gray-400">Subtotal</span>
+                  <span className="text-gray-400">£{rawTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between pt-1">
+                  <span className="text-emerald-400 text-sm">
+                    {appliedCoupon && appliedCoupon.discountPct >= discount
+                      ? `Coupon ${appliedCoupon.code}`
+                      : `${discountTier} discount`} ({effectiveDiscount}%)
+                  </span>
+                  <span className="text-emerald-400 text-sm">-£{discountAmount.toFixed(2)}</span>
+                </div>
+              </>
+            )}
+            <div className={`flex justify-between ${effectiveDiscount > 0 ? "pt-2 border-t border-white/[0.08] mt-2" : "pt-4 mt-2"}`}>
               <span className="text-white font-bold">Total</span>
               <span className="text-white font-bold text-lg">£{totalStr}</span>
             </div>

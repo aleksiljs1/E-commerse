@@ -37,26 +37,19 @@ export function HeroSection() {
         </h1>
 
         {/* Subtext */}
-        <p className="text-base text-gray-400 mb-10 max-w-[600px] mx-auto leading-relaxed">
+        <p className="text-base text-white mb-10 max-w-[600px] mx-auto leading-relaxed">
           Upgrade your personal accounts with premium subscriptions at a lowered cost
         </p>
 
-        {/* CTAs */}
-        <div className="flex gap-3 justify-center flex-wrap mb-10">
+        {/* CTA */}
+        <div className="flex justify-center mb-10">
           <Link
             href="/products"
-            className="relative z-20 inline-flex items-center gap-2.5 text-white px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(249,115,22,0.3)]"
+            className="relative z-20 inline-flex items-center gap-2.5 text-white px-9 py-4 rounded-xl font-semibold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(249,115,22,0.3)]"
             style={{ background: "linear-gradient(to right, #f97316 2%, #f43f5e 50%, #9333ea 98%)" }}
           >
-            <Lock className="w-4 h-4" />
-            Shop Accounts
-          </Link>
-          <Link
-            href="/products"
-            className="relative z-20 inline-flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.15] hover:bg-white/[0.08] hover:border-white/[0.25] text-gray-200 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all backdrop-blur-md"
-          >
-            <Lock className="w-4 h-4" />
-            Shop Services
+            <Lock className="w-5 h-5" />
+            Upgrade now
           </Link>
         </div>
 
@@ -86,7 +79,7 @@ export function HeroSection() {
           </div>
           <div className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5" />
-            <span>12-24h delivery</span>
+            <span>4 to 5 day delivery</span>
           </div>
           <div className="flex items-center gap-1.5">
             <MessageCircle className="w-3.5 h-3.5" />

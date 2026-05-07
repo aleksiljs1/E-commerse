@@ -9,6 +9,22 @@ import { ServiceIcon } from "@/components/store/ServiceIcon";
 import api from "@/lib/api";
 import { toast } from "sonner";
 
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  PENDING: ["PAID", "CANCELLED"],
+  PAID: ["CREDENTIALS_SUBMITTED", "CANCELLED"],
+  CREDENTIALS_SUBMITTED: ["COMPLETED", "CANCELLED"],
+  COMPLETED: [],
+  CANCELLED: [],
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: "Mark as Pending",
+  PAID: "Mark as Paid",
+  CREDENTIALS_SUBMITTED: "Mark as Credentials Submitted",
+  COMPLETED: "Mark as Completed",
+  CANCELLED: "Cancel Order",
+};
+
 type Props = {
   order: any;
 };
@@ -127,46 +143,50 @@ export function OrderDetailView({ order: initialOrder }: Props) {
       </div>
 
       {/* Status Actions */}
-      <div className="flex items-center gap-3 flex-wrap">
-        {order.status === "CREDENTIALS_SUBMITTED" && (
-          <Button
-            onClick={() => handleStatusChange("COMPLETED")}
-            disabled={loading}
-          >
-            Mark as Completed
-          </Button>
-        )}
-        {order.status !== "COMPLETED" && order.status !== "CANCELLED" && (
-          confirmCancel ? (
-            <div className="flex items-center gap-2 bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-2">
-              <span className="text-red-300 text-sm font-medium">Cancel this order?</span>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => handleStatusChange("CANCELLED")}
-                disabled={loading}
-              >
-                {loading ? "Cancelling..." : "Yes, cancel"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setConfirmCancel(false)}
-                disabled={loading}
-                className="border-red-800/50 text-red-300 hover:bg-red-900/30"
-              >
-                Keep order
-              </Button>
-            </div>
-          ) : (
-            <Button
-              variant="destructive"
-              onClick={() => setConfirmCancel(true)}
-              disabled={loading}
-            >
-              Cancel Order
-            </Button>
-          )
+      <div className="bg-white/[0.04] border border-white/[0.1] rounded-2xl p-6">
+        <h3 className="text-base font-semibold text-white mb-4">Change Status</h3>
+        {VALID_TRANSITIONS[order.status]?.length > 0 ? (
+          <div className="flex items-center gap-3 flex-wrap">
+            {VALID_TRANSITIONS[order.status].map((nextStatus: string) => {
+              const isCancelling = nextStatus === "CANCELLED";
+              if (isCancelling && confirmCancel) {
+                return (
+                  <div key={nextStatus} className="flex items-center gap-2 bg-red-950/40 border border-red-800/50 rounded-xl px-4 py-2">
+                    <span className="text-red-300 text-sm font-medium">Cancel this order?</span>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleStatusChange("CANCELLED")}
+                      disabled={loading}
+                    >
+                      {loading ? "Updating..." : "Yes, cancel"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setConfirmCancel(false)}
+                      disabled={loading}
+                      className="border-red-800/50 text-red-300 hover:bg-red-900/30"
+                    >
+                      Keep order
+                    </Button>
+                  </div>
+                );
+              }
+              return (
+                <Button
+                  key={nextStatus}
+                  variant={isCancelling ? "destructive" : "default"}
+                  onClick={() => isCancelling ? setConfirmCancel(true) : handleStatusChange(nextStatus)}
+                  disabled={loading}
+                >
+                  {loading ? "Updating..." : STATUS_LABELS[nextStatus] ?? nextStatus}
+                </Button>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm">This order is <span className="text-white font-medium">{order.status.toLowerCase().replace(/_/g, " ")}</span> — no further status changes available.</p>
         )}
       </div>
     </div>

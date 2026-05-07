@@ -77,7 +77,7 @@ export function ProductCard({ product }: Props) {
       {/* Content */}
       <div className="flex flex-col flex-1 p-4">
         <p className="text-base font-semibold text-white leading-snug mb-1 line-clamp-2 min-h-[2.5rem]">{product.title}</p>
-        <p className="text-xs text-gray-400 line-clamp-2 mb-3 min-h-[2rem]">{product.description}</p>
+        <p className="text-xs text-gray-400 line-clamp-2 mb-3 min-h-[2rem]" dangerouslySetInnerHTML={{ __html: product.description.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") }} />
         <p className="text-xs text-orange-400 mb-2 min-h-[1rem]">
           {product.stock < 5 && product.stock > 0 ? `Only ${product.stock} left` : "\u00A0"}
         </p>

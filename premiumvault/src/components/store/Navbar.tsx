@@ -2,28 +2,42 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { Menu, X, ShoppingCart, User } from "lucide-react";
 import Image from "next/image";
 import { useCartStore } from "@/store/cart";
+import { useSession } from "next-auth/react";
 
 const NAV_LINKS = [
-  { href: "/products", label: "Products", hasDropdown: false },
+  { href: "/products", label: "Products" },
   // TODO: Reviews page — link to a dedicated reviews page or section.
   // Should display verified Trustpilot/customer reviews with ratings,
   // review text, date, and product purchased. Consider adding filters
   // (by product, rating) and pagination.
-  { href: "#reviews", label: "Reviews", hasDropdown: false },
+  { href: "#reviews", label: "Reviews" },
+];
+
+const AUTH_LINKS = [
+  { href: "/account", label: "My Orders" },
 ];
 
 export function Navbar() {
   const { totalItems, openCart } = useCartStore();
+  const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bump, setBump] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [bannerText, setBannerText] = useState("✨ Must Read Before Purchasing ✨");
   const count = totalItems();
   const prevCount = useRef(count);
+  const isLoggedIn = !!session?.user;
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    fetch("/api/settings?key=banner_text")
+      .then((r) => r.json())
+      .then((data) => { if (data.value) setBannerText(data.value); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (count > prevCount.current) {
@@ -34,6 +48,8 @@ export function Navbar() {
     }
     prevCount.current = count;
   }, [count]);
+
+  const allLinks = isLoggedIn ? [...NAV_LINKS, ...AUTH_LINKS] : NAV_LINKS;
 
   return (
     <>
@@ -46,24 +62,19 @@ export function Navbar() {
         >
           <Image src="/logo.png" alt="PremiumVault" width={62} height={62} className="w-[62px] h-[62px] object-contain -my-4" />
           <span className="font-jakarta bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-            PremiumVaults
+            PremiumVault
           </span>
         </Link>
 
         {/* Nav Links */}
         <ul className="hidden lg:flex items-center gap-5 list-none">
-          {NAV_LINKS.map(({ href, label, hasDropdown }) => (
+          {allLinks.map(({ href, label }) => (
             <li key={label}>
               <Link
                 href={href}
-                className="text-gray-400 font-medium text-sm hover:text-white transition-colors inline-flex items-center gap-1"
+                className="text-gray-400 font-medium text-sm hover:text-white transition-colors"
               >
                 {label}
-                {hasDropdown && (
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="mt-px opacity-60">
-                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
               </Link>
             </li>
           ))}
@@ -86,13 +97,23 @@ export function Navbar() {
             )}
           </button>
 
-          {/* Sign In */}
-          <Link
-            href="/auth/signin"
-            className="hidden md:inline-flex text-sm font-medium text-gray-300 hover:text-white transition-colors ml-1"
-          >
-            Sign In
-          </Link>
+          {/* Auth */}
+          {isLoggedIn ? (
+            <Link
+              href="/account"
+              className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-gray-300 hover:text-white transition-colors ml-1"
+            >
+              <User className="w-4 h-4" />
+              {session.user.name || "Account"}
+            </Link>
+          ) : (
+            <Link
+              href="/auth/signin"
+              className="hidden md:inline-flex text-sm font-medium text-gray-300 hover:text-white transition-colors ml-1"
+            >
+              Sign In
+            </Link>
+          )}
 
           {/* Mobile toggle */}
           <button
@@ -116,13 +137,13 @@ export function Navbar() {
           href="#"
           className="relative z-10 text-white font-medium text-sm tracking-wide hover:opacity-90 transition-opacity"
         >
-          ✨ Must Read Before Purchasing ✨
+          {bannerText}
         </Link>
       </div>
 
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 top-[57px] z-[999] bg-[#0a0a12]/98 backdrop-blur-xl flex flex-col px-6 py-6 gap-1 border-t border-white/[0.06]">
-          {NAV_LINKS.map(({ href, label }) => (
+          {allLinks.map(({ href, label }) => (
             <Link
               key={label}
               href={href}
@@ -132,13 +153,23 @@ export function Navbar() {
               {label}
             </Link>
           ))}
-          <Link
-            href="/auth/signin"
-            onClick={() => setMobileOpen(false)}
-            className="text-orange-400 font-semibold text-xl py-4"
-          >
-            Sign In
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/account"
+              onClick={() => setMobileOpen(false)}
+              className="text-orange-400 font-semibold text-xl py-4"
+            >
+              My Account
+            </Link>
+          ) : (
+            <Link
+              href="/auth/signin"
+              onClick={() => setMobileOpen(false)}
+              className="text-orange-400 font-semibold text-xl py-4"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       )}
     </>

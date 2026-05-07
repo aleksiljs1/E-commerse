@@ -11,6 +11,8 @@ const updateSchema = z.object({
   stock: z.number().int().min(0).optional(),
   serviceType: z.string().min(1).optional(),
   logoUrl: z.string().optional(),
+  requirements: z.string().nullable().optional(),
+  warrantyTerms: z.string().nullable().optional(),
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
 });

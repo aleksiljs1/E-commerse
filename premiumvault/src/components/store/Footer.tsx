@@ -8,8 +8,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1.5fr] gap-10 mb-10">
           {/* Brand */}
           <div>
-            <div className="font-rajdhani text-2xl font-bold flex items-center gap-2">
-              <Image src="/logo.png" alt="PremiumVault" width={28} height={28} className="w-7 h-7 object-contain" />
+            <div className="font-rajdhani text-2xl font-bold flex items-center gap-0">
+              <Image src="/logo.png" alt="PremiumVault" width={56} height={56} className="w-14 h-14 object-contain -my-2" />
               <span className="bg-gradient-to-br from-orange-400 to-rose-400 bg-clip-text text-transparent">
                 PremiumVault
               </span>
@@ -60,7 +60,7 @@ export function Footer() {
         </div>
 
         <div className="text-center pt-7 border-t border-white/[0.06] text-gray-400 text-xs">
-          <p>&copy; {new Date().getFullYear()} PremiumVault. All rights reserved.</p>
+          <p>&copy; 2026 PremiumVault. All rights reserved.</p>
         </div>
       </div>
     </footer>

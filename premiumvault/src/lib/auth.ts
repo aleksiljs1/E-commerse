@@ -13,7 +13,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
   session: { strategy: "jwt" },
   pages: {
-    signIn: "/admin/login",
+    signIn: "/auth/signin",
   },
   providers: [
     Credentials({
@@ -48,7 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as { role?: string }).role ?? "ADMIN";
+        token.role = (user as { role?: string }).role ?? "USER";
       }
       return token;
     },

@@ -3,6 +3,22 @@ import { Lock } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { ServiceIcon } from "@/components/store/ServiceIcon";
 import { ProductActions } from "./ProductActions";
+import { Fragment } from "react";
+
+function RichText({ text }: { text: string }) {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith("**") && part.endsWith("**") ? (
+          <strong key={i} className="text-white font-semibold">{part.slice(2, -2)}</strong>
+        ) : (
+          <Fragment key={i}>{part}</Fragment>
+        )
+      )}
+    </>
+  );
+}
 
 export default async function ProductDetailPage({
   params,
@@ -66,43 +82,38 @@ export default async function ProductDetailPage({
 
           {/* 3. Description */}
           <p className="text-gray-400 text-sm leading-relaxed">
-            {product.description}
+            <RichText text={product.description} />
           </p>
 
           {/* 4. What we require */}
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-2">What We Require From You</h2>
-            <ul className="space-y-1.5">
-              {[
-                "Your account email address",
-                "Your account password (submitted via secure encrypted link after payment)",
-                "Do not change your password during the upgrade process",
-              ].map((req) => (
-                <li key={req} className="flex items-start gap-2 text-gray-400 text-sm">
-                  <span className="text-orange-400 mt-0.5">•</span>
-                  {req}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {product.requirements && (
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-2">What We Require From You</h2>
+              <ul className="space-y-1.5">
+                {product.requirements.split("\n").filter(Boolean).map((req, i) => (
+                  <li key={i} className="flex items-start gap-2 text-gray-400 text-sm">
+                    <span className="text-orange-400 mt-0.5">•</span>
+                    <span><RichText text={req} /></span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* 5. Warranty & Terms */}
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-2">Warranty &amp; Terms</h2>
-            <ul className="space-y-1.5">
-              {[
-                "Upgrade guaranteed within 4–5 business days",
-                "If upgrade fails for any reason, full refund guaranteed",
-                "Your credentials are encrypted and never stored in plain text",
-                "Do not change your password during the upgrade window",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-2 text-gray-400 text-sm">
-                  <span className="text-green-400 mt-0.5">✓</span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {product.warrantyTerms && (
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-2">Warranty &amp; Terms</h2>
+              <ul className="space-y-1.5">
+                {product.warrantyTerms.split("\n").filter(Boolean).map((t, i) => (
+                  <li key={i} className="flex items-start gap-2 text-gray-400 text-sm">
+                    <span className="text-green-400 mt-0.5">✓</span>
+                    <span><RichText text={t} /></span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Right column — sticky purchase panel */}

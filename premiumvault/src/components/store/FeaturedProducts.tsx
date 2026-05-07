@@ -34,12 +34,18 @@ export function FeaturedProducts({ products }: Props) {
   const isPaused = useRef(false);
   const didSwipe = useRef(false);
 
+  const [spreadPx, setSpreadPx] = useState(290);
+
+  useEffect(() => {
+    const update = () => setSpreadPx(window.innerWidth >= 768 ? 290 : 190);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   if (featured.length === 0) return null;
 
-  const spreadPx = typeof window !== "undefined" && window.innerWidth >= 768 ? 290 : 190;
-
-  const getInterval = () =>
-    typeof window !== "undefined" && window.innerWidth < 768 ? 4000 : 6000;
+  const getInterval = () => window.innerWidth < 768 ? 4000 : 6000;
 
   const startAutoplay = useCallback(() => {
     if (autoplayRef.current) clearInterval(autoplayRef.current);
