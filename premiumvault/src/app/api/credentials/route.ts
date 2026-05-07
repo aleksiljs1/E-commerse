@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email/send";
 import { credentialConfirmationTemplate } from "@/lib/email/templates/credential-confirmation";
+import { getEmailSettings } from "@/lib/email/settings";
 import { apiError } from "@/lib/api-error";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -74,15 +75,20 @@ export async function POST(req: NextRequest) {
       });
     });
 
-    sendEmail({
-      to: order.customerEmail,
-      subject: "PremiumVault — Credentials Received ✅",
-      html: credentialConfirmationTemplate({
-        orderNumber: order.orderNumber,
-        customerEmail: order.customerEmail,
-        serviceCount: credentials.length,
-      }),
-    }).catch((err) => console.error("[credentials/POST] Confirmation email failed for order", order.id, err));
+    getEmailSettings().then((settings) =>
+      sendEmail({
+        to: order.customerEmail,
+        subject: settings.credentialSubject,
+        html: credentialConfirmationTemplate({
+          orderNumber: order.orderNumber,
+          customerEmail: order.customerEmail,
+          serviceCount: credentials.length,
+          heading: settings.credentialHeading,
+          body: settings.credentialBody,
+          footer: settings.credentialFooter,
+        }),
+      })
+    ).catch((err) => console.error("[credentials/POST] Confirmation email failed for order", order.id, err));
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

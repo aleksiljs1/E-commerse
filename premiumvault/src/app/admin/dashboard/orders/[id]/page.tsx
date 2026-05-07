@@ -28,7 +28,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-bold text-[#E8F5EE]">Order Detail</h1>
+      <h1 className="text-2xl font-bold text-white">Order Detail</h1>
       <OrderDetailView order={JSON.parse(JSON.stringify(order))} />
     </div>
   );

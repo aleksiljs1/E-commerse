@@ -43,7 +43,7 @@ export default function EditProductPage() {
   }
 
   if (fetchLoading) {
-    return <div className="text-[#A0B5A8] text-sm">Loading product...</div>;
+    return <div className="text-gray-400 text-sm">Loading product...</div>;
   }
 
   if (!product) {
@@ -63,8 +63,8 @@ export default function EditProductPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold text-[#E8F5EE]">Edit Product</h1>
-      <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl p-6">
+      <h1 className="text-2xl font-bold text-white">Edit Product</h1>
+      <div className="bg-white/[0.04] border border-white/[0.1] rounded-2xl p-6">
         <ProductForm
           defaultValues={defaultValues}
           onSubmit={handleSubmit}

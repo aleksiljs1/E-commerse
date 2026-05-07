@@ -11,6 +11,8 @@ const productSchema = z.object({
   stock: z.number().int().min(0),
   serviceType: z.string().min(1),
   logoUrl: z.string().optional().or(z.literal("")).transform((val) => val === "" ? undefined : val),
+  requirements: z.string().optional().or(z.literal("")).transform((val) => val === "" ? null : val),
+  warrantyTerms: z.string().optional().or(z.literal("")).transform((val) => val === "" ? null : val),
   featured: z.boolean().default(false),
   active: z.boolean().default(true),
 });

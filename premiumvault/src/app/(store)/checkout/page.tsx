@@ -8,12 +8,15 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/cart";
 import { ServiceIcon } from "@/components/store/ServiceIcon";
+import { Ticket, X, Check, Loader2 } from "lucide-react";
 
 const checkoutSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
+
+type AppliedCoupon = { id: string; code: string; discountPct: number };
 
 const PAYPAL_BOXES = [
   { id: "ff", label: "I agree to send the payment as friends & family" },
@@ -28,6 +31,12 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paypalChecks, setPaypalChecks] = useState({ ff: false, amount: false, nonote: false });
   const [showErrors, setShowErrors] = useState(false);
+  const [discount, setDiscount] = useState(0);
+  const [discountTier, setDiscountTier] = useState("");
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   const {
     register,
@@ -42,10 +51,51 @@ export default function CheckoutPage() {
     if (items.length === 0) router.replace("/");
   }, [items, router]);
 
+  useEffect(() => {
+    fetch("/api/user/discount")
+      .then((r) => r.json())
+      .then((data) => {
+        setDiscount(data.discount);
+        setDiscountTier(data.tier);
+      })
+      .catch(() => {});
+  }, []);
+
   if (items.length === 0) return null;
 
-  const total = subtotal();
+  const rawTotal = subtotal();
+  const effectiveDiscount = Math.max(discount, appliedCoupon?.discountPct ?? 0);
+  const discountAmount = effectiveDiscount > 0 ? rawTotal * (effectiveDiscount / 100) : 0;
+  const total = rawTotal - discountAmount;
   const totalStr = total.toFixed(2);
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setCouponError(data.error); return; }
+      setAppliedCoupon(data);
+      toast.success(`Coupon applied: ${data.discountPct}% off`);
+    } catch {
+      setCouponError("Failed to validate coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
 
   const allPaypalChecked = paypalChecks.ff && paypalChecks.amount && paypalChecks.nonote;
 
@@ -66,6 +116,7 @@ export default function CheckoutPage() {
           email: data.email,
           paymentMethod,
           items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+          ...(appliedCoupon ? { couponCode: appliedCoupon.code } : {}),
         }),
       });
 
@@ -105,10 +156,10 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F1412] text-[#E8F5EE]">
-      <header className="border-b border-[#1F8A5B]/30 px-6 py-4">
+    <div className="min-h-screen bg-[#0a0a0f] text-white">
+      <header className="border-b border-white/[0.08] px-6 py-4">
         <div className="max-w-5xl mx-auto">
-          <span className="text-2xl font-bold text-[#E8F5EE]">PremiumVault</span>
+          <span className="text-2xl font-bold text-white">PremiumVault</span>
         </div>
       </header>
 
@@ -117,37 +168,96 @@ export default function CheckoutPage() {
 
           {/* LEFT: Order Summary */}
           <div>
-            <h2 className="text-xl font-bold text-[#E8F5EE] mb-6">Order Summary</h2>
+            <h2 className="text-xl font-bold text-white mb-6">Order Summary</h2>
             <div>
               {items.map((item) => (
-                <div key={item.productId} className="flex items-center gap-3 py-3 border-b border-[#1F8A5B]/30">
+                <div key={item.productId} className="flex items-center gap-3 py-3 border-b border-white/[0.08]">
                   <ServiceIcon serviceType={item.serviceType} logoUrl={item.logoUrl} size="sm" />
-                  <span className="text-[#E8F5EE] text-sm flex-1">{item.quantity}× {item.title}</span>
-                  <span className="text-[#A0B5A8] text-sm">£{(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="text-white text-sm flex-1">{item.quantity}× {item.title}</span>
+                  <span className="text-gray-400 text-sm">£{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
-            <div className="flex justify-between pt-4 mt-2">
-              <span className="text-[#E8F5EE] font-bold">Total</span>
-              <span className="text-[#E8F5EE] font-bold text-lg">£{totalStr}</span>
+            {/* Coupon code input */}
+            <div className="mt-5 pt-4 border-t border-white/[0.08]">
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between bg-emerald-400/[0.06] border border-emerald-400/20 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div>
+                      <span className="text-emerald-400 text-sm font-semibold">{appliedCoupon.code}</span>
+                      <span className="text-emerald-400/70 text-xs ml-2">{appliedCoupon.discountPct}% off</span>
+                    </div>
+                  </div>
+                  <button type="button" onClick={removeCoupon} className="cursor-pointer text-gray-400 hover:text-white transition-colors p-1">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                      <input
+                        type="text"
+                        value={couponInput}
+                        onChange={(e) => { setCouponInput(e.target.value); setCouponError(""); }}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyCoupon(); } }}
+                        placeholder="Coupon code"
+                        className="bg-white/[0.04] border border-white/[0.08] focus:border-orange-400 rounded-xl text-white pl-10 pr-4 py-2.5 w-full outline-none transition-colors text-sm uppercase placeholder:normal-case"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={applyCoupon}
+                      disabled={couponLoading || !couponInput.trim()}
+                      className="cursor-pointer bg-white/[0.06] border border-white/[0.08] hover:border-orange-400 hover:text-orange-400 text-gray-400 px-4 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                    >
+                      {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                    </button>
+                  </div>
+                  {couponError && <p className="text-red-400 text-xs mt-1.5">{couponError}</p>}
+                </div>
+              )}
+            </div>
+
+            {effectiveDiscount > 0 && (
+              <>
+                <div className="flex justify-between pt-4 mt-2">
+                  <span className="text-gray-400">Subtotal</span>
+                  <span className="text-gray-400">£{rawTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between pt-1">
+                  <span className="text-emerald-400 text-sm">
+                    {appliedCoupon && appliedCoupon.discountPct >= discount
+                      ? `Coupon ${appliedCoupon.code}`
+                      : `${discountTier} discount`} ({effectiveDiscount}%)
+                  </span>
+                  <span className="text-emerald-400 text-sm">-£{discountAmount.toFixed(2)}</span>
+                </div>
+              </>
+            )}
+            <div className={`flex justify-between ${effectiveDiscount > 0 ? "pt-2 border-t border-white/[0.08] mt-2" : "pt-4 mt-2"}`}>
+              <span className="text-white font-bold">Total</span>
+              <span className="text-white font-bold text-lg">£{totalStr}</span>
             </div>
           </div>
 
           {/* CENTER divider */}
-          <div className="hidden lg:block w-px bg-[#1F8A5B]/30" />
+          <div className="hidden lg:block w-px bg-white/[0.08]" />
 
           {/* RIGHT: Checkout Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <h2 className="text-xl font-bold text-[#E8F5EE]">Checkout</h2>
+            <h2 className="text-xl font-bold text-white">Checkout</h2>
 
             {/* Email */}
             <div className="space-y-2">
-              <label className="text-base font-semibold text-[#E8F5EE]">Email</label>
-              <p className="text-sm text-[#A0B5A8]">The order will be sent to this email</p>
+              <label className="text-base font-semibold text-white">Email</label>
+              <p className="text-sm text-gray-400">The order will be sent to this email</p>
               <input
                 type="email"
                 placeholder="your@email.com"
-                className="bg-[#16221B] border border-[#1F8A5B]/30 focus:border-[#1F8A5B] rounded-xl text-[#E8F5EE] px-4 py-3 w-full outline-none transition-colors"
+                className="bg-white/[0.04] border border-white/[0.08] focus:border-orange-400 rounded-xl text-white px-4 py-3 w-full outline-none transition-colors"
                 {...register("email")}
               />
               {errors.email && <p className="text-red-400 text-xs">{errors.email.message}</p>}
@@ -155,8 +265,8 @@ export default function CheckoutPage() {
 
             {/* Payment Method */}
             <div className="space-y-2">
-              <label className="text-base font-semibold text-[#E8F5EE]">Payment Method</label>
-              <p className="text-sm text-[#A0B5A8]">Select payment method</p>
+              <label className="text-base font-semibold text-white">Payment Method</label>
+              <p className="text-sm text-gray-400">Select payment method</p>
               <div className="grid grid-cols-2 gap-3">
                 {(["STRIPE", "PAYPAL"] as const).map((method) => (
                   <button
@@ -165,8 +275,8 @@ export default function CheckoutPage() {
                     onClick={() => { setPaymentMethod(method); setShowErrors(false); }}
                     className={`cursor-pointer rounded-xl py-3 font-medium text-sm transition-all ${
                       paymentMethod === method
-                        ? "bg-[#1F8A5B]/10 border border-[#1F8A5B] text-[#2ECC71]"
-                        : "bg-[#16221B] border border-[#1F8A5B]/30 text-[#A0B5A8] hover:border-[#1F8A5B]/50"
+                        ? "bg-orange-400/10 border border-orange-400 text-orange-400"
+                        : "bg-white/[0.04] border border-white/[0.08] text-gray-400 hover:border-white/[0.15]"
                     }`}
                   >
                     {method === "PAYPAL" ? "PayPal F&F" : "Stripe"}
@@ -177,11 +287,11 @@ export default function CheckoutPage() {
 
             {/* PayPal F&F agreement checkboxes */}
             {paymentMethod === "PAYPAL" && (
-              <div className="bg-[#16221B] border border-[#1F8A5B]/30 rounded-xl p-4 space-y-4">
+              <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 space-y-4">
                 {/* Notice */}
-                <p className="text-xs text-[#A0B5A8] leading-relaxed border-b border-[#1F8A5B]/20 pb-3">
+                <p className="text-xs text-gray-400 leading-relaxed border-b border-white/[0.06] pb-3">
                   Please note that you are required to send the exact payment of{" "}
-                  <span className="text-[#E8F5EE] font-semibold">£{totalStr}</span>.
+                  <span className="text-white font-semibold">£{totalStr}</span>.
                   If you were to send any amount over or below, our funds will be lost.
                 </p>
 
@@ -206,10 +316,10 @@ export default function CheckoutPage() {
                         />
                         <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
                           paypalChecks[key]
-                            ? "bg-[#1F8A5B] border-[#1F8A5B]"
+                            ? "bg-orange-400 border-orange-400"
                             : uncheckedError
                             ? "border-red-400 bg-red-400/5"
-                            : "border-[#1F8A5B]/40 bg-[#0F1412] group-hover:border-[#1F8A5B]/70"
+                            : "border-white/[0.15] bg-[#0a0a0f] group-hover:border-white/[0.3]"
                         }`}>
                           {paypalChecks[key] && (
                             <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -219,7 +329,7 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <span className={`text-sm ${paypalChecks[key] ? "text-[#E8F5EE]" : "text-[#A0B5A8]"}`}>
+                        <span className={`text-sm ${paypalChecks[key] ? "text-white" : "text-gray-400"}`}>
                           {label}
                         </span>
                         {uncheckedError && (
@@ -236,12 +346,12 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={!isValid || !paymentMethod || isProcessing}
-              className="cursor-pointer w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl py-3 font-semibold transition-colors"
+              className="cursor-pointer w-full bg-gradient-to-r from-orange-400 to-rose-500 hover:from-rose-500 hover:to-orange-400 text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl py-3 font-semibold transition-colors"
             >
               {isProcessing ? "Processing..." : "Continue to Payment"}
             </button>
 
-            <p className="text-xs text-[#A0B5A8]/70 text-center leading-relaxed">
+            <p className="text-xs text-gray-400/70 text-center leading-relaxed">
               🔒 Your data is secured by extended validation SSL certificates (256-bit encryption).
               This complies with the strongest payment security standard available today.
             </p>

@@ -2,25 +2,42 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { Menu, X, ShoppingCart, User } from "lucide-react";
+import Image from "next/image";
 import { useCartStore } from "@/store/cart";
+import { useSession } from "next-auth/react";
 
 const NAV_LINKS = [
-  { href: "/products", label: "Accounts" },
-  { href: "#reviews", label: "Feedbacks" },
-  { href: "#", label: "Blog" },
-  { href: "#support", label: "Help Center" },
+  { href: "/products", label: "Products" },
+  // TODO: Reviews page — link to a dedicated reviews page or section.
+  // Should display verified Trustpilot/customer reviews with ratings,
+  // review text, date, and product purchased. Consider adding filters
+  // (by product, rating) and pagination.
+  { href: "#reviews", label: "Reviews" },
+];
+
+const AUTH_LINKS = [
+  { href: "/account", label: "My Orders" },
 ];
 
 export function Navbar() {
   const { totalItems, openCart } = useCartStore();
+  const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bump, setBump] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [bannerText, setBannerText] = useState("✨ Must Read Before Purchasing ✨");
   const count = totalItems();
   const prevCount = useRef(count);
+  const isLoggedIn = !!session?.user;
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    fetch("/api/settings?key=banner_text")
+      .then((r) => r.json())
+      .then((data) => { if (data.value) setBannerText(data.value); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (count > prevCount.current) {
@@ -32,79 +49,77 @@ export function Navbar() {
     prevCount.current = count;
   }, [count]);
 
+  const allLinks = isLoggedIn ? [...NAV_LINKS, ...AUTH_LINKS] : NAV_LINKS;
+
   return (
     <>
-      <nav className="sticky top-0 z-[1000] bg-[#0F1412]/95 backdrop-blur-xl border-b border-[#1F8A5B]/30 px-6 md:px-10 py-4 flex items-center justify-between">
+      <nav className="sticky top-0 z-[1000] bg-[#0a0a12]/90 backdrop-blur-xl border-b border-white/[0.06] px-4 md:px-8 py-3 flex items-center gap-6 relative">
+        {/* Logo */}
         <Link
           href="/"
-          className="font-rajdhani text-xl font-bold flex items-center gap-2 text-[#E8F5EE]"
+          className="font-rajdhani text-xl font-bold flex items-center gap-0 text-white shrink-0"
           onClick={() => setMobileOpen(false)}
         >
-          PremiumVault
+          <Image src="/logo.png" alt="PremiumVault" width={62} height={62} className="w-[62px] h-[62px] object-contain -my-4" />
+          <span className="font-jakarta bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            PremiumVault
+          </span>
         </Link>
 
         {/* Nav Links */}
-        <ul className="hidden lg:flex items-center gap-7 list-none">
-          <li>
-            <Link
-              href="/products"
-              className="text-[#A0B5A8] font-medium text-[0.9rem] hover:text-[#7DFFB2] transition-colors inline-flex items-center gap-1"
-            >
-              Accounts
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="mt-px">
-                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          </li>
-          <li>
-            <Link href="#reviews" className="text-[#A0B5A8] font-medium text-[0.9rem] hover:text-[#7DFFB2] transition-colors">
-              Feedbacks
-            </Link>
-          </li>
-          <li>
-            <Link href="#" className="text-[#A0B5A8] font-medium text-[0.9rem] hover:text-[#7DFFB2] transition-colors">
-              Blog
-            </Link>
-          </li>
-          <li>
-            <Link href="#support" className="text-[#A0B5A8] font-medium text-[0.9rem] hover:text-[#7DFFB2] transition-colors">
-              Help Center
-            </Link>
-          </li>
+        <ul className="hidden lg:flex items-center gap-5 list-none">
+          {allLinks.map(({ href, label }) => (
+            <li key={label}>
+              <Link
+                href={href}
+                className="text-gray-400 font-medium text-sm hover:text-white transition-colors"
+              >
+                {label}
+              </Link>
+            </li>
+          ))}
         </ul>
 
-        {/* Search Bar */}
-        <div className="hidden md:flex items-center bg-[#16221B] border border-zinc-800 rounded-lg px-3 py-2 gap-2 w-56 focus-within:border-[#1F8A5B] transition-colors">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 text-[#A0B5A8]">
-            <circle cx="7" cy="7" r="5.25" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="bg-transparent outline-none text-[#E8F5EE] text-[0.85rem] placeholder:text-[#A0B5A8]/50 w-full"
-            readOnly
-          />
-        </div>
-
-        {/* Right: Cart + Mobile Toggle */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Right actions */}
+        <div className="flex items-center gap-2 shrink-0 ml-auto">
+          {/* Cart */}
           <button
             onClick={openCart}
-            className={`relative bg-[#16221B] border border-[#1F8A5B]/30 rounded-xl px-4 py-2.5 text-[#E8F5EE] font-medium text-[0.95rem] cursor-pointer transition-all hover:border-[#1F8A5B] hover:shadow-[0_0_15px_rgba(31,138,91,0.4)] flex items-center gap-2 ${bump ? "scale-125" : "scale-100"} transition-transform duration-200`}
+            className={`relative w-9 h-9 rounded-lg bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-gray-400 hover:text-white transition-all ${bump ? "scale-110" : "scale-100"} transition-transform duration-200`}
+            style={{ touchAction: "manipulation" }}
             aria-label="Open basket"
           >
-            <ShoppingCart className="w-4 h-4" /> Cart
+            <ShoppingCart className="w-4 h-4" />
             {mounted && count > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#2ECC71] text-white text-[0.7rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-rose-500 text-white text-[0.6rem] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                 {count}
               </span>
             )}
           </button>
 
+          {/* Auth */}
+          {isLoggedIn ? (
+            <Link
+              href="/account"
+              className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-gray-300 hover:text-white transition-colors ml-1"
+            >
+              <User className="w-4 h-4" />
+              {session.user.name || "Account"}
+            </Link>
+          ) : (
+            <Link
+              href="/auth/signin"
+              className="hidden md:inline-flex text-sm font-medium text-gray-300 hover:text-white transition-colors ml-1"
+            >
+              Sign In
+            </Link>
+          )}
+
+          {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen((o) => !o)}
-            className="lg:hidden text-[#A0B5A8] hover:text-[#7DFFB2] transition-colors p-1"
+            style={{ touchAction: "manipulation" }}
+            className="lg:hidden text-gray-400 hover:text-white transition-colors p-1"
             aria-label="Toggle navigation"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -112,18 +127,49 @@ export function Navbar() {
         </div>
       </nav>
 
+      {/* Must Read Banner */}
+      <div className="relative z-[999] w-full py-2.5 flex items-center justify-center overflow-hidden"
+        style={{
+          background: "linear-gradient(90deg, #1a0a2e 0%, #2d1b4e 15%, #4a1942 30%, #6b2140 45%, #8b4513 55%, #b8860b 65%, #4a6741 80%, #2d4a7a 90%, #1a0a2e 100%)",
+        }}
+      >
+        <Link
+          href="#"
+          className="relative z-10 text-white font-medium text-sm tracking-wide hover:opacity-90 transition-opacity"
+        >
+          {bannerText}
+        </Link>
+      </div>
+
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 top-[61px] z-[999] bg-[#0F1412]/98 backdrop-blur-xl flex flex-col px-6 py-6 gap-1 border-t border-[#1F8A5B]/30">
-          {NAV_LINKS.map(({ href, label }) => (
+        <div className="lg:hidden fixed inset-0 top-[57px] z-[999] bg-[#0a0a12]/98 backdrop-blur-xl flex flex-col px-6 py-6 gap-1 border-t border-white/[0.06]">
+          {allLinks.map(({ href, label }) => (
             <Link
-              key={href}
+              key={label}
               href={href}
               onClick={() => setMobileOpen(false)}
-              className="text-[#E8F5EE] font-semibold text-xl py-4 border-b border-[#1F8A5B]/20 hover:text-[#7DFFB2] transition-colors"
+              className="text-white font-semibold text-xl py-4 border-b border-white/[0.06] hover:text-orange-400 transition-colors"
             >
               {label}
             </Link>
           ))}
+          {isLoggedIn ? (
+            <Link
+              href="/account"
+              onClick={() => setMobileOpen(false)}
+              className="text-orange-400 font-semibold text-xl py-4"
+            >
+              My Account
+            </Link>
+          ) : (
+            <Link
+              href="/auth/signin"
+              onClick={() => setMobileOpen(false)}
+              className="text-orange-400 font-semibold text-xl py-4"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       )}
     </>

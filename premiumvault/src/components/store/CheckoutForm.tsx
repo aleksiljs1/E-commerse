@@ -78,25 +78,25 @@ export function CheckoutForm({ items }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-[#E8F5EE] mb-1">Checkout</h2>
-        <Separator className="bg-[#1F8A5B]/30" />
+        <h2 className="text-xl font-bold text-white mb-1">Checkout</h2>
+        <Separator className="bg-white/[0.1]" />
       </div>
 
       <div className="space-y-2">
-        <Label className="text-base font-semibold text-[#E8F5EE]">Email</Label>
-        <p className="text-sm text-[#A0B5A8]">The order will be sent to this email</p>
+        <Label className="text-base font-semibold text-white">Email</Label>
+        <p className="text-sm text-gray-400">The order will be sent to this email</p>
         <Input
           type="email"
           placeholder="your@email.com"
-          className="bg-[#16221B] border-[#1F8A5B]/30"
+          className="bg-white/[0.04] border-white/[0.1]"
           {...register("email")}
         />
         {errors.email && <p className="text-red-400 text-sm">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
-        <Label className="text-base font-semibold text-[#E8F5EE]">Payment Method</Label>
-        <p className="text-sm text-[#A0B5A8]">Select payment method</p>
+        <Label className="text-base font-semibold text-white">Payment Method</Label>
+        <p className="text-sm text-gray-400">Select payment method</p>
         <PaymentMethodSelector selected={paymentMethod} onSelect={setPaymentMethod} />
       </div>
 
@@ -109,7 +109,7 @@ export function CheckoutForm({ items }: Props) {
         {isProcessing ? "Processing..." : "Continue to Payment"}
       </Button>
 
-      <p className="text-xs text-[#A0B5A8]/70 text-center leading-relaxed">
+      <p className="text-xs text-gray-400/70 text-center leading-relaxed">
         🔒 Your data is secured by extended validation SSL certificates (256-bit encryption).
         This complies with the strongest payment security standard available today.
       </p>

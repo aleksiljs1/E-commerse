@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { createPayPalOrder } from "@/lib/paypal";
 import { apiError } from "@/lib/api-error";
+import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
@@ -10,6 +11,7 @@ const orderSchema = z.object({
   email: z.string().email(),
   paymentMethod: z.enum(["STRIPE", "PAYPAL"]),
   items: z.array(z.object({ productId: z.string(), quantity: z.number().int().positive() })).min(1),
+  couponCode: z.string().optional(),
 });
 
 async function rollbackOrder(orderId: string, items: { productId: string; quantity: number }[]) {
@@ -31,7 +33,7 @@ export async function POST(req: NextRequest) {
 
   const parsed = orderSchema.safeParse(body);
   if (!parsed.success) return apiError("Invalid request", 400);
-  const { email, paymentMethod, items } = parsed.data;
+  const { email, paymentMethod, items, couponCode } = parsed.data;
 
   try {
     const productIds = items.map((i) => i.productId);
@@ -58,20 +60,56 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Link order to logged-in user if available
+    const session = await auth();
+    const userId = session?.user?.id ?? null;
+
+    // Calculate tier discount for logged-in users
+    let discountPercent = 0;
+    if (userId) {
+      const orderCount = await prisma.order.count({
+        where: { userId, status: { notIn: ["CANCELLED", "PENDING"] } },
+      });
+      if (orderCount >= 10) discountPercent = 15;
+      else if (orderCount >= 5) discountPercent = 10;
+      else if (orderCount >= 2) discountPercent = 5;
+    }
+
+    // Validate coupon code if provided
+    let couponId: string | null = null;
+    let couponDiscountPct = 0;
+    if (couponCode) {
+      const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.trim().toUpperCase() } });
+      if (!coupon) return apiError("Invalid coupon code", 400);
+      if (!coupon.active) return apiError("This coupon is no longer active", 400);
+      if (new Date() > coupon.expiresAt) return apiError("This coupon has expired", 400);
+      if (coupon.timesUsed >= coupon.maxUses) return apiError("This coupon has reached its usage limit", 400);
+      couponId = coupon.id;
+      couponDiscountPct = coupon.discountPct;
+    }
+
+    // Use the higher discount between tier and coupon
+    const effectiveDiscount = Math.max(discountPercent, couponDiscountPct);
+
     const orderItems = items.map((item) => {
       const product = products.find((p) => p.id === item.productId)!;
       return { productId: item.productId, quantity: item.quantity, priceAtPurchase: Number(product.price), lineTotal: Number(product.price) * item.quantity };
     });
-    const totalAmount = orderItems.reduce((sum, i) => sum + i.lineTotal, 0);
+    const rawTotal = orderItems.reduce((sum, i) => sum + i.lineTotal, 0);
+    const totalAmount = effectiveDiscount > 0 ? rawTotal * (1 - effectiveDiscount / 100) : rawTotal;
     const orderNumber = `PV-${Date.now().toString(36).toUpperCase()}-${uuidv4().slice(0, 6).toUpperCase()}`;
 
     const order = await prisma.$transaction(async (tx) => {
       const newOrder = await tx.order.create({
         data: {
-          orderNumber, customerEmail: email, totalAmount, paymentMethod, status: "PENDING",
+          orderNumber, customerEmail: email, userId, couponId, totalAmount, paymentMethod, status: "PENDING",
           items: { create: orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity, priceAtPurchase: i.priceAtPurchase })) },
         },
       });
+      // Increment coupon usage
+      if (couponId) {
+        await tx.coupon.update({ where: { id: couponId }, data: { timesUsed: { increment: 1 } } });
+      }
       for (const item of items) {
         await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } });
       }

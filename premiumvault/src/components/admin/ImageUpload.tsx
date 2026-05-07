@@ -53,7 +53,7 @@ export function ImageUpload({ value, onChange }: Props) {
         <img
           src={value}
           alt="Product logo"
-          className="w-20 h-20 rounded-xl object-contain bg-[#0F1412] p-2"
+          className="w-20 h-20 rounded-xl object-contain bg-[#0e0c1a] p-2"
         />
       )}
       <div
@@ -64,8 +64,8 @@ export function ImageUpload({ value, onChange }: Props) {
         className={[
           "relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-8 cursor-pointer transition-colors",
           dragging
-            ? "border-[#1F8A5B] bg-[#1F8A5B]/10"
-            : "border-[#1F8A5B]/30 bg-[#16221B] hover:border-[#1F8A5B] hover:bg-[#1F8A5B]/10",
+            ? "border-orange-400 bg-white/[0.05]"
+            : "border-white/[0.1] bg-white/[0.04] hover:border-orange-400 hover:bg-white/[0.05]",
           uploading ? "pointer-events-none opacity-60" : "",
         ].join(" ")}
       >
@@ -82,13 +82,13 @@ export function ImageUpload({ value, onChange }: Props) {
           <img
             src={value}
             alt="Product image"
-            className="w-24 h-24 rounded-xl object-contain bg-[#0F1412] p-2 shadow-lg"
+            className="w-24 h-24 rounded-xl object-contain bg-[#0e0c1a] p-2 shadow-lg"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-[#0F1412] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-[#0e0c1a] flex items-center justify-center">
             {uploading ? (
               <svg
-                className="w-6 h-6 text-[#6ED3A3] animate-spin"
+                className="w-6 h-6 text-rose-400 animate-spin"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -108,7 +108,7 @@ export function ImageUpload({ value, onChange }: Props) {
               </svg>
             ) : (
               <svg
-                className="w-6 h-6 text-[#A0B5A8]"
+                className="w-6 h-6 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
@@ -126,19 +126,19 @@ export function ImageUpload({ value, onChange }: Props) {
 
         <div className="text-center">
           {uploading ? (
-            <p className="text-sm text-[#6ED3A3] font-medium">Uploading…</p>
+            <p className="text-sm text-rose-400 font-medium">Uploading…</p>
           ) : value ? (
             <>
-              <p className="text-sm font-medium text-[#E8F5EE]">Click or drag to replace</p>
-              <p className="text-xs text-[#A0B5A8] mt-0.5">JPG, PNG, WebP, GIF, SVG · max 5 MB</p>
+              <p className="text-sm font-medium text-white">Click or drag to replace</p>
+              <p className="text-xs text-gray-400 mt-0.5">JPG, PNG, WebP, GIF, SVG · max 5 MB</p>
             </>
           ) : (
             <>
-              <p className="text-sm font-medium text-[#E8F5EE]">
+              <p className="text-sm font-medium text-white">
                 Drag &amp; drop or{" "}
-                <span className="text-[#6ED3A3] underline underline-offset-2">browse</span>
+                <span className="text-rose-400 underline underline-offset-2">browse</span>
               </p>
-              <p className="text-xs text-[#A0B5A8] mt-0.5">JPG, PNG, WebP, GIF, SVG · max 5 MB</p>
+              <p className="text-xs text-gray-400 mt-0.5">JPG, PNG, WebP, GIF, SVG · max 5 MB</p>
             </>
           )}
         </div>
@@ -149,7 +149,7 @@ export function ImageUpload({ value, onChange }: Props) {
         <button
           type="button"
           onClick={() => onChange("")}
-          className="text-xs text-[#A0B5A8] hover:text-red-400 transition-colors cursor-pointer"
+          className="text-xs text-gray-400 hover:text-red-400 transition-colors cursor-pointer"
         >
           Remove image
         </button>

@@ -82,11 +82,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --accent-glow: rgba(31, 138, 91, 0.4);
-  --store-bg: #0F1412;
-  --store-card-bg: #16221B;
-  --store-border: #1F8A5B;
-  --store-text-muted: #A0B5A8;
+  --accent-glow: rgba(249, 115, 22, 0.4);
+  --store-bg: #0a0a0f;
+  --store-card-bg: rgba(255,255,255,0.04);
+  --store-border: rgba(255,255,255,0.1);
+  --store-text-muted: #9ca3af;
 }
 
 .dark {
@@ -140,6 +140,9 @@
   .font-rajdhani {
     font-family: var(--font-rajdhani), sans-serif;
   }
+  .font-jakarta {
+    font-family: var(--font-jakarta), sans-serif;
+  }
   .font-inter {
     font-family: var(--font-inter), sans-serif;
   }
@@ -155,4 +158,20 @@
 @keyframes shimmer {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.85; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+.cosmic-bg {
+  background: #0a0a0f url('/cosmic-bg.png') center center / cover no-repeat fixed;
+  position: relative;
+  min-height: 100vh;
 }

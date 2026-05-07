@@ -31,16 +31,17 @@ export function CartPopup() {
       <div
         className="fixed inset-0 z-[1001] bg-black/60"
         onClick={closeCart}
+        style={{ touchAction: "manipulation" }}
       />
 
       {/* Popup box */}
-      <div className="fixed top-16 right-4 z-[1002] w-[380px] max-w-[calc(100vw-2rem)] max-h-[70vh] bg-[#16221B] border border-[#1F8A5B]/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="fixed z-[1002] bg-[#141220] border border-white/[0.1] shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden inset-x-0 bottom-0 max-h-[80vh] rounded-t-2xl md:inset-x-auto md:bottom-auto md:top-16 md:right-4 md:w-[380px] md:max-h-[70vh] md:rounded-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1F8A5B]/30">
-          <h2 className="text-base font-semibold text-[#E8F5EE]">Your Basket</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.1]">
+          <h2 className="text-base font-semibold text-white">Your Basket</h2>
           <button
             onClick={closeCart}
-            className="cursor-pointer text-[#A0B5A8] hover:text-[#7DFFB2] transition-colors"
+            className="cursor-pointer text-gray-400 hover:text-white transition-colors"
             aria-label="Close basket"
           >
             <X className="w-4 h-4" />
@@ -50,7 +51,7 @@ export function CartPopup() {
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-3">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 text-[#A0B5A8]/70">
+            <div className="flex flex-col items-center justify-center py-10 text-gray-400/70">
               <span className="text-3xl mb-2">🛒</span>
               <p className="text-sm">Your basket is empty</p>
             </div>
@@ -61,14 +62,14 @@ export function CartPopup() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-[#1F8A5B]/30 px-5 py-4 space-y-3">
+          <div className="border-t border-white/[0.1] px-5 py-4 space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#A0B5A8]">Subtotal</span>
-              <span className="text-[#E8F5EE] font-bold text-base">£{subtotal().toFixed(2)}</span>
+              <span className="text-gray-400">Subtotal</span>
+              <span className="text-white font-bold text-base">£{subtotal().toFixed(2)}</span>
             </div>
             <button
               onClick={handleCheckout}
-              className="cursor-pointer w-full bg-gradient-to-r from-[#2ECC71] to-[#27AE60] hover:from-[#27AE60] hover:to-[#2ECC71] text-white rounded-xl py-3 font-semibold transition-colors"
+              className="cursor-pointer w-full bg-gradient-to-r from-orange-400 to-rose-500 hover:from-rose-500 hover:to-orange-400 text-white rounded-xl py-3 font-semibold transition-colors"
             >
               Checkout
             </button>
