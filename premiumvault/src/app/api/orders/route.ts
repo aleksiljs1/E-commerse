@@ -6,6 +6,7 @@ import { apiError } from "@/lib/api-error";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
+import { getTierConfig, getDiscountPercent } from "@/lib/discount-tiers";
 
 const orderSchema = z.object({
   email: z.string().email(),
@@ -70,9 +71,8 @@ export async function POST(req: NextRequest) {
       const orderCount = await prisma.order.count({
         where: { userId, status: { notIn: ["CANCELLED", "PENDING"] } },
       });
-      if (orderCount >= 10) discountPercent = 15;
-      else if (orderCount >= 5) discountPercent = 10;
-      else if (orderCount >= 2) discountPercent = 5;
+      const tierConfig = await getTierConfig();
+      discountPercent = getDiscountPercent(orderCount, tierConfig);
     }
 
     // Validate coupon code if provided

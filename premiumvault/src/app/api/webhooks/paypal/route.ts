@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { capturePayPalOrder } from "@/lib/paypal";
 import { prisma } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
+import { notifyAdminNewOrder } from "@/lib/email/notify-admin";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -42,6 +43,25 @@ export async function GET(req: NextRequest) {
         headers: { "Content-Type": "application/json", "x-internal-secret": process.env.NEXTAUTH_SECRET! },
         body: JSON.stringify({ orderId: order.id }),
       }).catch((err) => console.error("[webhook/paypal] Failed to send confirmation email for order", order.id, err));
+
+      // Notify admin
+      const fullOrder = await prisma.order.findUnique({
+        where: { id: order.id },
+        include: { items: { include: { product: { select: { title: true, productType: true } } } } },
+      });
+      if (fullOrder) {
+        notifyAdminNewOrder({
+          orderNumber: fullOrder.orderNumber,
+          customerEmail: fullOrder.customerEmail,
+          items: fullOrder.items.map((i) => ({
+            title: i.product.title,
+            quantity: i.quantity,
+            priceAtPurchase: Number(i.priceAtPurchase),
+          })),
+          totalAmount: Number(fullOrder.totalAmount),
+          hasUpgradeItems: fullOrder.items.some((i) => i.product.productType === "UPGRADE"),
+        }).catch((err) => console.error("[webhook/paypal] Admin notification failed:", err));
+      }
     }
 
     return NextResponse.redirect(new URL(`/checkout/success?orderId=${order.id}`, req.url));

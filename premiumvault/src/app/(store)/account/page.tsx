@@ -2,27 +2,22 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/store/SignOutButton";
-
-function getDiscountTier(orderCount: number) {
-  if (orderCount >= 10) return { tier: "Gold", discount: 15, next: null, remaining: 0 };
-  if (orderCount >= 5) return { tier: "Silver", discount: 10, next: "Gold", remaining: 10 - orderCount };
-  if (orderCount >= 2) return { tier: "Bronze", discount: 5, next: "Silver", remaining: 5 - orderCount };
-  return { tier: "None", discount: 0, next: "Bronze", remaining: 2 - orderCount };
-}
+import { getTierConfig, getDiscountTier } from "@/lib/discount-tiers";
 
 export default async function AccountPage() {
   const session = await auth();
   if (!session?.user) redirect("/auth/signin");
 
   const orders = await prisma.order.findMany({
-    where: { userId: session.user.id, status: { not: "CANCELLED" } },
+    where: { userId: session.user.id },
     include: { items: { include: { product: true } } },
     orderBy: { createdAt: "desc" },
   });
 
   const completedOrders = orders.filter((o) => o.status === "COMPLETED" || o.status === "PAID" || o.status === "CREDENTIALS_SUBMITTED");
   const totalSpent = completedOrders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
-  const { tier, discount, next, remaining } = getDiscountTier(completedOrders.length);
+  const tierConfig = await getTierConfig();
+  const { tier, discount, next, remaining } = getDiscountTier(completedOrders.length, tierConfig);
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
@@ -62,9 +57,9 @@ export default async function AccountPage() {
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 mb-10">
         <h2 className="text-sm font-semibold text-white mb-3">Discount Tiers</h2>
         <div className="flex gap-6 text-sm">
-          <div className="text-gray-400"><span className="text-orange-400 font-semibold">Bronze</span> — 2+ orders — 5% off</div>
-          <div className="text-gray-400"><span className="text-gray-300 font-semibold">Silver</span> — 5+ orders — 10% off</div>
-          <div className="text-gray-400"><span className="text-yellow-400 font-semibold">Gold</span> — 10+ orders — 15% off</div>
+          <div className="text-gray-400"><span className="text-orange-400 font-semibold">Bronze</span> — {tierConfig.bronzeOrders}+ orders — {tierConfig.bronzeDiscount}% off</div>
+          <div className="text-gray-400"><span className="text-gray-300 font-semibold">Silver</span> — {tierConfig.silverOrders}+ orders — {tierConfig.silverDiscount}% off</div>
+          <div className="text-gray-400"><span className="text-yellow-400 font-semibold">Gold</span> — {tierConfig.goldOrders}+ orders — {tierConfig.goldDiscount}% off</div>
         </div>
       </div>
 

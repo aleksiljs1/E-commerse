@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { getTierConfig, getDiscountTier } from "@/lib/discount-tiers";
 
 export async function GET() {
   const session = await auth();
@@ -15,12 +16,8 @@ export async function GET() {
     },
   });
 
-  let tier = "None";
-  let discount = 0;
-
-  if (orderCount >= 10) { tier = "Gold"; discount = 15; }
-  else if (orderCount >= 5) { tier = "Silver"; discount = 10; }
-  else if (orderCount >= 2) { tier = "Bronze"; discount = 5; }
+  const tierConfig = await getTierConfig();
+  const { tier, discount } = getDiscountTier(orderCount, tierConfig);
 
   return NextResponse.json({ discount, tier, orderCount });
 }

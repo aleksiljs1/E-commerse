@@ -4,6 +4,7 @@ import { sendEmail } from "@/lib/email/send";
 import { credentialConfirmationTemplate } from "@/lib/email/templates/credential-confirmation";
 import { getEmailSettings } from "@/lib/email/settings";
 import { apiError } from "@/lib/api-error";
+import { notifyAdminCredentialsSubmitted } from "@/lib/email/notify-admin";
 import { z } from "zod";
 
 const submitSchema = z.object({
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
   try {
     const order = await prisma.order.findUnique({
       where: { credentialToken: token },
-      include: { items: true },
+      include: { items: { include: { product: { select: { title: true } } } } },
     });
 
     if (!order) return apiError("Invalid or expired link", 400);
@@ -86,6 +87,19 @@ export async function POST(req: NextRequest) {
         }),
       })
     ).catch((err) => console.error("[credentials/POST] Confirmation email failed for order", order.id, err));
+
+    // Notify admin — credentials submitted, action required
+    notifyAdminCredentialsSubmitted({
+      orderNumber: order.orderNumber,
+      customerEmail: order.customerEmail,
+      items: order.items.map((i) => ({
+        title: i.product.title,
+        quantity: i.quantity,
+        priceAtPurchase: Number(i.priceAtPurchase),
+      })),
+      totalAmount: Number(order.totalAmount),
+      hasUpgradeItems: true,
+    }).catch((err) => console.error("[credentials/POST] Admin notification failed:", err));
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

@@ -21,7 +21,11 @@ export type EmailTemplateSettings = {
   credentialFooter: string;
 };
 
-export type EmailSettings = SmtpSettings & EmailTemplateSettings;
+export type AdminNotificationSettings = {
+  adminNotificationEmail: string;
+};
+
+export type EmailSettings = SmtpSettings & EmailTemplateSettings & AdminNotificationSettings;
 
 const DEFAULTS: EmailSettings = {
   host: process.env.SMTP_HOST ?? "smtp.gmail.com",
@@ -39,6 +43,7 @@ const DEFAULTS: EmailSettings = {
   credentialHeading: "Credentials Received!",
   credentialBody: "Congratulations! We've received your account credentials for order {orderNumber}.",
   credentialFooter: "Thank you for choosing PremiumVault.",
+  adminNotificationEmail: "",
 };
 
 const KEY_MAP: Record<string, keyof EmailSettings> = {
@@ -57,6 +62,7 @@ const KEY_MAP: Record<string, keyof EmailSettings> = {
   email_credential_heading: "credentialHeading",
   email_credential_body: "credentialBody",
   email_credential_footer: "credentialFooter",
+  admin_notification_email: "adminNotificationEmail",
 };
 
 export async function getEmailSettings(): Promise<EmailSettings> {

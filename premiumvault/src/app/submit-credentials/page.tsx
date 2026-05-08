@@ -118,7 +118,7 @@ export default function SubmitCredentialsPage() {
               <Input
                 id="order-id"
                 placeholder="Paste your Order ID here..."
-                className="bg-[#0e0c1a] border-white/[0.1] font-mono text-sm"
+                className="bg-[#0e0c1a] border-white/[0.1] font-mono text-sm text-white placeholder:text-zinc-500"
                 value={orderIdInput}
                 onChange={(e) => setOrderIdInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !lookingUp && handleLookup()}
@@ -188,7 +188,7 @@ export default function SubmitCredentialsPage() {
                               <Label className="text-xs text-zinc-400">Email / Username</Label>
                               <Input
                                 placeholder="your@email.com"
-                                className="bg-[#0e0c1a] border-white/[0.1] h-9 text-sm"
+                                className="bg-[#0e0c1a] border-white/[0.1] h-9 text-sm text-white placeholder:text-zinc-500"
                                 value={creds[key]?.username ?? ""}
                                 onChange={(e) => updateCred(key, "username", e.target.value)}
                               />
@@ -198,7 +198,7 @@ export default function SubmitCredentialsPage() {
                               <Input
                                 type="password"
                                 placeholder="••••••••"
-                                className="bg-[#0e0c1a] border-white/[0.1] h-9 text-sm"
+                                className="bg-[#0e0c1a] border-white/[0.1] h-9 text-sm text-white placeholder:text-zinc-500"
                                 value={creds[key]?.password ?? ""}
                                 onChange={(e) => updateCred(key, "password", e.target.value)}
                               />

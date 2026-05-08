@@ -11,6 +11,8 @@ import {
   Mail,
   Send,
   FileText,
+  Bell,
+  Award,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -99,6 +101,17 @@ export default function SettingsPage() {
   const [credentialBody, setCredentialBody] = useState("");
   const [credentialFooter, setCredentialFooter] = useState("");
 
+  /* Admin Notification */
+  const [adminNotificationEmail, setAdminNotificationEmail] = useState("");
+
+  /* Discount Tiers */
+  const [bronzeOrders, setBronzeOrders] = useState("2");
+  const [bronzeDiscount, setBronzeDiscount] = useState("5");
+  const [silverOrders, setSilverOrders] = useState("5");
+  const [silverDiscount, setSilverDiscount] = useState("10");
+  const [goldOrders, setGoldOrders] = useState("10");
+  const [goldDiscount, setGoldDiscount] = useState("15");
+
   /* UI state */
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -134,6 +147,15 @@ export default function SettingsPage() {
         setCredentialBody(map.get("email_credential_body") ?? "");
         setCredentialFooter(map.get("email_credential_footer") ?? "");
 
+        setAdminNotificationEmail(map.get("admin_notification_email") ?? "");
+
+        setBronzeOrders(map.get("tier_bronze_orders") ?? "2");
+        setBronzeDiscount(map.get("tier_bronze_discount") ?? "5");
+        setSilverOrders(map.get("tier_silver_orders") ?? "5");
+        setSilverDiscount(map.get("tier_silver_discount") ?? "10");
+        setGoldOrders(map.get("tier_gold_orders") ?? "10");
+        setGoldDiscount(map.get("tier_gold_discount") ?? "15");
+
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -166,6 +188,13 @@ export default function SettingsPage() {
         { key: "email_credential_heading", value: credentialHeading },
         { key: "email_credential_body", value: credentialBody },
         { key: "email_credential_footer", value: credentialFooter },
+        { key: "admin_notification_email", value: adminNotificationEmail },
+        { key: "tier_bronze_orders", value: bronzeOrders },
+        { key: "tier_bronze_discount", value: bronzeDiscount },
+        { key: "tier_silver_orders", value: silverOrders },
+        { key: "tier_silver_discount", value: silverDiscount },
+        { key: "tier_gold_orders", value: goldOrders },
+        { key: "tier_gold_discount", value: goldDiscount },
       ];
 
       const res = await fetch("/api/admin/settings", {
@@ -243,6 +272,55 @@ export default function SettingsPage() {
             <span className="text-white font-medium text-sm tracking-wide">
               {bannerText || "(empty)"}
             </span>
+          </div>
+        </div>
+      </Section>
+
+      {/* ===== Admin Notifications ===== */}
+      <Section icon={<Bell className="w-5 h-5 text-gray-400" />} title="Admin Notifications">
+        <p className={hintCls}>
+          Receive an email every time a customer makes a purchase or submits credentials for an upgrade.
+          Leave blank to disable notifications.
+        </p>
+        <Field
+          label="Notification Email"
+          hint="The email address where you want to receive order notifications."
+          value={adminNotificationEmail}
+          onChange={setAdminNotificationEmail}
+          placeholder="admin@example.com"
+          type="email"
+        />
+      </Section>
+
+      {/* ===== Discount Tiers ===== */}
+      <Section icon={<Award className="w-5 h-5 text-gray-400" />} title="Discount Tiers">
+        <p className={hintCls}>
+          Configure loyalty discount tiers. Customers who reach the required number of completed orders automatically get the discount applied.
+        </p>
+        <div className="space-y-4">
+          {/* Bronze */}
+          <div className="flex items-center gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+            <span className="text-orange-400 font-semibold text-sm w-16 shrink-0">Bronze</span>
+            <div className="flex-1 grid grid-cols-2 gap-3">
+              <Field label="Orders Required" value={bronzeOrders} onChange={setBronzeOrders} type="number" placeholder="2" />
+              <Field label="Discount %" value={bronzeDiscount} onChange={setBronzeDiscount} type="number" placeholder="5" />
+            </div>
+          </div>
+          {/* Silver */}
+          <div className="flex items-center gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+            <span className="text-gray-300 font-semibold text-sm w-16 shrink-0">Silver</span>
+            <div className="flex-1 grid grid-cols-2 gap-3">
+              <Field label="Orders Required" value={silverOrders} onChange={setSilverOrders} type="number" placeholder="5" />
+              <Field label="Discount %" value={silverDiscount} onChange={setSilverDiscount} type="number" placeholder="10" />
+            </div>
+          </div>
+          {/* Gold */}
+          <div className="flex items-center gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+            <span className="text-yellow-400 font-semibold text-sm w-16 shrink-0">Gold</span>
+            <div className="flex-1 grid grid-cols-2 gap-3">
+              <Field label="Orders Required" value={goldOrders} onChange={setGoldOrders} type="number" placeholder="10" />
+              <Field label="Discount %" value={goldDiscount} onChange={setGoldDiscount} type="number" placeholder="15" />
+            </div>
           </div>
         </div>
       </Section>
