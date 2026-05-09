@@ -101,6 +101,9 @@ export default function SettingsPage() {
   const [credentialBody, setCredentialBody] = useState("");
   const [credentialFooter, setCredentialFooter] = useState("");
 
+  /* Support Email (shown to customers on submit-credentials page and delivery emails) */
+  const [supportEmail, setSupportEmail] = useState("");
+
   /* Admin Notification */
   const [adminNotificationEmail, setAdminNotificationEmail] = useState("");
 
@@ -147,6 +150,7 @@ export default function SettingsPage() {
         setCredentialBody(map.get("email_credential_body") ?? "");
         setCredentialFooter(map.get("email_credential_footer") ?? "");
 
+        setSupportEmail(map.get("email_support") ?? "");
         setAdminNotificationEmail(map.get("admin_notification_email") ?? "");
 
         setBronzeOrders(map.get("tier_bronze_orders") ?? "2");
@@ -188,6 +192,7 @@ export default function SettingsPage() {
         { key: "email_credential_heading", value: credentialHeading },
         { key: "email_credential_body", value: credentialBody },
         { key: "email_credential_footer", value: credentialFooter },
+        { key: "email_support", value: supportEmail },
         { key: "admin_notification_email", value: adminNotificationEmail },
         { key: "tier_bronze_orders", value: bronzeOrders },
         { key: "tier_bronze_discount", value: bronzeDiscount },
@@ -336,6 +341,14 @@ export default function SettingsPage() {
           <Field label="SMTP User" value={smtpUser} onChange={setSmtpUser} placeholder="you@gmail.com" />
           <Field label="SMTP Password" value={smtpPass} onChange={setSmtpPass} placeholder="App password" type="password" />
           <Field label="From Email" value={emailFrom} onChange={setEmailFrom} placeholder="you@gmail.com" />
+          <Field
+            label="Support Email"
+            hint="Shown to customers in delivery emails and the credential submission page."
+            value={supportEmail}
+            onChange={setSupportEmail}
+            placeholder="support@example.com"
+            type="email"
+          />
           <div className="flex items-center gap-3 pt-6">
             <button
               type="button"
@@ -355,6 +368,24 @@ export default function SettingsPage() {
             <span className="text-sm text-gray-400">SSL/TLS (port 465)</span>
           </div>
         </div>
+
+        {/* Port / secure mismatch warning */}
+        {smtpPort === "465" && !smtpSecure && (
+          <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3">
+            <span className="text-yellow-400 text-base leading-none mt-0.5">⚠️</span>
+            <p className="text-yellow-300 text-sm leading-relaxed">
+              Port 465 requires <strong>SSL/TLS enabled</strong>. Toggle SSL/TLS on or change the port to 587.
+            </p>
+          </div>
+        )}
+        {smtpSecure && smtpPort !== "465" && smtpPort !== "" && (
+          <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3">
+            <span className="text-yellow-400 text-base leading-none mt-0.5">⚠️</span>
+            <p className="text-yellow-300 text-sm leading-relaxed">
+              SSL/TLS is on but port is <strong>{smtpPort}</strong>. SSL/TLS is normally used on port 465. Use port 587 with SSL/TLS off for STARTTLS.
+            </p>
+          </div>
+        )}
 
         {/* Test email */}
         <div className="mt-4 pt-4 border-t border-white/[0.06]">

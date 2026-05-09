@@ -7,6 +7,7 @@ export type SmtpSettings = {
   user: string;
   pass: string;
   from: string;
+  supportEmail: string;
 };
 
 export type EmailTemplateSettings = {
@@ -34,6 +35,7 @@ const DEFAULTS: EmailSettings = {
   user: process.env.SMTP_USER ?? "",
   pass: process.env.SMTP_PASS ?? "",
   from: process.env.EMAIL_FROM ?? "",
+  supportEmail: process.env.EMAIL_FROM ?? "",
   purchaseSubject: "PremiumVault — Order {orderNumber} Confirmed",
   purchaseHeading: "Payment Confirmed ✅",
   purchaseBody: "To complete your upgrade, please submit your account credentials using the secure link below. This link expires in 7 days.",
@@ -63,6 +65,7 @@ const KEY_MAP: Record<string, keyof EmailSettings> = {
   email_credential_body: "credentialBody",
   email_credential_footer: "credentialFooter",
   admin_notification_email: "adminNotificationEmail",
+  email_support: "supportEmail",
 };
 
 export async function getEmailSettings(): Promise<EmailSettings> {

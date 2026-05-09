@@ -17,8 +17,6 @@ type OrderItem = {
 type CredField = { username: string; password: string };
 type CredsMap = Record<string, CredField>;
 
-const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "";
-
 export default function SubmitCredentialsPage() {
   const [orderIdInput, setOrderIdInput] = useState("");
   const [stage, setStage] = useState<"enter" | "filling" | "success">("enter");
@@ -29,6 +27,7 @@ export default function SubmitCredentialsPage() {
   const [orderNumber, setOrderNumber] = useState("");
   const [items, setItems] = useState<OrderItem[]>([]);
   const [creds, setCreds] = useState<CredsMap>({});
+  const [supportEmail, setSupportEmail] = useState("");
 
   const expandedKeys = useMemo(
     () => items.flatMap((item) => Array.from({ length: item.quantity }, (_, i) => `${item.id}-${i}`)),
@@ -48,10 +47,11 @@ export default function SubmitCredentialsPage() {
     setLookingUp(true);
     try {
       const res = await api.get(`/api/credentials/${encodeURIComponent(input)}`);
-      const { orderNumber: num, items: orderItems } = res.data;
+      const { orderNumber: num, items: orderItems, supportEmail: email } = res.data;
       setToken(input);
       setOrderNumber(num);
       setItems(orderItems);
+      setSupportEmail(email ?? "");
       const init: CredsMap = {};
       orderItems.forEach((item: OrderItem) => {
         for (let i = 0; i < item.quantity; i++) {
@@ -219,14 +219,14 @@ export default function SubmitCredentialsPage() {
                   <strong className="text-amber-200">this cannot be undone</strong> and your Order ID will no
                   longer be valid.
                 </p>
-                {SUPPORT_EMAIL && (
+                {supportEmail && (
                   <p className="text-amber-200/60 text-xs">
                     Need help? Contact us at{" "}
                     <a
-                      href={`mailto:${SUPPORT_EMAIL}`}
+                      href={`mailto:${supportEmail}`}
                       className="text-amber-400 underline underline-offset-2 hover:text-amber-300"
                     >
-                      {SUPPORT_EMAIL}
+                      {supportEmail}
                     </a>
                   </p>
                 )}

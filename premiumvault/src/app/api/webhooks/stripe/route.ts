@@ -3,6 +3,7 @@ import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
 import { notifyAdminNewOrder } from "@/lib/email/notify-admin";
+import { processOrderConfirmation } from "@/lib/email/process-order-confirmation";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -40,19 +41,18 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ received: true });
       }
 
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/credentials/send-confirmation`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-internal-secret": process.env.NEXTAUTH_SECRET! },
-        body: JSON.stringify({ orderId }),
-      }).catch((err) => console.error("[webhook/stripe] Failed to send confirmation email for order", orderId, err));
+      // Call directly — no internal HTTP roundtrip, errors are logged not swallowed
+      await processOrderConfirmation(orderId).catch((err) =>
+        console.error("[webhook/stripe] processOrderConfirmation failed for order", orderId, err)
+      );
 
-      // Notify admin directly from webhook
+      // Await so the notification completes before we return 200 to Stripe
       const fullOrder = await prisma.order.findUnique({
         where: { id: orderId },
         include: { items: { include: { product: { select: { title: true, productType: true } } } } },
       });
       if (fullOrder) {
-        notifyAdminNewOrder({
+        await notifyAdminNewOrder({
           orderNumber: fullOrder.orderNumber,
           customerEmail: fullOrder.customerEmail,
           items: fullOrder.items.map((i) => ({

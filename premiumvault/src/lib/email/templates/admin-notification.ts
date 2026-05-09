@@ -83,7 +83,7 @@ export function adminNotificationTemplate(data: AdminNotificationData): string {
 
         ${isCredentials ? `
         <div style="margin-top:24px;text-align:center">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/dashboard/orders" style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600">Go to Admin Panel →</a>
+          <a href="${(process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "")}/admin/dashboard/orders" style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600">Go to Admin Panel →</a>
         </div>
         ` : ""}
       </div>

@@ -69,7 +69,9 @@ export async function POST(req: NextRequest) {
       await tx.credential.createMany({ data: credentialData });
       await tx.order.update({
         where: { id: order.id },
-        data: { status: "CREDENTIALS_SUBMITTED", credentialToken: null },
+        data: { status: "CREDENTIALS_SUBMITTED" },
+        // credentialToken is intentionally kept so [token] route returns 409 "already submitted"
+        // instead of 404 "invalid link" if the customer tries again
       });
     });
 

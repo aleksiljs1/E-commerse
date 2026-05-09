@@ -3,6 +3,7 @@ import { capturePayPalOrder } from "@/lib/paypal";
 import { prisma } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
 import { notifyAdminNewOrder } from "@/lib/email/notify-admin";
+import { processOrderConfirmation } from "@/lib/email/process-order-confirmation";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -38,19 +39,18 @@ export async function GET(req: NextRequest) {
     });
 
     if (result.count > 0) {
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/credentials/send-confirmation`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-internal-secret": process.env.NEXTAUTH_SECRET! },
-        body: JSON.stringify({ orderId: order.id }),
-      }).catch((err) => console.error("[webhook/paypal] Failed to send confirmation email for order", order.id, err));
+      // Call directly — no internal HTTP roundtrip, errors are logged not swallowed
+      await processOrderConfirmation(order.id).catch((err) =>
+        console.error("[webhook/paypal] processOrderConfirmation failed for order", order.id, err)
+      );
 
-      // Notify admin
+      // Await so the notification completes before we redirect the customer
       const fullOrder = await prisma.order.findUnique({
         where: { id: order.id },
         include: { items: { include: { product: { select: { title: true, productType: true } } } } },
       });
       if (fullOrder) {
-        notifyAdminNewOrder({
+        await notifyAdminNewOrder({
           orderNumber: fullOrder.orderNumber,
           customerEmail: fullOrder.customerEmail,
           items: fullOrder.items.map((i) => ({
