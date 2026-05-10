@@ -24,6 +24,34 @@ async function rollbackOrder(orderId: string, items: { productId: string; quanti
   }).catch((e) => console.error("[orders/rollback] Failed to roll back order", orderId, e));
 }
 
+/** Cancel PENDING orders older than 1 hour and restore their stock */
+async function cleanupStalePendingOrders() {
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const staleOrders = await prisma.order.findMany({
+    where: { status: "PENDING", createdAt: { lt: oneHourAgo } },
+    include: { items: { select: { productId: true, quantity: true } } },
+  });
+
+  for (const order of staleOrders) {
+    await prisma.$transaction(async (tx) => {
+      await tx.order.updateMany({
+        where: { id: order.id, status: "PENDING" },
+        data: { status: "CANCELLED" },
+      });
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        });
+      }
+    }).catch((e) => console.error("[orders/cleanup] Failed to cancel stale order", order.id, e));
+  }
+
+  if (staleOrders.length > 0) {
+    console.log(`[orders/cleanup] Cancelled ${staleOrders.length} stale PENDING order(s)`);
+  }
+}
+
 export async function POST(req: NextRequest) {
   let body: unknown;
   try {
@@ -37,6 +65,9 @@ export async function POST(req: NextRequest) {
   const { email, paymentMethod, items, couponCode } = parsed.data;
 
   try {
+    // Clean up abandoned orders older than 1 hour — restores reserved stock
+    await cleanupStalePendingOrders();
+
     const productIds = items.map((i) => i.productId);
     const products = await prisma.product.findMany({ where: { id: { in: productIds }, active: true } });
     if (products.length !== productIds.length) return apiError("One or more products not found", 404);
