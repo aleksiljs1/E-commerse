@@ -19,6 +19,7 @@ function PendingContent() {
 
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [paypalEmail, setPaypalEmail] = useState("");
+  const [paypalMeUsername, setPaypalMeUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -40,6 +41,7 @@ function PendingContent() {
       .then(([orderData, settingsData]) => {
         setOrder(orderData);
         setPaypalEmail(settingsData.email ?? "");
+        setPaypalMeUsername(settingsData.paypalMeUsername ?? "");
       })
       .catch(() => setError("Failed to load order details. Please check your order link."))
       .finally(() => setLoading(false));
@@ -87,6 +89,10 @@ function PendingContent() {
   }
 
   const amount = order ? `£${Number(order.totalAmount).toFixed(2)}` : "";
+  const amountRaw = order ? Number(order.totalAmount).toFixed(2) : "";
+  const paypalMeLink = paypalMeUsername && amountRaw
+    ? `https://paypal.me/${paypalMeUsername}/${amountRaw}GBP`
+    : "";
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white flex items-center justify-center p-6">
@@ -98,6 +104,18 @@ function PendingContent() {
             Send the exact amount below via PayPal Friends &amp; Family to complete your order.
           </p>
         </div>
+
+        {/* Pay Now Button */}
+        {paypalMeLink && (
+          <a
+            href={paypalMeLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center bg-[#0070ba] hover:bg-[#005ea6] text-white font-semibold py-4 rounded-2xl transition-colors text-lg"
+          >
+            Pay {amount} with PayPal
+          </a>
+        )}
 
         <div className="bg-white/[0.04] border border-white/[0.1] rounded-2xl p-6 space-y-5">
           {/* PayPal Email */}
@@ -130,7 +148,7 @@ function PendingContent() {
               <span className="text-white font-bold text-2xl">{amount}</span>
               {amount && (
                 <button
-                  onClick={() => copyToClipboard(Number(order!.totalAmount).toFixed(2), "amount")}
+                  onClick={() => copyToClipboard(amountRaw, "amount")}
                   className="cursor-pointer shrink-0 p-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] transition-colors"
                   title="Copy amount"
                 >
@@ -153,11 +171,11 @@ function PendingContent() {
 
         {/* Instructions */}
         <div className="bg-orange-400/[0.06] border border-orange-400/20 rounded-2xl p-5 space-y-3">
-          <h3 className="text-orange-400 font-semibold text-sm">Important Instructions</h3>
+          <h3 className="text-orange-400 font-semibold text-sm">Important — Select &quot;Friends &amp; Family&quot;</h3>
           <ol className="text-sm text-gray-300 space-y-2 list-decimal list-inside">
-            <li>Open PayPal and select <span className="text-white font-medium">Send money to friends &amp; family</span></li>
-            <li>Enter the email address shown above</li>
-            <li>Send exactly <span className="text-white font-medium">{amount}</span> — no more, no less</li>
+            <li>Click the <span className="text-white font-medium">&quot;Pay with PayPal&quot;</span> button above</li>
+            <li>On PayPal&apos;s page, select <span className="text-white font-medium">&quot;Sending to a friend&quot;</span></li>
+            <li>Confirm the amount is exactly <span className="text-white font-medium">{amount}</span></li>
             <li><span className="text-orange-400 font-medium">Do NOT add a note</span> to the payment</li>
             <li>Your order will be processed once we confirm the payment</li>
           </ol>

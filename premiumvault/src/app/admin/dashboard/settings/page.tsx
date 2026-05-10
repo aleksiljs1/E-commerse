@@ -100,6 +100,7 @@ export default function SettingsPage() {
 
   /* PayPal F&F */
   const [paypalFfEmail, setPaypalFfEmail] = useState("");
+  const [paypalMeUsername, setPaypalMeUsername] = useState("");
 
   /* Discount Tiers */
   const [bronzeOrders, setBronzeOrders] = useState("2");
@@ -138,6 +139,7 @@ export default function SettingsPage() {
         setSupportEmail(map.get("email_support") ?? "");
         setAdminNotificationEmail(map.get("admin_notification_email") ?? "");
         setPaypalFfEmail(map.get("paypal_ff_email") ?? "");
+        setPaypalMeUsername(map.get("paypal_me_username") ?? "");
 
         setBronzeOrders(map.get("tier_bronze_orders") ?? "2");
         setBronzeDiscount(map.get("tier_bronze_discount") ?? "5");
@@ -175,6 +177,7 @@ export default function SettingsPage() {
         { key: "email_support", value: supportEmail },
         { key: "admin_notification_email", value: adminNotificationEmail },
         { key: "paypal_ff_email", value: paypalFfEmail },
+        { key: "paypal_me_username", value: paypalMeUsername },
         { key: "tier_bronze_orders", value: bronzeOrders },
         { key: "tier_bronze_discount", value: bronzeDiscount },
         { key: "tier_silver_orders", value: silverOrders },
@@ -271,6 +274,13 @@ export default function SettingsPage() {
           onChange={setPaypalFfEmail}
           placeholder="your-paypal@email.com"
           type="email"
+        />
+        <Field
+          label="PayPal.me Username"
+          hint="Your PayPal.me link username (e.g. 'syedfhahmid' for paypal.me/syedfhahmid). Enables the 'Pay Now' button on the pending page."
+          value={paypalMeUsername}
+          onChange={setPaypalMeUsername}
+          placeholder="syedfhahmid"
         />
       </Section>
 
