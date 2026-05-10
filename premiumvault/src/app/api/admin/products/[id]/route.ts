@@ -15,7 +15,7 @@ const updateSchema = z.object({
   warrantyTerms: z.string().nullable().optional(),
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
-  productType: z.enum(["UPGRADE", "PURCHASE"]).optional(),
+  productType: z.enum(["UPGRADE", "PURCHASE", "DROPSHIP"]).optional(),
 });
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {

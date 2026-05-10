@@ -15,7 +15,7 @@ const productSchema = z.object({
   warrantyTerms: z.string().optional().or(z.literal("")).transform((val) => val === "" ? null : val),
   featured: z.boolean().default(false),
   active: z.boolean().default(true),
-  productType: z.enum(["UPGRADE", "PURCHASE"]).default("UPGRADE"),
+  productType: z.enum(["UPGRADE", "PURCHASE", "DROPSHIP"]).default("UPGRADE"),
   accountCredentials: z
     .array(z.object({ username: z.string().min(1), password: z.string().min(1) }))
     .optional(),
