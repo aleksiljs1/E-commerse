@@ -8,8 +8,6 @@ import {
   CheckCircle,
   XCircle,
   X,
-  Mail,
-  Send,
   FileText,
   Bell,
   Award,
@@ -80,14 +78,6 @@ export default function SettingsPage() {
   /* Banner */
   const [bannerText, setBannerText] = useState("");
 
-  /* SMTP */
-  const [smtpHost, setSmtpHost] = useState("");
-  const [smtpPort, setSmtpPort] = useState("");
-  const [smtpSecure, setSmtpSecure] = useState(false);
-  const [smtpUser, setSmtpUser] = useState("");
-  const [smtpPass, setSmtpPass] = useState("");
-  const [emailFrom, setEmailFrom] = useState("");
-
   /* Purchase Confirmation template */
   const [purchaseSubject, setPurchaseSubject] = useState("");
   const [purchaseHeading, setPurchaseHeading] = useState("");
@@ -118,8 +108,6 @@ export default function SettingsPage() {
   /* UI state */
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [testing, setTesting] = useState(false);
-  const [testEmail, setTestEmail] = useState("");
   const [toast, setToast] = useState<Toast | null>(null);
 
   /* ---- Load settings ---- */
@@ -131,13 +119,6 @@ export default function SettingsPage() {
         for (const s of data.data ?? []) map.set(s.key, s.value);
 
         setBannerText(map.get("banner_text") ?? "✨ Must Read Before Purchasing ✨");
-
-        setSmtpHost(map.get("smtp_host") ?? "");
-        setSmtpPort(map.get("smtp_port") ?? "");
-        setSmtpSecure(map.get("smtp_secure") === "true");
-        setSmtpUser(map.get("smtp_user") ?? "");
-        setSmtpPass(map.get("smtp_pass") ?? "");
-        setEmailFrom(map.get("email_from") ?? "");
 
         setPurchaseSubject(map.get("email_purchase_subject") ?? "");
         setPurchaseHeading(map.get("email_purchase_heading") ?? "");
@@ -177,12 +158,6 @@ export default function SettingsPage() {
     try {
       const settings = [
         { key: "banner_text", value: bannerText },
-        { key: "smtp_host", value: smtpHost },
-        { key: "smtp_port", value: smtpPort },
-        { key: "smtp_secure", value: String(smtpSecure) },
-        { key: "smtp_user", value: smtpUser },
-        { key: "smtp_pass", value: smtpPass },
-        { key: "email_from", value: emailFrom },
         { key: "email_purchase_subject", value: purchaseSubject },
         { key: "email_purchase_heading", value: purchaseHeading },
         { key: "email_purchase_body", value: purchaseBody },
@@ -213,33 +188,6 @@ export default function SettingsPage() {
       showToast("error", "Something went wrong. Please try again.");
     } finally {
       setSaving(false);
-    }
-  }
-
-  /* ---- Send test email ---- */
-  async function handleTestEmail() {
-    if (!testEmail) return showToast("error", "Enter a recipient email address.");
-    const host = smtpHost || process.env.NEXT_PUBLIC_SMTP_HOST || "smtp.gmail.com";
-    const port = Number(smtpPort) || 587;
-    const user = smtpUser;
-    const pass = smtpPass;
-    const from = emailFrom || smtpUser;
-    if (!user || !pass) return showToast("error", "SMTP user and password are required to send a test.");
-
-    setTesting(true);
-    try {
-      const res = await fetch("/api/admin/email-test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to: testEmail, host, port, secure: smtpSecure, user, pass, from }),
-      });
-      const data = await res.json();
-      if (res.ok) showToast("success", "Test email sent! Check your inbox.");
-      else showToast("error", data.error ?? "Test email failed.");
-    } catch {
-      showToast("error", "Failed to send test email.");
-    } finally {
-      setTesting(false);
     }
   }
 
@@ -295,6 +243,14 @@ export default function SettingsPage() {
           placeholder="admin@example.com"
           type="email"
         />
+        <Field
+          label="Support Email"
+          hint="Shown to customers in delivery emails and the credential submission page."
+          value={supportEmail}
+          onChange={setSupportEmail}
+          placeholder="support@example.com"
+          type="email"
+        />
       </Section>
 
       {/* ===== Discount Tiers ===== */}
@@ -326,86 +282,6 @@ export default function SettingsPage() {
               <Field label="Orders Required" value={goldOrders} onChange={setGoldOrders} type="number" placeholder="10" />
               <Field label="Discount %" value={goldDiscount} onChange={setGoldDiscount} type="number" placeholder="15" />
             </div>
-          </div>
-        </div>
-      </Section>
-
-      {/* ===== SMTP Configuration ===== */}
-      <Section icon={<Mail className="w-5 h-5 text-gray-400" />} title="SMTP Configuration">
-        <p className={hintCls}>
-          Configure your outgoing email server. Leave blank to use environment variable defaults.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="SMTP Host" value={smtpHost} onChange={setSmtpHost} placeholder="smtp.gmail.com" />
-          <Field label="SMTP Port" value={smtpPort} onChange={setSmtpPort} placeholder="587" type="number" />
-          <Field label="SMTP User" value={smtpUser} onChange={setSmtpUser} placeholder="you@gmail.com" />
-          <Field label="SMTP Password" value={smtpPass} onChange={setSmtpPass} placeholder="App password" type="password" />
-          <Field label="From Email" value={emailFrom} onChange={setEmailFrom} placeholder="you@gmail.com" />
-          <Field
-            label="Support Email"
-            hint="Shown to customers in delivery emails and the credential submission page."
-            value={supportEmail}
-            onChange={setSupportEmail}
-            placeholder="support@example.com"
-            type="email"
-          />
-          <div className="flex items-center gap-3 pt-6">
-            <button
-              type="button"
-              role="switch"
-              aria-checked={smtpSecure}
-              onClick={() => setSmtpSecure(!smtpSecure)}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-                smtpSecure ? "bg-orange-500" : "bg-white/[0.1]"
-              }`}
-            >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform ${
-                  smtpSecure ? "translate-x-5" : "translate-x-0"
-                }`}
-              />
-            </button>
-            <span className="text-sm text-gray-400">SSL/TLS (port 465)</span>
-          </div>
-        </div>
-
-        {/* Port / secure mismatch warning */}
-        {smtpPort === "465" && !smtpSecure && (
-          <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3">
-            <span className="text-yellow-400 text-base leading-none mt-0.5">⚠️</span>
-            <p className="text-yellow-300 text-sm leading-relaxed">
-              Port 465 requires <strong>SSL/TLS enabled</strong>. Toggle SSL/TLS on or change the port to 587.
-            </p>
-          </div>
-        )}
-        {smtpSecure && smtpPort !== "465" && smtpPort !== "" && (
-          <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3">
-            <span className="text-yellow-400 text-base leading-none mt-0.5">⚠️</span>
-            <p className="text-yellow-300 text-sm leading-relaxed">
-              SSL/TLS is on but port is <strong>{smtpPort}</strong>. SSL/TLS is normally used on port 465. Use port 587 with SSL/TLS off for STARTTLS.
-            </p>
-          </div>
-        )}
-
-        {/* Test email */}
-        <div className="mt-4 pt-4 border-t border-white/[0.06]">
-          <label className={labelCls}>Send Test Email</label>
-          <div className="flex gap-3">
-            <input
-              type="email"
-              className={inputCls}
-              value={testEmail}
-              onChange={(e) => setTestEmail(e.target.value)}
-              placeholder="recipient@example.com"
-            />
-            <button
-              onClick={handleTestEmail}
-              disabled={testing}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white/[0.06] border border-white/[0.1] text-white text-sm font-semibold rounded-xl hover:bg-white/[0.1] transition-colors disabled:opacity-50 shrink-0"
-            >
-              {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              {testing ? "Sending..." : "Send Test"}
-            </button>
           </div>
         </div>
       </Section>
