@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminShell } from "@/components/admin/AdminShell";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
@@ -12,13 +11,9 @@ async function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   if ((session.user as any).role !== "ADMIN") redirect("/");
 
   return (
-    <>
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <AdminHeader user={session.user} />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
-    </>
+    <AdminShell user={session.user}>
+      {children}
+    </AdminShell>
   );
 }
 

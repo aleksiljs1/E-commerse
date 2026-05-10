@@ -58,8 +58,8 @@ export function ProductTable({ products, onDeactivate, onActivate }: Props) {
   }
 
   return (
-    <div className="bg-white/[0.04] border border-white/[0.1] rounded-xl overflow-hidden">
-      <Table>
+    <div className="bg-white/[0.04] border border-white/[0.1] rounded-xl overflow-x-auto">
+      <Table className="min-w-[700px]">
         <TableHeader>
           <TableRow className="border-white/[0.1] hover:bg-transparent bg-[#0e0c1a]/60">
             <TableHead className="text-zinc-500 text-[11px] uppercase tracking-wider font-medium w-12">Logo</TableHead>

@@ -291,7 +291,7 @@ export default function SettingsPage() {
         </p>
         <div className="space-y-4">
           {/* Bronze */}
-          <div className="flex items-center gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
             <span className="text-orange-400 font-semibold text-sm w-16 shrink-0">Bronze</span>
             <div className="flex-1 grid grid-cols-2 gap-3">
               <Field label="Orders Required" value={bronzeOrders} onChange={setBronzeOrders} type="number" placeholder="2" />
@@ -299,7 +299,7 @@ export default function SettingsPage() {
             </div>
           </div>
           {/* Silver */}
-          <div className="flex items-center gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
             <span className="text-gray-300 font-semibold text-sm w-16 shrink-0">Silver</span>
             <div className="flex-1 grid grid-cols-2 gap-3">
               <Field label="Orders Required" value={silverOrders} onChange={setSilverOrders} type="number" placeholder="5" />
@@ -307,7 +307,7 @@ export default function SettingsPage() {
             </div>
           </div>
           {/* Gold */}
-          <div className="flex items-center gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
             <span className="text-yellow-400 font-semibold text-sm w-16 shrink-0">Gold</span>
             <div className="flex-1 grid grid-cols-2 gap-3">
               <Field label="Orders Required" value={goldOrders} onChange={setGoldOrders} type="number" placeholder="10" />
