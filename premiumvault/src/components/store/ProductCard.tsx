@@ -1,15 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
-import { Layers } from "lucide-react";
+import { Layers, Pencil } from "lucide-react";
 import type { SerializedProduct } from "@/types";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 type Props = { product: SerializedProduct };
 
 export function ProductCard({ product }: Props) {
   const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as any)?.role === "ADMIN";
   const soldOut = product.stock <= 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -36,6 +39,17 @@ export function ProductCard({ product }: Props) {
           : "hover:-translate-y-1 hover:border-white/[0.2] hover:shadow-[0_0_24px_rgba(255,255,255,0.05)]"
       }`}
     >
+      {/* Admin edit button */}
+      {isAdmin && (
+        <button
+          onClick={(e) => { e.stopPropagation(); router.push(`/admin/dashboard/products/${product.id}/edit`); }}
+          className="cursor-pointer absolute top-2 right-2 z-30 w-8 h-8 flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 text-gray-300 hover:text-white hover:bg-indigo-600 hover:border-indigo-500 transition-all"
+          title="Edit product"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
+      )}
+
       {/* Sold Out tag */}
       {soldOut && (
         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
