@@ -1,15 +1,20 @@
 import { Suspense } from "react";
 import { prisma } from "@/lib/db";
-import { ProductGrid } from "@/components/store/ProductGrid";
+import { ProductsPageClient } from "@/components/store/ProductsPageClient";
 import type { SerializedProduct } from "@/types";
 
-async function ProductList() {
-  const raw = await prisma.product.findMany({
-    where: { active: true },
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-  });
-  const products: SerializedProduct[] = raw.map((p) => ({ ...p, price: Number(p.price) }));
-  return <ProductGrid products={products} />;
+async function ProductsContent() {
+  const [rawProducts, serviceTypes] = await Promise.all([
+    prisma.product.findMany({
+      where: { active: true },
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    }),
+    (prisma as any).serviceType?.findMany({ orderBy: { label: "asc" } }).catch(() => []) ?? [],
+  ]);
+
+  const products: SerializedProduct[] = rawProducts.map((p) => ({ ...p, price: Number(p.price) }));
+
+  return <ProductsPageClient products={products} serviceTypes={serviceTypes} />;
 }
 
 export default function ProductsPage() {
@@ -21,7 +26,7 @@ export default function ProductsPage() {
           <p className="text-gray-400 text-sm mt-1">Browse all available premium subscriptions</p>
         </div>
         <Suspense fallback={<div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" /></div>}>
-          <ProductList />
+          <ProductsContent />
         </Suspense>
       </div>
     </div>

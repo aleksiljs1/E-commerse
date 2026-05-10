@@ -34,6 +34,7 @@ enum CredentialStatus {
 enum ProductType {
   UPGRADE
   PURCHASE
+  DROPSHIP
 }
 
 model User {
@@ -208,5 +209,14 @@ model VerificationToken {
 model SiteSetting {
   key       String   @id
   value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model ServiceType {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  label     String
+  color     String   @default("#6366f1")
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -1,5 +1,5 @@
 type AdminNotificationData = {
-  type: "NEW_PURCHASE" | "CREDENTIALS_SUBMITTED";
+  type: "NEW_PURCHASE" | "CREDENTIALS_SUBMITTED" | "DROPSHIP_ORDER";
   orderNumber: string;
   customerEmail: string;
   items: { title: string; quantity: number; priceAtPurchase: number }[];
@@ -9,19 +9,24 @@ type AdminNotificationData = {
 
 export function adminNotificationTemplate(data: AdminNotificationData): string {
   const isCredentials = data.type === "CREDENTIALS_SUBMITTED";
+  const isDropship = data.type === "DROPSHIP_ORDER";
 
   const title = isCredentials
     ? "Credentials Submitted — Action Required"
-    : "New Order Received";
+    : isDropship
+      ? "New Dropship Order — Action Required"
+      : "New Order Received";
 
   const subtitle = isCredentials
     ? "A customer has submitted their credentials. Please log in and upgrade their account."
-    : data.hasUpgradeItems
-      ? "A new upgrade order has been placed. You will be notified again when the customer submits their credentials."
-      : "A new purchase order has been completed and the accounts have been delivered automatically.";
+    : isDropship
+      ? "A customer has placed a dropship order. Please source and deliver the account credentials within 4–5 business days."
+      : data.hasUpgradeItems
+        ? "A new upgrade order has been placed. You will be notified again when the customer submits their credentials."
+        : "A new purchase order has been completed and the accounts have been delivered automatically.";
 
-  const statusColor = isCredentials ? "#f97316" : "#22c55e";
-  const statusLabel = isCredentials ? "ACTION REQUIRED" : "NEW ORDER";
+  const statusColor = isCredentials || isDropship ? "#f97316" : "#22c55e";
+  const statusLabel = isCredentials || isDropship ? "ACTION REQUIRED" : "NEW ORDER";
 
   const itemRows = data.items
     .map(
@@ -81,7 +86,7 @@ export function adminNotificationTemplate(data: AdminNotificationData): string {
           <tbody>${itemRows}</tbody>
         </table>
 
-        ${isCredentials ? `
+        ${isCredentials || isDropship ? `
         <div style="margin-top:24px;text-align:center">
           <a href="${(process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "")}/admin/dashboard/orders" style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600">Go to Admin Panel →</a>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,52 @@ export function OrderDetailView({ order: initialOrder, deliveredStock = [] }: Pr
   const [loading, setLoading] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmingPayment, setConfirmingPayment] = useState(false);
+  const [fulfillCredentials, setFulfillCredentials] = useState<Record<string, { username: string; password: string }[]>>({});
+  const [fulfilling, setFulfilling] = useState(false);
   const router = useRouter();
+
+  const hasDropshipItems = order.items?.some((i: any) => i.product?.productType === "DROPSHIP");
+  const isAwaitingFulfillment = hasDropshipItems && order.status === "PAID";
+
+  const transitions = isAwaitingFulfillment
+    ? { ...VALID_TRANSITIONS, PAID: ["CANCELLED"] }
+    : VALID_TRANSITIONS;
+
+  useEffect(() => {
+    if (!hasDropshipItems) return;
+    const init: Record<string, { username: string; password: string }[]> = {};
+    order.items?.forEach((item: any) => {
+      if (item.product?.productType === "DROPSHIP") {
+        init[item.id] = Array.from({ length: item.quantity }, () => ({ username: "", password: "" }));
+      }
+    });
+    setFulfillCredentials(init);
+  }, [order.id]);
+
+  async function handleFulfill() {
+    const credentials = [];
+    for (const [orderItemId, rows] of Object.entries(fulfillCredentials)) {
+      for (const row of rows) {
+        if (!row.username.trim() || !row.password.trim()) {
+          toast.error("Please fill in all credentials before fulfilling");
+          return;
+        }
+        credentials.push({ orderItemId, username: row.username.trim(), password: row.password.trim() });
+      }
+    }
+
+    setFulfilling(true);
+    try {
+      await api.post(`/api/admin/orders/${order.id}/fulfill`, { credentials });
+      toast.success("Order fulfilled — credentials sent to customer");
+      setOrder((prev: any) => ({ ...prev, status: "COMPLETED" }));
+      router.refresh();
+    } catch {
+      toast.error("Failed to fulfill order");
+    } finally {
+      setFulfilling(false);
+    }
+  }
 
   async function handleConfirmPayment() {
     setConfirmingPayment(true);
@@ -217,12 +262,70 @@ export function OrderDetailView({ order: initialOrder, deliveredStock = [] }: Pr
         </div>
       )}
 
+      {/* Fulfill Dropship Order */}
+      {isAwaitingFulfillment && (
+        <div className="bg-orange-500/[0.06] border border-orange-500/20 rounded-2xl p-6">
+          <h3 className="text-base font-semibold text-white mb-1">Fulfill Dropship Order</h3>
+          <p className="text-sm text-gray-400 mb-4">
+            Input the account credentials for each item and click Fulfill. The customer will receive them by email immediately.
+          </p>
+          <div className="space-y-4">
+            {order.items?.filter((i: any) => i.product?.productType === "DROPSHIP").map((item: any) => (
+              <div key={item.id} className="border border-white/[0.08] rounded-xl p-4">
+                <p className="text-sm font-medium text-white mb-3">
+                  {item.product?.title}
+                  <span className="text-gray-500 font-normal ml-1">(×{item.quantity})</span>
+                </p>
+                <div className="space-y-3">
+                  {(fulfillCredentials[item.id] ?? []).map((cred, idx) => (
+                    <div key={idx} className="grid grid-cols-2 gap-3">
+                      {item.quantity > 1 && (
+                        <p className="col-span-2 text-xs text-gray-500">Account {idx + 1}</p>
+                      )}
+                      <input
+                        type="text"
+                        placeholder="Email / Username"
+                        value={cred.username}
+                        onChange={(e) => setFulfillCredentials((prev) => {
+                          const rows = [...(prev[item.id] ?? [])];
+                          rows[idx] = { ...rows[idx], username: e.target.value };
+                          return { ...prev, [item.id]: rows };
+                        })}
+                        className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-orange-400/50 transition-colors"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Password"
+                        value={cred.password}
+                        onChange={(e) => setFulfillCredentials((prev) => {
+                          const rows = [...(prev[item.id] ?? [])];
+                          rows[idx] = { ...rows[idx], password: e.target.value };
+                          return { ...prev, [item.id]: rows };
+                        })}
+                        className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-orange-400/50 transition-colors"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <Button
+            onClick={handleFulfill}
+            disabled={fulfilling}
+            className="mt-4 bg-orange-500 hover:bg-orange-600 text-white"
+          >
+            {fulfilling ? "Fulfilling..." : "Fulfill Order & Send to Customer"}
+          </Button>
+        </div>
+      )}
+
       {/* Status Actions */}
       <div className="bg-white/[0.04] border border-white/[0.1] rounded-2xl p-6">
         <h3 className="text-base font-semibold text-white mb-4">Change Status</h3>
-        {VALID_TRANSITIONS[order.status]?.length > 0 ? (
+        {transitions[order.status]?.length > 0 ? (
           <div className="flex items-center gap-3 flex-wrap">
-            {VALID_TRANSITIONS[order.status].map((nextStatus: string) => {
+            {transitions[order.status].map((nextStatus: string) => {
               const isCancelling = nextStatus === "CANCELLED";
               if (isCancelling && confirmCancel) {
                 return (

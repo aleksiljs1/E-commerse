@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { sendEmail } from "./send";
 import { purchaseConfirmationTemplate } from "./templates/purchase-confirmation";
 import { accountDeliveryTemplate } from "./templates/account-delivery";
+import { dropshipConfirmationTemplate } from "./templates/dropship-confirmation";
+import { adminNotificationTemplate } from "./templates/admin-notification";
 import { getEmailSettings } from "./settings";
 
 export async function processOrderConfirmation(orderId: string): Promise<void> {
@@ -23,6 +25,7 @@ export async function processOrderConfirmation(orderId: string): Promise<void> {
 
   const upgradeItems = order.items.filter((i) => i.product.productType === "UPGRADE");
   const purchaseItems = order.items.filter((i) => i.product.productType === "PURCHASE");
+  const dropshipItems = order.items.filter((i) => i.product.productType === "DROPSHIP");
 
   // PURCHASE items: assign stock and deliver credentials by email
   if (purchaseItems.length > 0) {
@@ -110,5 +113,51 @@ export async function processOrderConfirmation(orderId: string): Promise<void> {
     }).catch((err) =>
       console.error("[process-order-confirmation] Upgrade confirmation email failed for order", order.id, err)
     );
+  }
+
+  // DROPSHIP items: notify customer to wait; alert admin to fulfill manually
+  if (dropshipItems.length > 0) {
+    // Send confirmation email to customer (fire-and-forget)
+    sendEmail({
+      to: order.customerEmail,
+      subject: `PremiumVault — Order Confirmed (Order ${order.orderNumber})`,
+      orderId: order.id,
+      html: dropshipConfirmationTemplate({
+        orderNumber: order.orderNumber,
+        customerEmail: order.customerEmail,
+        items: dropshipItems.map((i) => ({
+          title: i.product.title,
+          quantity: i.quantity,
+          priceAtPurchase: Number(i.priceAtPurchase),
+        })),
+        totalAmount: Number(order.totalAmount),
+        supportEmail: settings.supportEmail,
+      }),
+    }).catch((err) =>
+      console.error("[process-order-confirmation] Dropship confirmation email failed for order", order.id, err)
+    );
+
+    // Send admin notification to fulfill the order (fire-and-forget)
+    if (settings.adminNotificationEmail) {
+      sendEmail({
+        to: settings.adminNotificationEmail,
+        subject: `ACTION REQUIRED — New Dropship Order ${order.orderNumber}`,
+        orderId: order.id,
+        html: adminNotificationTemplate({
+          type: "DROPSHIP_ORDER",
+          orderNumber: order.orderNumber,
+          customerEmail: order.customerEmail,
+          items: order.items.map((i) => ({
+            title: i.product.title,
+            quantity: i.quantity,
+            priceAtPurchase: Number(i.priceAtPurchase),
+          })),
+          totalAmount: Number(order.totalAmount),
+          hasUpgradeItems: false,
+        }),
+      }).catch((err) =>
+        console.error("[process-order-confirmation] Dropship admin notification failed for order", order.id, err)
+      );
+    }
   }
 }

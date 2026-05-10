@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingBag, Ticket, Settings, Mail, Users, X } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, Ticket, Settings, Mail, Users, Layers, X } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/admin/dashboard/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/dashboard/coupons", label: "Coupons", icon: Ticket },
   { href: "/admin/dashboard/users", label: "Users", icon: Users },
+  { href: "/admin/dashboard/service-types", label: "Service Types", icon: Layers },
   { href: "/admin/dashboard/email-logs", label: "Email Logs", icon: Mail },
   { href: "/admin/dashboard/settings", label: "Settings", icon: Settings },
 ];

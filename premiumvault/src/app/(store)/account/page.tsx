@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/store/SignOutButton";
 import { getTierConfig, getDiscountTier } from "@/lib/discount-tiers";
+import { ViewCredentialsButton } from "@/components/store/ViewCredentialsButton";
 
 export default async function AccountPage() {
   const session = await auth();
@@ -10,7 +11,16 @@ export default async function AccountPage() {
 
   const orders = await prisma.order.findMany({
     where: { userId: session.user.id, status: { not: "PENDING" } },
-    include: { items: { include: { product: true } } },
+    include: {
+      items: {
+        include: {
+          product: true,
+          credentials: {
+            select: { username: true, password: true, status: true },
+          },
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -96,6 +106,36 @@ export default async function AccountPage() {
                   </p>
                 ))}
               </div>
+              {(() => {
+                const hasDropship = order.items.some(
+                  (i) => i.product.productType === "DROPSHIP"
+                );
+                if (!hasDropship) return null;
+
+                if (order.status === "PAID") {
+                  return (
+                    <div className="bg-orange-500/[0.06] border border-orange-500/20 rounded-lg px-4 py-3 mt-3 text-sm text-orange-300">
+                      Account being sourced — expected within 4–5 business days
+                    </div>
+                  );
+                }
+
+                if (order.status === "COMPLETED") {
+                  const dropshipCreds = order.items
+                    .filter((i) => i.product.productType === "DROPSHIP")
+                    .flatMap((i) =>
+                      (i as any).credentials.map((c: any) => ({
+                        username: c.username,
+                        password: c.password,
+                        productTitle: i.product.title,
+                      }))
+                    );
+                  if (dropshipCreds.length === 0) return null;
+                  return <ViewCredentialsButton credentials={dropshipCreds} />;
+                }
+
+                return null;
+              })()}
             </div>
           ))}
         </div>
