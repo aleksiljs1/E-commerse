@@ -22,7 +22,7 @@ export function CartItemRow({ item }: Props) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-white truncate">{item.title}</p>
         {item.description && (
-          <p className="text-xs text-gray-400/70 truncate mt-0.5">{item.description}</p>
+          <p className="text-xs text-gray-400/70 truncate mt-0.5">{item.description.replace(/\*\*/g, "")}</p>
         )}
         <p className="text-xs text-gray-400 mt-0.5">
           £{item.price.toFixed(2)} · Total: £{(item.price * item.quantity).toFixed(2)}
