@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
-import { Ticket, Plus, Pencil, Trash2, Power, PowerOff, Copy } from "lucide-react";
+import { Ticket, Plus, Pencil, Trash2, Power, PowerOff, Copy, History, X } from "lucide-react";
 import { format } from "date-fns";
 
 type Coupon = {
@@ -27,6 +27,29 @@ type FormData = {
   active: boolean;
 };
 
+type UsageOrder = {
+  id: string;
+  orderNumber: string;
+  customerEmail: string;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+  items: { quantity: number; product: { title: string } }[];
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  PAID: "Paid",
+  COMPLETED: "Completed",
+  CANCELLED: "Cancelled",
+  REFUNDED: "Refunded",
+};
+const STATUS_COLORS: Record<string, string> = {
+  PAID: "text-blue-400 bg-blue-400/10",
+  COMPLETED: "text-emerald-400 bg-emerald-400/10",
+  CANCELLED: "text-red-400 bg-red-400/10",
+  REFUNDED: "text-amber-400 bg-amber-400/10",
+};
+
 const emptyForm: FormData = { code: "", discountPct: 10, maxUses: 100, maxUsesPerUser: 0, expiresAt: "", active: true };
 
 export default function CouponsPage() {
@@ -36,6 +59,10 @@ export default function CouponsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [saving, setSaving] = useState(false);
+
+  const [historyFor, setHistoryFor] = useState<Coupon | null>(null);
+  const [historyOrders, setHistoryOrders] = useState<UsageOrder[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const fetchCoupons = useCallback(async () => {
     try {
@@ -68,6 +95,21 @@ export default function CouponsPage() {
       active: c.active,
     });
     setShowForm(true);
+  };
+
+  const openHistory = async (c: Coupon) => {
+    setHistoryFor(c);
+    setHistoryOrders([]);
+    setHistoryLoading(true);
+    try {
+      const res = await fetch(`/api/admin/coupons/${c.id}/usage`);
+      const data = await res.json();
+      setHistoryOrders(data.data ?? []);
+    } catch {
+      toast.error("Failed to load usage history");
+    } finally {
+      setHistoryLoading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -133,6 +175,8 @@ export default function CouponsPage() {
 
   const isExpired = (d: string) => new Date(d) < new Date();
   const isMaxed = (c: Coupon) => c.timesUsed >= c.maxUses;
+
+  const historyRevenue = historyOrders.reduce((s, o) => s + Number(o.totalAmount), 0);
 
   return (
     <div className="space-y-6">
@@ -281,6 +325,13 @@ export default function CouponsPage() {
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-1">
                           <button
+                            onClick={() => openHistory(c)}
+                            className="cursor-pointer p-2 text-gray-400 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-lg transition-all"
+                            title="Usage history"
+                          >
+                            <History className="w-4 h-4" />
+                          </button>
+                          <button
                             onClick={() => openEdit(c)}
                             className="cursor-pointer p-2 text-gray-400 hover:text-orange-400 hover:bg-white/[0.05] rounded-lg transition-all"
                             title="Edit"
@@ -315,6 +366,69 @@ export default function CouponsPage() {
           </div>
         )}
       </div>
+
+      {/* Usage history modal */}
+      {historyFor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-[#18181b] border border-white/[0.1] rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-white/[0.08]">
+              <div>
+                <p className="text-xs text-zinc-500 font-mono mb-0.5">Usage History</p>
+                <h2 className="text-lg font-bold text-white font-mono">{historyFor.code}</h2>
+              </div>
+              <button onClick={() => setHistoryFor(null)} className="cursor-pointer text-gray-500 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto flex-1">
+              {historyLoading ? (
+                <div className="p-10 text-center text-gray-400 text-sm">Loading...</div>
+              ) : historyOrders.length === 0 ? (
+                <div className="p-10 text-center text-gray-500 text-sm">No orders have used this coupon yet.</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-[#18181b]">
+                    <tr className="border-b border-white/[0.08]">
+                      <th className="text-left py-3 px-4 text-gray-400 font-medium">Order</th>
+                      <th className="text-left py-3 px-4 text-gray-400 font-medium">Customer</th>
+                      <th className="text-left py-3 px-4 text-gray-400 font-medium">Items</th>
+                      <th className="text-right py-3 px-4 text-gray-400 font-medium">Total</th>
+                      <th className="text-left py-3 px-4 text-gray-400 font-medium">Status</th>
+                      <th className="text-left py-3 px-4 text-gray-400 font-medium">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historyOrders.map((o) => (
+                      <tr key={o.id} className="border-b border-white/[0.05]">
+                        <td className="py-3 px-4 font-mono text-white text-xs">{o.orderNumber}</td>
+                        <td className="py-3 px-4 text-gray-400 text-xs">{o.customerEmail}</td>
+                        <td className="py-3 px-4 text-gray-400 text-xs">
+                          {o.items.map((it) => `${it.quantity}× ${it.product.title}`).join(", ")}
+                        </td>
+                        <td className="py-3 px-4 text-right text-white font-semibold">£{Number(o.totalAmount).toFixed(2)}</td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${STATUS_COLORS[o.status] ?? "text-gray-400 bg-gray-400/10"}`}>
+                            {STATUS_LABELS[o.status] ?? o.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-gray-500 text-xs">{format(new Date(o.createdAt), "dd MMM yyyy")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {!historyLoading && historyOrders.length > 0 && (
+              <div className="p-4 border-t border-white/[0.08] flex items-center justify-between text-sm">
+                <span className="text-gray-500">{historyOrders.length} order{historyOrders.length !== 1 ? "s" : ""}</span>
+                <span className="text-white font-semibold">Total revenue: £{historyRevenue.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -39,7 +39,7 @@ export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): st
     )
     .join("");
 
-  const submitUrl = `${data.appUrl.replace(/\/$/, "")}/submit-credentials`;
+  const submitUrl = `${data.appUrl.replace(/\/$/, "")}/submit-credentials?token=${data.credentialToken}`;
 
   return `
 <!DOCTYPE html>
@@ -82,30 +82,18 @@ export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): st
         Next step: Submit your account credentials
       </p>
       <p style="color: #a1a1aa; font-size: 14px; line-height: 1.7; margin-bottom: 20px;">
-        Visit the link below and enter your <strong style="color: #ffffff;">Order ID</strong> on the page, then fill in the credentials for the accounts you want upgraded.
+        Just click the button below — it will take you directly to the submission page with everything pre-filled.
       </p>
 
-      <!-- Order ID box -->
-      <div style="background: #09090b; border: 2px solid #6366f1; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
-        <p style="color: #71717a; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 10px 0;">
-          Your Order ID
+      <!-- Backup access code box -->
+      <div style="background: #09090b; border: 1px solid #3f3f46; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px;">
+        <p style="color: #52525b; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 6px 0;">
+          Backup Access Code (if button doesn't work)
         </p>
-        <p style="color: #ffffff; font-size: 15px; font-weight: 700; font-family: 'Courier New', monospace; margin: 0 0 14px 0; word-break: break-all; letter-spacing: 0.5px;">
+        <p style="color: #a1a1aa; font-size: 13px; font-family: 'Courier New', monospace; margin: 0; word-break: break-all;">
           ${data.credentialToken}
         </p>
-        <div style="background: #450a0a; border: 1px solid #7f1d1d; border-radius: 8px; padding: 8px 12px; display: inline-block;">
-          <p style="color: #fca5a5; font-size: 12px; font-weight: 600; margin: 0;">
-            &#x1F512; Do not share this ID with anyone
-          </p>
-        </div>
       </div>
-
-      <!-- Numbered steps -->
-      <ol style="color: #a1a1aa; font-size: 14px; line-height: 1.8; padding-left: 20px; margin-bottom: 24px;">
-        <li>Click the button below to open the submission page</li>
-        <li>Enter your Order ID from above</li>
-        <li>Fill in your account credentials and submit</li>
-      </ol>
 
       <a href="${submitUrl}"
          style="display: block; background: #6366f1; color: #ffffff; text-align: center;

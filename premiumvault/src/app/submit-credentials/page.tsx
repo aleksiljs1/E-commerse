@@ -1,5 +1,6 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import api from "@/lib/api";
 import { ServiceIcon } from "@/components/store/ServiceIcon";
@@ -18,6 +19,7 @@ type CredField = { username: string; password: string };
 type CredsMap = Record<string, CredField>;
 
 export default function SubmitCredentialsPage() {
+  const searchParams = useSearchParams();
   const [orderIdInput, setOrderIdInput] = useState("");
   const [stage, setStage] = useState<"enter" | "filling" | "success">("enter");
   const [lookingUp, setLookingUp] = useState(false);
@@ -41,9 +43,16 @@ export default function SubmitCredentialsPage() {
       return c?.username?.trim() && c?.password?.trim();
     });
 
-  async function handleLookup() {
-    const input = orderIdInput.trim();
-    if (!input) return;
+  useEffect(() => {
+    const urlToken = searchParams.get("token");
+    if (urlToken) {
+      setOrderIdInput(urlToken);
+      doLookup(urlToken);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function doLookup(input: string) {
     setLookingUp(true);
     try {
       const res = await api.get(`/api/credentials/${encodeURIComponent(input)}`);
@@ -66,6 +75,8 @@ export default function SubmitCredentialsPage() {
       setLookingUp(false);
     }
   }
+
+  function handleLookup() { doLookup(orderIdInput.trim()); }
 
   function updateCred(key: string, field: "username" | "password", value: string) {
     setCreds((prev) => ({ ...prev, [key]: { ...prev[key], [field]: value } }));
