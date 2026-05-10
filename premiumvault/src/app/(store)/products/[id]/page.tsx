@@ -36,20 +36,14 @@ export default async function ProductDetailPage({
   const price = Number(product.price);
   const stock = product.stock;
 
-  let stockBg = "bg-green-500/10 text-green-400 border-green-500/20";
-  if (stock < 3) {
-    stockBg = "bg-red-500/10 text-red-400 border-red-500/20";
-  } else if (stock < 10) {
-    stockBg = "bg-amber-500/10 text-amber-400 border-amber-500/20";
-  }
+  const isDropship = product.productType === "DROPSHIP";
 
   let stockColor = "text-green-400";
-  let stockLabel = `${stock} in stock`;
-  if (stock < 3) {
-    stockColor = "text-red-400";
-    stockLabel = stock === 0 ? "Out of stock" : `Only ${stock} left`;
-  } else if (stock < 10) {
-    stockColor = "text-amber-400";
+  let stockLabel = isDropship ? "On Demand" : `${stock} in stock`;
+  if (!isDropship) {
+    if (stock === 0) { stockColor = "text-red-400"; stockLabel = "Out of stock"; }
+    else if (stock < 3) { stockColor = "text-red-400"; stockLabel = `Only ${stock} left`; }
+    else if (stock < 10) { stockColor = "text-amber-400"; }
   }
 
   return (
@@ -132,6 +126,7 @@ export default async function ProductDetailPage({
               logoUrl={product.logoUrl}
               serviceType={product.serviceType}
               stock={stock}
+              productType={product.productType}
             />
 
             <div className="flex items-center gap-2 text-gray-400 text-xs pt-1 border-t border-white/[0.08]">

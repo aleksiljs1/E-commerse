@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     for (const item of items) {
       const product = products.find((p) => p.id === item.productId)!;
-      if (product.stock < item.quantity) {
+      if (product.productType !== "DROPSHIP" && product.stock < item.quantity) {
         return apiError(`Insufficient stock for "${product.title}"`, 400);
       }
     }
@@ -154,7 +154,10 @@ export async function POST(req: NextRequest) {
         },
       });
       for (const item of items) {
-        await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } });
+        const product = products.find((p) => p.id === item.productId)!;
+        if (product.productType !== "DROPSHIP") {
+          await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } });
+        }
       }
       return newOrder;
     });

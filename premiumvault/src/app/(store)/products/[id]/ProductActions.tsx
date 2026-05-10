@@ -13,9 +13,10 @@ type Props = {
   logoUrl: string | null;
   serviceType: string;
   stock: number;
+  productType: string;
 };
 
-export function ProductActions({ price, productId, title, description, logoUrl, serviceType, stock }: Props) {
+export function ProductActions({ price, productId, title, description, logoUrl, serviceType, stock, productType }: Props) {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
   const { addItem } = useCartStore();
@@ -29,7 +30,7 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
     router.push("/checkout");
   };
 
-  const isOutOfStock = stock <= 0;
+  const isOutOfStock = stock <= 0 && productType !== "DROPSHIP";
 
   return (
     <div className="flex flex-col gap-4">
@@ -37,10 +38,10 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
         <span className="text-gray-400 text-sm">Qty:</span>
         <QuantityControl
           value={quantity}
-          onIncrement={() => setQuantity((q) => Math.min(q + 1, stock))}
+          onIncrement={() => setQuantity((q) => productType === "DROPSHIP" ? q + 1 : Math.min(q + 1, stock))}
           onDecrement={() => setQuantity((q) => Math.max(q - 1, 1))}
           min={1}
-          max={stock}
+          max={productType === "DROPSHIP" ? 99 : stock}
         />
       </div>
 

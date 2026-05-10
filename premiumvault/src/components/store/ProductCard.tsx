@@ -13,7 +13,7 @@ export function ProductCard({ product }: Props) {
   const addItem = useCartStore((s) => s.addItem);
   const { data: session } = useSession();
   const isAdmin = (session?.user as any)?.role === "ADMIN";
-  const soldOut = product.stock <= 0;
+  const soldOut = product.stock <= 0 && product.productType !== "DROPSHIP";
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -94,7 +94,7 @@ export function ProductCard({ product }: Props) {
         <p className="text-base font-semibold text-white leading-snug mb-1 line-clamp-2 min-h-[2.5rem]">{product.title}</p>
         <p className="text-xs text-gray-400 line-clamp-2 mb-3 min-h-[2rem]" dangerouslySetInnerHTML={{ __html: product.description.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") }} />
         <p className="text-xs text-orange-400 mb-2 min-h-[1rem]">
-          {product.stock < 5 && product.stock > 0 ? `Only ${product.stock} left` : "\u00A0"}
+          {product.productType !== "DROPSHIP" && product.stock < 5 && product.stock > 0 ? `Only ${product.stock} left` : "\u00A0"}
         </p>
         <p className={`font-rajdhani text-2xl font-bold mb-3 ${soldOut ? "text-gray-400" : "text-orange-400"}`}>
           £{product.price.toFixed(2)}
