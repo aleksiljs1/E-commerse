@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import type { CartItem } from "@/types";
 
 const checkoutSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address").regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Please enter a valid email address"),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -59,8 +59,8 @@ export function CheckoutForm({ items }: Props) {
         return;
       }
 
-      if (paymentMethod === "PAYPAL" && responseData.approveUrl) {
-        window.location.href = responseData.approveUrl;
+      if (paymentMethod === "PAYPAL") {
+        router.push(`/checkout/pending?orderId=${responseData.orderId}`);
         return;
       }
 

@@ -34,7 +34,22 @@ export function OrderDetailView({ order: initialOrder, deliveredStock = [] }: Pr
   const [order, setOrder] = useState(initialOrder);
   const [loading, setLoading] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmingPayment, setConfirmingPayment] = useState(false);
   const router = useRouter();
+
+  async function handleConfirmPayment() {
+    setConfirmingPayment(true);
+    try {
+      await api.post(`/api/admin/orders/${order.id}/confirm-payment`);
+      setOrder((prev: any) => ({ ...prev, status: "PAID" }));
+      toast.success("Payment confirmed — order is now processing");
+      router.refresh();
+    } catch {
+      toast.error("Failed to confirm payment");
+    } finally {
+      setConfirmingPayment(false);
+    }
+  }
 
   async function handleStatusChange(status: string) {
     setLoading(true);
@@ -181,6 +196,24 @@ export function OrderDetailView({ order: initialOrder, deliveredStock = [] }: Pr
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* PayPal F&F Confirm Payment */}
+      {order.paymentMethod === "PAYPAL" && order.status === "PENDING" && (
+        <div className="bg-blue-500/[0.06] border border-blue-500/20 rounded-2xl p-6">
+          <h3 className="text-base font-semibold text-white mb-2">Confirm PayPal F&amp;F Payment</h3>
+          <p className="text-sm text-gray-400 mb-4">
+            Verify that you received <span className="text-white font-medium">£{Number(order.totalAmount).toFixed(2)}</span> from{" "}
+            <span className="text-white font-medium">{order.customerEmail}</span> via PayPal Friends &amp; Family, then confirm below.
+          </p>
+          <Button
+            onClick={handleConfirmPayment}
+            disabled={confirmingPayment}
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+          >
+            {confirmingPayment ? "Confirming..." : "Confirm Payment Received"}
+          </Button>
         </div>
       )}
 

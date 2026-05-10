@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import nodemailer from "nodemailer";
 import { z } from "zod";
+import { emailSchema } from "@/lib/email-validation";
 
 const schema = z.object({
-  to: z.string().email(),
+  to: emailSchema,
   host: z.string().min(1),
   port: z.coerce.number(),
   secure: z.boolean(),

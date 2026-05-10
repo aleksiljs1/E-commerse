@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import {
@@ -12,12 +13,29 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./StatusBadge";
+import api from "@/lib/api";
+import { toast } from "sonner";
 
 type Props = {
   orders: any[];
+  onOrderUpdated?: () => void;
 };
 
-export function OrdersTable({ orders }: Props) {
+export function OrdersTable({ orders, onOrderUpdated }: Props) {
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+
+  async function handleConfirmPayment(orderId: string) {
+    setConfirmingId(orderId);
+    try {
+      await api.post(`/api/admin/orders/${orderId}/confirm-payment`);
+      toast.success("Payment confirmed");
+      onOrderUpdated?.();
+    } catch {
+      toast.error("Failed to confirm payment");
+    } finally {
+      setConfirmingId(null);
+    }
+  }
   return (
     <div className="bg-white/[0.04] border border-white/[0.1] rounded-xl overflow-hidden">
       <Table>
@@ -73,11 +91,23 @@ export function OrdersTable({ orders }: Props) {
                   : "—"}
               </TableCell>
               <TableCell>
-                <Link href={`/admin/dashboard/orders/${order.id}`}>
-                  <Button size="sm" variant="outline">
-                    View Details
-                  </Button>
-                </Link>
+                <div className="flex items-center gap-2">
+                  {order.paymentMethod === "PAYPAL" && order.status === "PENDING" && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleConfirmPayment(order.id)}
+                      disabled={confirmingId === order.id}
+                      className="bg-blue-500 hover:bg-blue-600 text-white text-xs"
+                    >
+                      {confirmingId === order.id ? "..." : "Confirm Payment"}
+                    </Button>
+                  )}
+                  <Link href={`/admin/dashboard/orders/${order.id}`}>
+                    <Button size="sm" variant="outline">
+                      View Details
+                    </Button>
+                  </Link>
+                </div>
               </TableCell>
             </TableRow>
           ))}

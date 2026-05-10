@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { ShieldCheck, Package, BarChart3 } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.string().min(1, "Email is required").email("Enter a valid email").regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Enter a valid email"),
   password: z.string().min(1, "Password is required"),
 });
 

@@ -22,6 +22,7 @@ function OrdersContent() {
 
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     async function fetchOrders() {
@@ -39,7 +40,7 @@ function OrdersContent() {
       }
     }
     fetchOrders();
-  }, [activeStatus]);
+  }, [activeStatus, refreshKey]);
 
   function setStatus(status: string) {
     if (status) {
@@ -73,7 +74,7 @@ function OrdersContent() {
       {loading ? (
         <div className="text-gray-400 text-sm">Loading orders...</div>
       ) : (
-        <OrdersTable orders={orders} />
+        <OrdersTable orders={orders} onOrderUpdated={() => setRefreshKey((k) => k + 1)} />
       )}
     </div>
   );

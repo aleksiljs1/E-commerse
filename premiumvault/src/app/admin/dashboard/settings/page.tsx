@@ -11,6 +11,7 @@ import {
   FileText,
   Bell,
   Award,
+  Wallet,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -97,6 +98,9 @@ export default function SettingsPage() {
   /* Admin Notification */
   const [adminNotificationEmail, setAdminNotificationEmail] = useState("");
 
+  /* PayPal F&F */
+  const [paypalFfEmail, setPaypalFfEmail] = useState("");
+
   /* Discount Tiers */
   const [bronzeOrders, setBronzeOrders] = useState("2");
   const [bronzeDiscount, setBronzeDiscount] = useState("5");
@@ -133,6 +137,7 @@ export default function SettingsPage() {
 
         setSupportEmail(map.get("email_support") ?? "");
         setAdminNotificationEmail(map.get("admin_notification_email") ?? "");
+        setPaypalFfEmail(map.get("paypal_ff_email") ?? "");
 
         setBronzeOrders(map.get("tier_bronze_orders") ?? "2");
         setBronzeDiscount(map.get("tier_bronze_discount") ?? "5");
@@ -169,6 +174,7 @@ export default function SettingsPage() {
         { key: "email_credential_footer", value: credentialFooter },
         { key: "email_support", value: supportEmail },
         { key: "admin_notification_email", value: adminNotificationEmail },
+        { key: "paypal_ff_email", value: paypalFfEmail },
         { key: "tier_bronze_orders", value: bronzeOrders },
         { key: "tier_bronze_discount", value: bronzeDiscount },
         { key: "tier_silver_orders", value: silverOrders },
@@ -249,6 +255,21 @@ export default function SettingsPage() {
           value={supportEmail}
           onChange={setSupportEmail}
           placeholder="support@example.com"
+          type="email"
+        />
+      </Section>
+
+      {/* ===== PayPal F&F ===== */}
+      <Section icon={<Wallet className="w-5 h-5 text-gray-400" />} title="PayPal Friends & Family">
+        <p className={hintCls}>
+          Customers who select PayPal F&amp;F will be shown this email address and asked to send the exact payment amount manually.
+        </p>
+        <Field
+          label="PayPal Email"
+          hint="The PayPal email address where customers should send Friends & Family payments."
+          value={paypalFfEmail}
+          onChange={setPaypalFfEmail}
+          placeholder="your-paypal@email.com"
           type="email"
         />
       </Section>

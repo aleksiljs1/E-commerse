@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
-import { createPayPalOrder } from "@/lib/paypal";
 import { apiError } from "@/lib/api-error";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { getTierConfig, getDiscountPercent } from "@/lib/discount-tiers";
+import { emailSchema } from "@/lib/email-validation";
 
 const orderSchema = z.object({
-  email: z.string().email(),
+  email: emailSchema,
   paymentMethod: z.enum(["STRIPE", "PAYPAL"]),
   items: z.array(z.object({ productId: z.string(), quantity: z.number().int().positive() })).min(1),
   couponCode: z.string().optional(),
@@ -28,7 +28,7 @@ async function rollbackOrder(orderId: string, items: { productId: string; quanti
 async function cleanupStalePendingOrders() {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const staleOrders = await prisma.order.findMany({
-    where: { status: "PENDING", createdAt: { lt: oneHourAgo } },
+    where: { status: "PENDING", paymentMethod: "STRIPE", createdAt: { lt: oneHourAgo } },
     include: { items: { select: { productId: true, quantity: true } } },
   });
 
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       const isSame = items.every((item) => existingOrder.items.some((ei) => ei.productId === item.productId && ei.quantity === item.quantity));
       const sameCoupon = (couponCode ?? "") === (existingOrder.coupon?.code ?? "");
       if (isSame && sameCoupon) {
-        return NextResponse.json({ orderId: existingOrder.id, ...(paymentMethod === "STRIPE" ? { url: null } : { approveUrl: null }), duplicate: true });
+        return NextResponse.json({ orderId: existingOrder.id, ...(paymentMethod === "STRIPE" ? { url: null } : {}), duplicate: true });
       }
     }
 
@@ -181,15 +181,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    try {
-      const { id: paypalOrderId, approveUrl } = await createPayPalOrder(totalAmount);
-      await prisma.order.update({ where: { id: order.id }, data: { paymentId: paypalOrderId } });
-      return NextResponse.json({ orderId: order.id, approveUrl });
-    } catch (err) {
-      console.error("[orders/POST] PayPal order creation failed:", err);
-      await rollbackOrder(order.id, items);
-      return apiError("Payment provider unavailable. Please try again.", 502);
-    }
+    // PayPal F&F: no API call needed — customer sends payment manually
+    return NextResponse.json({ orderId: order.id });
   } catch (err: unknown) {
     return apiError("Internal error", 500, "orders/POST", err);
   }
