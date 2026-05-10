@@ -345,7 +345,7 @@ export default function CheckoutPage() {
             {/* Continue button */}
             <button
               type="submit"
-              disabled={!isValid || !paymentMethod || isProcessing}
+              disabled={!paymentMethod || isProcessing}
               className="cursor-pointer w-full bg-gradient-to-r from-orange-400 to-rose-500 hover:from-rose-500 hover:to-orange-400 text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl py-3 font-semibold transition-colors"
             >
               {isProcessing ? "Processing..." : "Continue to Payment"}
