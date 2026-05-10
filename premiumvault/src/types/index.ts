@@ -23,6 +23,7 @@ export type CartItem = {
   logoUrl: string | null;
   serviceType: string;
   quantity: number;
+  stock: number;
 };
 
 export type CheckoutPayload = {

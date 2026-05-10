@@ -22,6 +22,7 @@ export function ProductCard({ product }: Props) {
       price: product.price,
       logoUrl: product.logoUrl,
       serviceType: product.serviceType,
+      stock: product.stock,
     });
   };
 

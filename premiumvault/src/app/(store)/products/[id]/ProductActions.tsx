@@ -22,13 +22,13 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
-      addItem({ productId, title, description, price, logoUrl, serviceType });
+      addItem({ productId, title, description, price, logoUrl, serviceType, stock });
     }
   };
 
   const handleBuyNow = () => {
     for (let i = 0; i < quantity; i++) {
-      addItem({ productId, title, description, price, logoUrl, serviceType });
+      addItem({ productId, title, description, price, logoUrl, serviceType, stock });
     }
     router.push("/checkout");
   };
