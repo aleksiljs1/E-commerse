@@ -27,7 +27,18 @@ const KEY_MAP: Record<string, keyof TierConfig> = {
   tier_gold_discount: "goldDiscount",
 };
 
+let _tierCache: { config: TierConfig; expiresAt: number } | null = null;
+const TIER_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+export function clearTierCache(): void {
+  _tierCache = null;
+}
+
 export async function getTierConfig(): Promise<TierConfig> {
+  if (_tierCache && Date.now() < _tierCache.expiresAt) {
+    return _tierCache.config;
+  }
+
   const keys = Object.keys(KEY_MAP);
   const rows = await prisma.siteSetting.findMany({ where: { key: { in: keys } } });
   const map = new Map(rows.map((r) => [r.key, r.value]));
@@ -39,6 +50,8 @@ export async function getTierConfig(): Promise<TierConfig> {
       config[field] = Number(val);
     }
   }
+
+  _tierCache = { config, expiresAt: Date.now() + TIER_CACHE_TTL_MS };
   return config;
 }
 

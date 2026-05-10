@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingBag, Ticket, Settings } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, Ticket, Settings, Mail, Users } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/dashboard/products", label: "Products", icon: Package },
   { href: "/admin/dashboard/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/dashboard/coupons", label: "Coupons", icon: Ticket },
+  { href: "/admin/dashboard/users", label: "Users", icon: Users },
+  { href: "/admin/dashboard/email-logs", label: "Email Logs", icon: Mail },
   { href: "/admin/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -19,12 +22,10 @@ export function AdminSidebar() {
     <aside className="w-64 bg-white/[0.04] border-r border-white/[0.1] flex flex-col h-full">
       {/* Logo */}
       <div className="p-6 border-b border-white/[0.1]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center shrink-0">
-            <span className="text-[#0d0d18] text-[10px] font-black leading-none tracking-tight">PV</span>
-          </div>
+        <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+          <Image src="/logo.png" alt="PremiumVault" width={28} height={28} className="shrink-0" />
           <span className="font-rajdhani text-base font-bold text-white tracking-wide">PremiumVault</span>
-        </div>
+        </Link>
       </div>
 
       {/* Navigation */}

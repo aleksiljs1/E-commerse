@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Menu, X, ShoppingCart, User } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Shield } from "lucide-react";
 import Image from "next/image";
 import { useCartStore } from "@/store/cart";
 import { useSession } from "next-auth/react";
@@ -49,6 +49,7 @@ export function Navbar() {
     prevCount.current = count;
   }, [count]);
 
+  const isAdmin = (session?.user as any)?.role === "ADMIN";
   const allLinks = isLoggedIn ? [...NAV_LINKS, ...AUTH_LINKS] : NAV_LINKS;
 
   return (
@@ -115,6 +116,17 @@ export function Navbar() {
             </Link>
           )}
 
+          {/* Admin panel — only visible to admins */}
+          {isAdmin && (
+            <Link
+              href="/admin/dashboard"
+              className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-orange-400 bg-orange-400/10 border border-orange-400/20 hover:bg-orange-400/20 transition-all px-2.5 py-1.5 rounded-lg ml-1"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              Admin
+            </Link>
+          )}
+
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen((o) => !o)}
@@ -157,7 +169,7 @@ export function Navbar() {
             <Link
               href="/account"
               onClick={() => setMobileOpen(false)}
-              className="text-orange-400 font-semibold text-xl py-4"
+              className="text-orange-400 font-semibold text-xl py-4 border-b border-white/[0.06]"
             >
               My Account
             </Link>
@@ -168,6 +180,16 @@ export function Navbar() {
               className="text-orange-400 font-semibold text-xl py-4"
             >
               Sign In
+            </Link>
+          )}
+          {isAdmin && (
+            <Link
+              href="/admin/dashboard"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 text-orange-400 font-semibold text-xl py-4"
+            >
+              <Shield className="w-5 h-5" />
+              Admin Panel
             </Link>
           )}
         </div>

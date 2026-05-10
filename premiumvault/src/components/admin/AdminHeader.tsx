@@ -11,6 +11,10 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/admin/dashboard/products")) return "Products";
   if (pathname.match(/\/admin\/dashboard\/orders\/.+/)) return "Order Detail";
   if (pathname.startsWith("/admin/dashboard/orders")) return "Orders";
+  if (pathname.startsWith("/admin/dashboard/users")) return "Users";
+  if (pathname.startsWith("/admin/dashboard/email-logs")) return "Email Logs";
+  if (pathname.startsWith("/admin/dashboard/coupons")) return "Coupons";
+  if (pathname.startsWith("/admin/dashboard/settings")) return "Settings";
   return "Admin";
 }
 

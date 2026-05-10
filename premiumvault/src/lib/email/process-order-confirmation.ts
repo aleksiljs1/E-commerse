@@ -71,6 +71,7 @@ export async function processOrderConfirmation(orderId: string): Promise<void> {
       sendEmail({
         to: order.customerEmail,
         subject: `PremiumVault — Your Account Details (Order ${order.orderNumber})`,
+        orderId: order.id,
         html: accountDeliveryTemplate({
           orderNumber: order.orderNumber,
           customerEmail: order.customerEmail,
@@ -89,6 +90,7 @@ export async function processOrderConfirmation(orderId: string): Promise<void> {
     await sendEmail({
       to: order.customerEmail,
       subject,
+      orderId: order.id,
       html: purchaseConfirmationTemplate({
         orderNumber: order.orderNumber,
         customerEmail: order.customerEmail,

@@ -3,19 +3,30 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { isValidEmail } from "@/lib/email-validation";
+import { RefreshCw, CheckCircle } from "lucide-react";
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get("error");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(
+    urlError === "link_expired" ? "Verification link expired. Please request a new one." :
+    urlError === "invalid_link" ? "Invalid verification link." : ""
+  );
   const [loading, setLoading] = useState(false);
+  const [unverified, setUnverified] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setUnverified(false);
 
     if (!isValidEmail(email)) {
       setError("Please enter a valid email address");
@@ -24,12 +35,21 @@ export default function SignInPage() {
 
     setLoading(true);
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
+    // Check if account exists but is unverified before attempting signIn
+    const checkRes = await fetch("/api/auth/resend-verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, checkOnly: true }),
     });
+    const checkData = await checkRes.json();
 
+    if (checkData.unverified) {
+      setUnverified(true);
+      setLoading(false);
+      return;
+    }
+
+    const res = await signIn("credentials", { email, password, redirect: false });
     setLoading(false);
 
     if (res?.error) {
@@ -39,6 +59,22 @@ export default function SignInPage() {
 
     router.push("/");
     router.refresh();
+  };
+
+  const resend = async () => {
+    setResending(true);
+    try {
+      await fetch("/api/auth/resend-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      setResent(true);
+    } catch {
+      setError("Failed to resend. Please try again.");
+    } finally {
+      setResending(false);
+    }
   };
 
   return (
@@ -53,6 +89,29 @@ export default function SignInPage() {
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-red-400 text-sm">
               {error}
+            </div>
+          )}
+
+          {unverified && (
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 space-y-2">
+              <p className="text-amber-400 text-sm font-medium">Email not verified</p>
+              <p className="text-amber-300/70 text-xs">Check your inbox for the verification link.</p>
+              {resent ? (
+                <div className="flex items-center gap-1.5 text-emerald-400 text-xs">
+                  <CheckCircle className="w-3.5 h-3.5" />
+                  New link sent!
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={resend}
+                  disabled={resending}
+                  className="cursor-pointer flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${resending ? "animate-spin" : ""}`} />
+                  {resending ? "Resending..." : "Resend verification email"}
+                </button>
+              )}
             </div>
           )}
 

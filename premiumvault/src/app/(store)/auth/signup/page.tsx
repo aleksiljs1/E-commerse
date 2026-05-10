@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { isValidEmail } from "@/lib/email-validation";
@@ -32,29 +31,14 @@ export default function SignUpPage() {
     });
 
     const data = await res.json();
+    setLoading(false);
 
     if (!res.ok) {
       setError(data.error || "Something went wrong");
-      setLoading(false);
       return;
     }
 
-    // Auto sign in after signup
-    const signInRes = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    setLoading(false);
-
-    if (signInRes?.error) {
-      setError("Account created but sign in failed. Please sign in manually.");
-      return;
-    }
-
-    router.push("/");
-    router.refresh();
+    router.push(`/auth/verify-sent?email=${encodeURIComponent(email)}`);
   };
 
   return (

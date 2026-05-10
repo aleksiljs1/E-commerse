@@ -37,16 +37,21 @@ enum ProductType {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  password  String
-  name      String?
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  accounts  Account[]
-  sessions  Session[]
-  orders    Order[]
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  password            String
+  name                String?
+  role                Role      @default(USER)
+  emailVerified       DateTime?
+  verificationToken   String?   @unique
+  verificationExpiry  DateTime?
+  autoLoginToken      String?   @unique
+  autoLoginExpiry     DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  accounts            Account[]
+  sessions            Session[]
+  orders              Order[]
 }
 
 model Product {
@@ -100,6 +105,30 @@ model Order {
   coupon          Coupon?        @relation(fields: [couponId], references: [id])
   items           OrderItem[]
   credentials     Credential[]
+  emailLogs       EmailLog[]
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([couponId])
+}
+
+model EmailLog {
+  id        String    @id @default(cuid())
+  to        String
+  subject   String
+  html      String    @db.Text
+  status    String    @default("PENDING")
+  error     String?   @db.Text
+  attempts  Int       @default(0)
+  orderId   String?
+  nextRetry DateTime?
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  order     Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
 }
 
 model OrderItem {

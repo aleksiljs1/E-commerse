@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
       sendEmail({
         to: order.customerEmail,
         subject: settings.credentialSubject,
+        orderId: order.id,
         html: credentialConfirmationTemplate({
           orderNumber: order.orderNumber,
           customerEmail: order.customerEmail,

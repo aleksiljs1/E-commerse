@@ -68,7 +68,18 @@ const KEY_MAP: Record<string, keyof EmailSettings> = {
   email_support: "supportEmail",
 };
 
+let _settingsCache: { settings: EmailSettings; expiresAt: number } | null = null;
+const SETTINGS_CACHE_TTL_MS = 5 * 60 * 1000;
+
+export function clearEmailSettingsCache(): void {
+  _settingsCache = null;
+}
+
 export async function getEmailSettings(): Promise<EmailSettings> {
+  if (_settingsCache && Date.now() < _settingsCache.expiresAt) {
+    return _settingsCache.settings;
+  }
+
   const keys = Object.keys(KEY_MAP);
   const rows = await prisma.siteSetting.findMany({ where: { key: { in: keys } } });
   const map = new Map(rows.map((r) => [r.key, r.value]));
@@ -86,5 +97,7 @@ export async function getEmailSettings(): Promise<EmailSettings> {
       }
     }
   }
+
+  _settingsCache = { settings, expiresAt: Date.now() + SETTINGS_CACHE_TTL_MS };
   return settings;
 }

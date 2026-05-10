@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidateTag } from "next/cache";
 import { z } from "zod";
+import { clearTierCache } from "@/lib/discount-tiers";
+import { clearEmailSettingsCache } from "@/lib/email/settings";
 
 const updateSchema = z.object({
   key: z.string().min(1),
@@ -72,6 +74,8 @@ export async function PUT(req: NextRequest) {
         )
       );
       revalidateTag("site-settings", {});
+      clearTierCache();
+      clearEmailSettingsCache();
       return NextResponse.json({ success: true });
     }
 
@@ -87,6 +91,8 @@ export async function PUT(req: NextRequest) {
     });
 
     revalidateTag("site-settings", {});
+    clearTierCache();
+    clearEmailSettingsCache();
     return NextResponse.json(setting);
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
