@@ -21,15 +21,11 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
   const { addItem } = useCartStore();
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({ productId, title, description, price, logoUrl, serviceType, stock });
-    }
+    addItem({ productId, title, description, price, logoUrl, serviceType, stock }, quantity);
   };
 
   const handleBuyNow = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({ productId, title, description, price, logoUrl, serviceType, stock });
-    }
+    addItem({ productId, title, description, price, logoUrl, serviceType, stock }, quantity);
     router.push("/checkout");
   };
 
