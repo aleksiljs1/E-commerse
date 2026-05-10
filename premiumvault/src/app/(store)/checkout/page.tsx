@@ -117,14 +117,14 @@ export default function CheckoutPage() {
         url?: string | null;
       };
 
-      clearCart();
-
       if (paymentMethod === "STRIPE") {
+        clearCart();
         url ? (window.location.href = url) : router.push(`/checkout/success?orderId=${orderId}`);
         return;
       }
       if (paymentMethod === "PAYPAL") {
-        router.push(`/checkout/pending?orderId=${orderId}`);
+        clearCart();
+        window.location.href = `/checkout/pending?orderId=${orderId}`;
         return;
       }
     } catch {

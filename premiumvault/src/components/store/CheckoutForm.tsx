@@ -60,7 +60,7 @@ export function CheckoutForm({ items }: Props) {
       }
 
       if (paymentMethod === "PAYPAL") {
-        router.push(`/checkout/pending?orderId=${responseData.orderId}`);
+        window.location.href = `/checkout/pending?orderId=${responseData.orderId}`;
         return;
       }
 
