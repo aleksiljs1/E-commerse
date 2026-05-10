@@ -183,12 +183,12 @@ export default function SubmitCredentialsPage() {
                               Account {i + 1}
                             </p>
                           )}
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="space-y-1">
                               <Label className="text-xs text-zinc-400">Email / Username</Label>
                               <Input
                                 placeholder="your@email.com"
-                                className="bg-[#0e0c1a] border-white/[0.1] h-9 text-sm text-white placeholder:text-zinc-500"
+                                className="bg-[#0e0c1a] border-white/[0.1] h-10 text-sm text-white placeholder:text-zinc-500"
                                 value={creds[key]?.username ?? ""}
                                 onChange={(e) => updateCred(key, "username", e.target.value)}
                               />
@@ -198,7 +198,7 @@ export default function SubmitCredentialsPage() {
                               <Input
                                 type="password"
                                 placeholder="••••••••"
-                                className="bg-[#0e0c1a] border-white/[0.1] h-9 text-sm text-white placeholder:text-zinc-500"
+                                className="bg-[#0e0c1a] border-white/[0.1] h-10 text-sm text-white placeholder:text-zinc-500"
                                 value={creds[key]?.password ?? ""}
                                 onChange={(e) => updateCred(key, "password", e.target.value)}
                               />
