@@ -7,6 +7,7 @@ const updateSchema = z.object({
   code: z.string().min(1).transform((v) => v.trim().toUpperCase()).optional(),
   discountPct: z.number().int().min(1).max(100).optional(),
   maxUses: z.number().int().min(1).optional(),
+  maxUsesPerUser: z.number().int().min(0).optional(),
   expiresAt: z.string().transform((v) => new Date(v)).optional(),
   active: z.boolean().optional(),
 });
@@ -45,6 +46,15 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
 
   try {
     const { id } = await params;
+    const usedInOrders = await prisma.order.count({
+      where: { couponId: id, status: { notIn: ["PENDING", "CANCELLED"] } },
+    });
+    if (usedInOrders > 0) {
+      return NextResponse.json(
+        { error: `Cannot delete: this coupon was used in ${usedInOrders} paid order(s). Deactivate it instead.` },
+        { status: 409 }
+      );
+    }
     await prisma.coupon.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch {

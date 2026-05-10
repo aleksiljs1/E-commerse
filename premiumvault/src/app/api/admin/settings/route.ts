@@ -30,9 +30,38 @@ export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
 
+    const NUMERIC_SETTINGS = [
+      "tier_bronze_orders", "tier_bronze_discount",
+      "tier_silver_orders", "tier_silver_discount",
+      "tier_gold_orders", "tier_gold_discount",
+      "smtp_port",
+    ];
+
     // Support batch upsert: { settings: [{ key, value }, ...] }
     const batchParsed = batchSchema.safeParse(body);
     if (batchParsed.success) {
+      for (const s of batchParsed.data.settings) {
+        if (NUMERIC_SETTINGS.includes(s.key)) {
+          const n = Number(s.value);
+          if (isNaN(n) || n < 0) {
+            return NextResponse.json({ error: `Setting "${s.key}" must be a valid number` }, { status: 400 });
+          }
+        }
+      }
+      // validate tier thresholds if all 6 tier settings are present
+      const tierSettings = Object.fromEntries(
+        batchParsed.data.settings
+          .filter(s => s.key.startsWith("tier_"))
+          .map(s => [s.key, Number(s.value)])
+      );
+      if (Object.keys(tierSettings).length === 6) {
+        const { tier_bronze_orders, tier_silver_orders, tier_gold_orders } = tierSettings;
+        if (tier_bronze_orders >= tier_silver_orders || tier_silver_orders >= tier_gold_orders) {
+          return NextResponse.json({
+            error: "Tier order thresholds must be in order: Bronze < Silver < Gold"
+          }, { status: 400 });
+        }
+      }
       await prisma.$transaction(
         batchParsed.data.settings.map((s) =>
           prisma.siteSetting.upsert({

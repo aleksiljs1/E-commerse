@@ -10,6 +10,7 @@ type Coupon = {
   code: string;
   discountPct: number;
   maxUses: number;
+  maxUsesPerUser: number;
   timesUsed: number;
   expiresAt: string;
   active: boolean;
@@ -21,11 +22,12 @@ type FormData = {
   code: string;
   discountPct: number;
   maxUses: number;
+  maxUsesPerUser: number;
   expiresAt: string;
   active: boolean;
 };
 
-const emptyForm: FormData = { code: "", discountPct: 10, maxUses: 100, expiresAt: "", active: true };
+const emptyForm: FormData = { code: "", discountPct: 10, maxUses: 100, maxUsesPerUser: 0, expiresAt: "", active: true };
 
 export default function CouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -61,6 +63,7 @@ export default function CouponsPage() {
       code: c.code,
       discountPct: c.discountPct,
       maxUses: c.maxUses,
+      maxUsesPerUser: c.maxUsesPerUser,
       expiresAt: c.expiresAt.slice(0, 16),
       active: c.active,
     });
@@ -71,6 +74,7 @@ export default function CouponsPage() {
     if (!form.code.trim()) { toast.error("Code is required"); return; }
     if (form.discountPct < 1 || form.discountPct > 100) { toast.error("Discount must be 1-100%"); return; }
     if (form.maxUses < 1) { toast.error("Max uses must be at least 1"); return; }
+    if (form.maxUsesPerUser < 0) { toast.error("Per-user limit must be 0 or more"); return; }
     if (!form.expiresAt) { toast.error("Expiry date is required"); return; }
 
     setSaving(true);
@@ -113,7 +117,8 @@ export default function CouponsPage() {
     if (!confirm(`Delete coupon "${c.code}"? This cannot be undone.`)) return;
     try {
       const res = await fetch(`/api/admin/coupons/${c.id}`, { method: "DELETE" });
-      if (!res.ok) { toast.error("Failed to delete"); return; }
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error ?? "Failed to delete"); return; }
       toast.success("Coupon deleted");
       fetchCoupons();
     } catch {
@@ -179,6 +184,17 @@ export default function CouponsPage() {
                 className="bg-white/[0.04] border border-white/[0.08] focus:border-orange-400 rounded-xl text-white px-4 py-2.5 w-full outline-none transition-colors text-sm"
               />
               <p className="text-xs text-gray-500">Total times this code can be used across all customers</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm text-gray-400">Max Uses Per Customer</label>
+              <input
+                type="number"
+                min={0}
+                value={form.maxUsesPerUser}
+                onChange={(e) => setForm({ ...form, maxUsesPerUser: Number(e.target.value) })}
+                className="bg-white/[0.04] border border-white/[0.08] focus:border-orange-400 rounded-xl text-white px-4 py-2.5 w-full outline-none transition-colors text-sm"
+              />
+              <p className="text-xs text-gray-500">0 = unlimited per customer</p>
             </div>
             <div className="space-y-1.5">
               <label className="text-sm text-gray-400">Expires At</label>
@@ -252,7 +268,7 @@ export default function CouponsPage() {
                         <span className="text-orange-400 font-semibold">{c.discountPct}%</span>
                       </td>
                       <td className="py-3 px-4 text-gray-400">
-                        {c.timesUsed} / {c.maxUses}
+                        {c.timesUsed} / {c.maxUses}{c.maxUsesPerUser > 0 ? ` (${c.maxUsesPerUser}/user)` : ""}
                       </td>
                       <td className="py-3 px-4 text-gray-400 text-xs">
                         {format(new Date(c.expiresAt), "dd MMM yyyy, HH:mm")}

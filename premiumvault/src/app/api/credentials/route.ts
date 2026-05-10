@@ -34,14 +34,21 @@ export async function POST(req: NextRequest) {
   try {
     const order = await prisma.order.findUnique({
       where: { credentialToken: token },
-      include: { items: { include: { product: { select: { title: true } } } } },
+      include: { items: { include: { product: { select: { title: true, productType: true } } } } },
     });
 
     if (!order) return apiError("Invalid or expired link", 400);
     if (order.status !== "PAID") return apiError("Invalid, expired, or already-used link", 400);
     if (order.tokenExpiresAt && order.tokenExpiresAt < new Date()) return apiError("Link has expired", 410);
 
-    const validItemIds = new Set(order.items.map((i) => i.id));
+    const validItemIds = new Set(
+      order.items
+        .filter((i) => i.product.productType === "UPGRADE")
+        .map((i) => i.id)
+    );
+    if (validItemIds.size === 0) {
+      return apiError("This order does not require credential submission", 400);
+    }
     for (const cred of credentials) {
       if (!validItemIds.has(cred.orderItemId)) return apiError("Invalid order item", 400);
     }

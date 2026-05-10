@@ -15,11 +15,15 @@ const orderSchema = z.object({
   couponCode: z.string().optional(),
 });
 
-async function rollbackOrder(orderId: string, items: { productId: string; quantity: number }[]) {
+// FIX 1: rollbackOrder now accepts couponId and decrements timesUsed if a coupon was applied
+async function rollbackOrder(orderId: string, items: { productId: string; quantity: number }[], couponId: string | null) {
   await prisma.$transaction(async (tx) => {
     await tx.order.update({ where: { id: orderId }, data: { status: "CANCELLED" } });
     for (const item of items) {
       await tx.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } });
+    }
+    if (couponId) {
+      await tx.coupon.update({ where: { id: couponId }, data: { timesUsed: { decrement: 1 } } });
     }
   }).catch((e) => console.error("[orders/rollback] Failed to roll back order", orderId, e));
 }
@@ -48,15 +52,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Double-submit protection
+    // FIX 4: Double-submit protection — also checks that coupon code matches the existing order
     const sixtySecondsAgo = new Date(Date.now() - 60 * 1000);
     const existingOrder = await prisma.order.findFirst({
       where: { customerEmail: email, status: "PENDING", createdAt: { gte: sixtySecondsAgo }, items: { every: { productId: { in: productIds } } } },
-      include: { items: true },
+      include: { items: true, coupon: { select: { code: true } } },
     });
     if (existingOrder && existingOrder.items.length === items.length) {
       const isSame = items.every((item) => existingOrder.items.some((ei) => ei.productId === item.productId && ei.quantity === item.quantity));
-      if (isSame) {
+      const sameCoupon = (couponCode ?? "") === (existingOrder.coupon?.code ?? "");
+      if (isSame && sameCoupon) {
         return NextResponse.json({ orderId: existingOrder.id, ...(paymentMethod === "STRIPE" ? { url: null } : { approveUrl: null }), duplicate: true });
       }
     }
@@ -69,7 +74,7 @@ export async function POST(req: NextRequest) {
     let discountPercent = 0;
     if (userId) {
       const orderCount = await prisma.order.count({
-        where: { userId, status: { notIn: ["CANCELLED", "PENDING"] } },
+        where: { userId, status: "COMPLETED" },
       });
       const tierConfig = await getTierConfig();
       discountPercent = getDiscountPercent(orderCount, tierConfig);
@@ -78,14 +83,29 @@ export async function POST(req: NextRequest) {
     // Validate coupon code if provided
     let couponId: string | null = null;
     let couponDiscountPct = 0;
+    let coupon: Awaited<ReturnType<typeof prisma.coupon.findUnique>> | null = null;
     if (couponCode) {
-      const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.trim().toUpperCase() } });
+      coupon = await prisma.coupon.findUnique({ where: { code: couponCode.trim().toUpperCase() } });
       if (!coupon) return apiError("Invalid coupon code", 400);
       if (!coupon.active) return apiError("This coupon is no longer active", 400);
       if (new Date() > coupon.expiresAt) return apiError("This coupon has expired", 400);
       if (coupon.timesUsed >= coupon.maxUses) return apiError("This coupon has reached its usage limit", 400);
       couponId = coupon.id;
       couponDiscountPct = coupon.discountPct;
+
+      // FIX 3: Per-user coupon limit check (0 = unlimited)
+      if (coupon.maxUsesPerUser > 0) {
+        const userCouponUses = await prisma.order.count({
+          where: {
+            couponId: coupon.id,
+            customerEmail: email,
+            status: { notIn: ["CANCELLED", "PENDING"] },
+          },
+        });
+        if (userCouponUses >= coupon.maxUsesPerUser) {
+          return apiError("You have already used this coupon the maximum number of times", 400);
+        }
+      }
     }
 
     // Use the higher discount between tier and coupon
@@ -106,9 +126,15 @@ export async function POST(req: NextRequest) {
           items: { create: orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity, priceAtPurchase: i.priceAtPurchase })) },
         },
       });
-      // Increment coupon usage
+      // FIX 2: Atomic coupon increment — only succeeds if the limit has not been reached concurrently
       if (couponId) {
-        await tx.coupon.update({ where: { id: couponId }, data: { timesUsed: { increment: 1 } } });
+        const couponUpdateResult = await tx.coupon.updateMany({
+          where: { id: couponId!, timesUsed: { lt: coupon!.maxUses } },
+          data: { timesUsed: { increment: 1 } },
+        });
+        if (couponUpdateResult.count === 0) {
+          throw Object.assign(new Error("Coupon limit reached"), { code: "COUPON_LIMIT" });
+        }
       }
       for (const item of items) {
         await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } });
@@ -118,21 +144,23 @@ export async function POST(req: NextRequest) {
 
     if (paymentMethod === "STRIPE") {
       try {
-        const session = await stripe.checkout.sessions.create({
+        const stripeSession = await stripe.checkout.sessions.create({
           mode: "payment",
           customer_email: email,
           line_items: orderItems.map((item) => {
             const product = products.find((p) => p.id === item.productId)!;
-            return { price_data: { currency: "gbp", product_data: { name: product.title }, unit_amount: Math.round(item.priceAtPurchase * 100) }, quantity: item.quantity };
+            const discountedUnitAmount = Math.round(item.priceAtPurchase * (1 - effectiveDiscount / 100) * 100);
+            return { price_data: { currency: "gbp", product_data: { name: product.title }, unit_amount: discountedUnitAmount }, quantity: item.quantity };
           }),
           metadata: { orderId: order.id, orderNumber },
           success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?orderId=${order.id}`,
           cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
         });
-        return NextResponse.json({ orderId: order.id, url: session.url });
+        return NextResponse.json({ orderId: order.id, url: stripeSession.url });
       } catch (err) {
         console.error("[orders/POST] Stripe session creation failed:", err);
-        await rollbackOrder(order.id, items);
+        // FIX 1: pass couponId so rollback undoes the coupon usage increment
+        await rollbackOrder(order.id, items, couponId);
         return apiError("Payment provider unavailable. Please try again.", 502);
       }
     }
@@ -143,10 +171,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ orderId: order.id, approveUrl });
     } catch (err) {
       console.error("[orders/POST] PayPal order creation failed:", err);
-      await rollbackOrder(order.id, items);
+      // FIX 1: pass couponId so rollback undoes the coupon usage increment
+      await rollbackOrder(order.id, items, couponId);
       return apiError("Payment provider unavailable. Please try again.", 502);
     }
-  } catch (err) {
+  } catch (err: unknown) {
+    // FIX 2: handle the atomic coupon limit race condition surfaced from the transaction
+    if (err instanceof Error && (err as Error & { code?: string }).code === "COUPON_LIMIT") {
+      return apiError("This coupon has reached its usage limit", 400);
+    }
     return apiError("Internal error", 500, "orders/POST", err);
   }
 }

@@ -27,6 +27,29 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+      const orderRecord = await prisma.order.findUnique({
+        where: { id: orderId },
+        select: { totalAmount: true, status: true },
+      });
+
+      if (!orderRecord || orderRecord.status !== "PENDING") {
+        // Order not found or already processed — nothing to do
+        return NextResponse.json({ received: true });
+      }
+
+      const expectedPence = Math.round(Number(orderRecord.totalAmount) * 100);
+      if (session.amount_total !== expectedPence) {
+        console.error(
+          "[webhook/stripe] AMOUNT MISMATCH — orderId:",
+          orderId,
+          "expected:",
+          expectedPence,
+          "got:",
+          session.amount_total
+        );
+        return NextResponse.json({ received: true });
+      }
+
       const credentialToken = uuidv4();
       const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 

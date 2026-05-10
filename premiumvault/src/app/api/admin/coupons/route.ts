@@ -7,6 +7,7 @@ const couponSchema = z.object({
   code: z.string().min(1).transform((v) => v.trim().toUpperCase()),
   discountPct: z.number().int().min(1).max(100),
   maxUses: z.number().int().min(1),
+  maxUsesPerUser: z.number().int().min(0).default(0),
   expiresAt: z.string().transform((v) => new Date(v)),
   active: z.boolean().default(true),
 });
