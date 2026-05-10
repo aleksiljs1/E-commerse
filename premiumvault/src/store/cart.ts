@@ -22,9 +22,10 @@ export const useCartStore = create<CartState>()(
       isOpen: false,
 
       addItem: (item, qty = 1) => {
+        const cap = item.stock > 0 ? item.stock : Infinity;
         const existing = get().items.find((i) => i.productId === item.productId);
         if (existing) {
-          const newQty = Math.min(existing.quantity + qty, item.stock);
+          const newQty = Math.min(existing.quantity + qty, cap);
           if (newQty === existing.quantity) return;
           set({
             items: get().items.map((i) =>
@@ -32,7 +33,7 @@ export const useCartStore = create<CartState>()(
             ),
           });
         } else {
-          set({ items: [...get().items, { ...item, quantity: Math.min(qty, item.stock) }] });
+          set({ items: [...get().items, { ...item, quantity: Math.min(qty, cap) }] });
         }
       },
 
@@ -46,7 +47,8 @@ export const useCartStore = create<CartState>()(
           return;
         }
         const item = get().items.find((i) => i.productId === productId);
-        const clamped = item ? Math.min(quantity, item.stock) : quantity;
+        const cap = item && item.stock > 0 ? item.stock : Infinity;
+        const clamped = item ? Math.min(quantity, cap) : quantity;
         set({
           items: get().items.map((i) =>
             i.productId === productId ? { ...i, quantity: clamped } : i
