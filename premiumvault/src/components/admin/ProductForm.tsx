@@ -25,7 +25,7 @@ const productFormSchema = z.object({
   warrantyTerms: z.string().optional(),
   featured: z.boolean(),
   active: z.boolean(),
-  productType: z.enum(["UPGRADE", "PURCHASE"]),
+  productType: z.enum(["UPGRADE", "PURCHASE", "DROPSHIP"]),
 });
 
 type FormSchema = z.infer<typeof productFormSchema>;
@@ -236,7 +236,7 @@ export function ProductForm({
             control={control}
             render={({ field }) => (
               <div className="flex rounded-xl overflow-hidden border border-white/[0.1] w-fit">
-                {(["UPGRADE", "PURCHASE"] as const).map((type) => (
+                {(["UPGRADE", "PURCHASE", "DROPSHIP"] as const).map((type) => (
                   <button
                     key={type}
                     type="button"
@@ -247,7 +247,7 @@ export function ProductForm({
                         : "bg-[#0e0c1a] text-gray-400 hover:text-gray-200"
                     }`}
                   >
-                    {type === "UPGRADE" ? "Upgrade" : "Purchase"}
+                    {type === "UPGRADE" ? "Upgrade" : type === "PURCHASE" ? "Purchase" : "Dropship"}
                   </button>
                 ))}
               </div>
@@ -256,7 +256,9 @@ export function ProductForm({
           <p className="text-gray-600 text-xs mt-1.5">
             {productType === "UPGRADE"
               ? "Customer submits their own account credentials to be upgraded."
-              : "Customer receives pre-loaded account credentials via email."}
+              : productType === "PURCHASE"
+              ? "Customer receives pre-loaded account credentials via email."
+              : "Customer orders and waits — you source and deliver credentials within 4–5 days."}
           </p>
         </div>
 
