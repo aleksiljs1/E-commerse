@@ -12,7 +12,7 @@ export async function GET() {
   const orderCount = await prisma.order.count({
     where: {
       userId: session.user.id,
-      status: "COMPLETED",
+      status: { notIn: ["CANCELLED", "PENDING"] },
     },
   });
 

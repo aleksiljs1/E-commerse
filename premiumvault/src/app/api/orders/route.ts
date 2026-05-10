@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     let discountPercent = 0;
     if (userId) {
       const orderCount = await prisma.order.count({
-        where: { userId, status: "COMPLETED" },
+        where: { userId, status: { notIn: ["CANCELLED", "PENDING"] } },
       });
       const tierConfig = await getTierConfig();
       discountPercent = getDiscountPercent(orderCount, tierConfig);
