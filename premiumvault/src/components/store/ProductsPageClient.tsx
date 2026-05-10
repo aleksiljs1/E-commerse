@@ -33,10 +33,10 @@ export function ProductsPageClient({ products, serviceTypes }: Props) {
     <>
       {/* Filter tabs */}
       {tabs.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="flex gap-2 mb-8 overflow-x-auto scrollbar-hide pb-1">
           <button
             onClick={() => setActive("all")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer shrink-0 ${
               active === "all"
                 ? "bg-white text-black"
                 : "bg-white/[0.07] text-gray-300 hover:bg-white/[0.12]"
@@ -48,7 +48,7 @@ export function ProductsPageClient({ products, serviceTypes }: Props) {
             <button
               key={t.slug}
               onClick={() => setActive(t.slug)}
-              className="px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer border"
+              className="px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer border shrink-0 whitespace-nowrap"
               style={
                 active === t.slug
                   ? { background: t.color, color: "#fff", borderColor: t.color }
