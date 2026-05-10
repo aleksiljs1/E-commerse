@@ -39,6 +39,14 @@ export async function GET(req: NextRequest) {
     });
 
     if (result.count > 0) {
+      // Increment coupon usage now that payment is confirmed
+      if (order.couponId) {
+        await prisma.coupon.update({
+          where: { id: order.couponId },
+          data: { timesUsed: { increment: 1 } },
+        });
+      }
+
       // Call directly — no internal HTTP roundtrip, errors are logged not swallowed
       await processOrderConfirmation(order.id).catch((err) =>
         console.error("[webhook/paypal] processOrderConfirmation failed for order", order.id, err)

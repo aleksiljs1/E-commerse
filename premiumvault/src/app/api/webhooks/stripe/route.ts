@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     try {
       const orderRecord = await prisma.order.findUnique({
         where: { id: orderId },
-        select: { totalAmount: true, status: true },
+        select: { totalAmount: true, status: true, couponId: true },
       });
 
       if (!orderRecord || orderRecord.status !== "PENDING") {
@@ -62,6 +62,14 @@ export async function POST(req: NextRequest) {
       if (result.count === 0) {
         // Already processed by a previous delivery
         return NextResponse.json({ received: true });
+      }
+
+      // Increment coupon usage now that payment is confirmed
+      if (orderRecord.couponId) {
+        await prisma.coupon.update({
+          where: { id: orderRecord.couponId },
+          data: { timesUsed: { increment: 1 } },
+        });
       }
 
       // Call directly — no internal HTTP roundtrip, errors are logged not swallowed

@@ -9,7 +9,7 @@ export default async function AccountPage() {
   if (!session?.user) redirect("/auth/signin");
 
   const orders = await prisma.order.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, status: { not: "PENDING" } },
     include: { items: { include: { product: true } } },
     orderBy: { createdAt: "desc" },
   });

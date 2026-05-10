@@ -15,15 +15,11 @@ const orderSchema = z.object({
   couponCode: z.string().optional(),
 });
 
-// FIX 1: rollbackOrder now accepts couponId and decrements timesUsed if a coupon was applied
-async function rollbackOrder(orderId: string, items: { productId: string; quantity: number }[], couponId: string | null) {
+async function rollbackOrder(orderId: string, items: { productId: string; quantity: number }[]) {
   await prisma.$transaction(async (tx) => {
     await tx.order.update({ where: { id: orderId }, data: { status: "CANCELLED" } });
     for (const item of items) {
       await tx.product.update({ where: { id: item.productId }, data: { stock: { increment: item.quantity } } });
-    }
-    if (couponId) {
-      await tx.coupon.update({ where: { id: couponId }, data: { timesUsed: { decrement: 1 } } });
     }
   }).catch((e) => console.error("[orders/rollback] Failed to roll back order", orderId, e));
 }
@@ -126,16 +122,6 @@ export async function POST(req: NextRequest) {
           items: { create: orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity, priceAtPurchase: i.priceAtPurchase })) },
         },
       });
-      // FIX 2: Atomic coupon increment — only succeeds if the limit has not been reached concurrently
-      if (couponId) {
-        const couponUpdateResult = await tx.coupon.updateMany({
-          where: { id: couponId!, timesUsed: { lt: coupon!.maxUses } },
-          data: { timesUsed: { increment: 1 } },
-        });
-        if (couponUpdateResult.count === 0) {
-          throw Object.assign(new Error("Coupon limit reached"), { code: "COUPON_LIMIT" });
-        }
-      }
       for (const item of items) {
         await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } });
       }
@@ -159,8 +145,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ orderId: order.id, url: stripeSession.url });
       } catch (err) {
         console.error("[orders/POST] Stripe session creation failed:", err);
-        // FIX 1: pass couponId so rollback undoes the coupon usage increment
-        await rollbackOrder(order.id, items, couponId);
+        await rollbackOrder(order.id, items);
         return apiError("Payment provider unavailable. Please try again.", 502);
       }
     }
@@ -171,15 +156,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ orderId: order.id, approveUrl });
     } catch (err) {
       console.error("[orders/POST] PayPal order creation failed:", err);
-      // FIX 1: pass couponId so rollback undoes the coupon usage increment
-      await rollbackOrder(order.id, items, couponId);
+      await rollbackOrder(order.id, items);
       return apiError("Payment provider unavailable. Please try again.", 502);
     }
   } catch (err: unknown) {
-    // FIX 2: handle the atomic coupon limit race condition surfaced from the transaction
-    if (err instanceof Error && (err as Error & { code?: string }).code === "COUPON_LIMIT") {
-      return apiError("This coupon has reached its usage limit", 400);
-    }
     return apiError("Internal error", 500, "orders/POST", err);
   }
 }
