@@ -9,13 +9,8 @@ import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+
 import { ImageUpload } from "./ImageUpload";
 import { Bold } from "lucide-react";
 
@@ -281,24 +276,19 @@ export function ProductForm({
         {/* Service Type */}
         <div>
           <Label className="text-gray-400 mb-2 block">Service Type</Label>
-          <Controller
-            name="serviceType"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full bg-[#0e0c1a] border-white/[0.1] text-white">
-                  <SelectValue placeholder="Select service..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {SERVICE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+          <Input
+            className="bg-[#0e0c1a] border-white/[0.1] text-white"
+            placeholder="e.g. spotify, netflix, or your own"
+            list="service-type-options"
+            {...register("serviceType")}
           />
+          <datalist id="service-type-options">
+            {SERVICE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </datalist>
           {errors.serviceType && (
             <p className="text-red-400 text-xs mt-1">{errors.serviceType.message}</p>
           )}
