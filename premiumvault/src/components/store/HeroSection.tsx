@@ -2,14 +2,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { Lock, Shield, Clock, MessageCircle, ClipboardList, Headphones, Star } from "lucide-react";
 
-const trustItems = [
-  { icon: ClipboardList, value: "9,083+", label: "Orders Delivered" },
-  { icon: Lock, value: "Secure", label: "Payment Protection" },
-  { icon: Headphones, value: "24h", label: "Support Response" },
-  { icon: Star, value: "Trustpilot", label: "Verified Reviews", highlight: true },
-];
+type Props = {
+  productsSold?: string;
+  feedbacks?: string;
+};
 
-export function HeroSection() {
+export function HeroSection({ productsSold = "298", feedbacks = "34" }: Props) {
+  const trustItems = [
+    { icon: ClipboardList, value: `${productsSold}+`, label: "Orders Delivered" },
+    { icon: Lock, value: "Secure", label: "Payment Protection" },
+    { icon: Headphones, value: "24h", label: "Support Response" },
+    { icon: Star, value: "Trustpilot", label: "Verified Reviews", highlight: true },
+  ];
   return (
     <section className="relative overflow-hidden min-h-[calc(100vh-97px)] flex flex-col justify-between text-center">
       {/* Cosmic background image */}
@@ -59,14 +63,14 @@ export function HeroSection() {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-gray-400">
               <path d="M2 12L5 5L8 8L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <span className="text-sm font-semibold text-white">9,083</span>
+            <span className="text-sm font-semibold text-white">{productsSold}</span>
             <span className="text-sm text-gray-400">Products Sold</span>
           </div>
           <div className="inline-flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-full px-5 py-2.5 backdrop-blur-sm">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-gray-400">
               <path d="M8 1L10 5.5L15 6L11.5 9.5L12.5 14.5L8 12L3.5 14.5L4.5 9.5L1 6L6 5.5L8 1Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
             </svg>
-            <span className="text-sm font-semibold text-white">2,171</span>
+            <span className="text-sm font-semibold text-white">{feedbacks}</span>
             <span className="text-sm text-gray-400">Feedbacks</span>
           </div>
         </div>

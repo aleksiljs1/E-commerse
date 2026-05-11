@@ -1,15 +1,23 @@
 import { getActiveProducts } from "@/lib/products";
 import { HeroSection } from "@/components/store/HeroSection";
-
 import { FeaturedProducts } from "@/components/store/FeaturedProducts";
-
+import { prisma } from "@/lib/db";
 
 export default async function HomePage() {
-  const products = await getActiveProducts();
+  const [products, statsSettings] = await Promise.all([
+    getActiveProducts(),
+    prisma.siteSetting.findMany({
+      where: { key: { in: ["stats_products_sold", "stats_feedbacks"] } },
+    }),
+  ]);
+
+  const statsMap = new Map(statsSettings.map((s) => [s.key, s.value]));
+  const productsSold = statsMap.get("stats_products_sold") || "298";
+  const feedbacks = statsMap.get("stats_feedbacks") || "34";
 
   return (
     <>
-      <HeroSection />
+      <HeroSection productsSold={productsSold} feedbacks={feedbacks} />
 
       <FeaturedProducts products={products} />
 

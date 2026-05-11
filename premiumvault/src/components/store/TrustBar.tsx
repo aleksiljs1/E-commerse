@@ -1,13 +1,16 @@
 import { ClipboardList, Lock, Headphones, Star } from "lucide-react";
 
-const items = [
-  { icon: ClipboardList, value: "9,083+", label: "Orders Delivered" },
-  { icon: Lock, value: "Secure", label: "Payment Protection" },
-  { icon: Headphones, value: "24h", label: "Support Response" },
-  { icon: Star, value: "Trustpilot", label: "Verified Reviews", highlight: true },
-];
+type Props = {
+  productsSold?: string;
+};
 
-export function TrustBar() {
+export function TrustBar({ productsSold = "298" }: Props) {
+  const items = [
+    { icon: ClipboardList, value: `${productsSold}+`, label: "Orders Delivered" },
+    { icon: Lock, value: "Secure", label: "Payment Protection" },
+    { icon: Headphones, value: "24h", label: "Support Response" },
+    { icon: Star, value: "Trustpilot", label: "Verified Reviews", highlight: true as const },
+  ];
   return (
     <section className="relative z-20 w-full border-y border-white/[0.12] bg-[#0c0a18]/90 backdrop-blur-md">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10 py-7 flex flex-wrap items-center justify-between">

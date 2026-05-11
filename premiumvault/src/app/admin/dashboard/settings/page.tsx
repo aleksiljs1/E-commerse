@@ -12,6 +12,7 @@ import {
   Bell,
   Award,
   Wallet,
+  BarChart3,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -76,6 +77,10 @@ function Field({
 /* ------------------------------------------------------------------ */
 
 export default function SettingsPage() {
+  /* Homepage Stats */
+  const [statsProductsSold, setStatsProductsSold] = useState("298");
+  const [statsFeedbacks, setStatsFeedbacks] = useState("34");
+
   /* Banner */
   const [bannerText, setBannerText] = useState("");
 
@@ -123,6 +128,8 @@ export default function SettingsPage() {
         const map = new Map<string, string>();
         for (const s of data.data ?? []) map.set(s.key, s.value);
 
+        setStatsProductsSold(map.get("stats_products_sold") ?? "298");
+        setStatsFeedbacks(map.get("stats_feedbacks") ?? "34");
         setBannerText(map.get("banner_text") ?? "✨ Must Read Before Purchasing ✨");
 
         setPurchaseSubject(map.get("email_purchase_subject") ?? "");
@@ -164,6 +171,8 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       const settings = [
+        { key: "stats_products_sold", value: statsProductsSold },
+        { key: "stats_feedbacks", value: statsFeedbacks },
         { key: "banner_text", value: bannerText },
         { key: "email_purchase_subject", value: purchaseSubject },
         { key: "email_purchase_heading", value: purchaseHeading },
@@ -212,6 +221,27 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-white">Settings</h1>
+
+      {/* ===== Homepage Stats ===== */}
+      <Section icon={<BarChart3 className="w-5 h-5 text-gray-400" />} title="Homepage Stats">
+        <p className={hintCls}>
+          These numbers are shown on the homepage hero section. Update them as your business grows.
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          <Field
+            label="Products Sold"
+            value={statsProductsSold}
+            onChange={setStatsProductsSold}
+            placeholder="298"
+          />
+          <Field
+            label="Feedbacks"
+            value={statsFeedbacks}
+            onChange={setStatsFeedbacks}
+            placeholder="34"
+          />
+        </div>
+      </Section>
 
       {/* ===== Site Banner ===== */}
       <Section icon={<Settings className="w-5 h-5 text-gray-400" />} title="Site Banner">
