@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import React, { useEffect, useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Mail, RefreshCw, RotateCcw, AlertTriangle, CheckCircle2, Clock, Ban } from "lucide-react";
@@ -184,9 +184,8 @@ function EmailLogsContent() {
                   const cfg = STATUS_CONFIG[log.status] ?? STATUS_CONFIG.PENDING;
                   const isExp = expanded === log.id;
                   return (
-                    <>
+                    <React.Fragment key={log.id}>
                       <tr
-                        key={log.id}
                         className="border-b border-white/[0.05] hover:bg-white/[0.02] transition-colors cursor-pointer"
                         onClick={() => setExpanded(isExp ? null : log.id)}
                       >
@@ -240,7 +239,7 @@ function EmailLogsContent() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   );
                 })}
               </tbody>
