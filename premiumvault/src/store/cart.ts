@@ -22,7 +22,7 @@ export const useCartStore = create<CartState>()(
       isOpen: false,
 
       addItem: (item, qty = 1) => {
-        const cap = item.stock > 0 ? item.stock : Infinity;
+        const cap = item.stock > 0 ? item.stock : 3;
         const existing = get().items.find((i) => i.productId === item.productId);
         if (existing) {
           const newQty = Math.min(existing.quantity + qty, cap);
@@ -47,7 +47,7 @@ export const useCartStore = create<CartState>()(
           return;
         }
         const item = get().items.find((i) => i.productId === productId);
-        const cap = item && item.stock > 0 ? item.stock : Infinity;
+        const cap = item && item.stock > 0 ? item.stock : 3;
         const clamped = item ? Math.min(quantity, cap) : quantity;
         set({
           items: get().items.map((i) =>

@@ -74,6 +74,9 @@ export async function POST(req: NextRequest) {
 
     for (const item of items) {
       const product = products.find((p) => p.id === item.productId)!;
+      if (product.productType === "DROPSHIP" && item.quantity > 3) {
+        return apiError(`Maximum 3 accounts per order for "${product.title}"`, 400);
+      }
       if (product.productType !== "DROPSHIP" && product.stock < item.quantity) {
         return apiError(`Insufficient stock for "${product.title}"`, 400);
       }

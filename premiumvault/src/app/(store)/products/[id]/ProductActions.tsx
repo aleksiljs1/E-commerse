@@ -38,10 +38,10 @@ export function ProductActions({ price, productId, title, description, logoUrl, 
         <span className="text-gray-400 text-sm">Qty:</span>
         <QuantityControl
           value={quantity}
-          onIncrement={() => setQuantity((q) => productType === "DROPSHIP" ? q + 1 : Math.min(q + 1, stock))}
+          onIncrement={() => setQuantity((q) => productType === "DROPSHIP" ? Math.min(q + 1, 3) : Math.min(q + 1, stock))}
           onDecrement={() => setQuantity((q) => Math.max(q - 1, 1))}
           min={1}
-          max={productType === "DROPSHIP" ? 99 : stock}
+          max={productType === "DROPSHIP" ? 3 : stock}
         />
       </div>
 
