@@ -82,7 +82,8 @@ export async function POST(req: NextRequest) {
         where: { id: orderId },
         include: { items: { include: { product: { select: { title: true, productType: true } } } } },
       });
-      if (fullOrder) {
+      const hasNonDropshipItems = fullOrder?.items.some((i) => i.product.productType !== "DROPSHIP");
+      if (fullOrder && hasNonDropshipItems) {
         await notifyAdminNewOrder({
           orderNumber: fullOrder.orderNumber,
           customerEmail: fullOrder.customerEmail,
