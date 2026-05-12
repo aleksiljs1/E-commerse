@@ -1,17 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["100.64.132.90", "square-office.tail523b20.ts.net"],
-  // @ts-expect-error dynamicIO exists at runtime but lags behind in types
-  experimental: { dynamicIO: true },
+  allowedDevOrigins: ["100.125.79.54", "desktop-35mtkeg.tailaf7658.ts.net"],
   cacheComponents: true,
-  webpack: (config) => {
-    config.watchOptions = {
-      ...config.watchOptions,
-      ignored: /node_modules/,
-    };
-    return config;
-  },
+  headers: async () => [
+    {
+      source: "/(.*)",
+      headers: [
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        { key: "X-XSS-Protection", value: "1; mode=block" },
+      ],
+    },
+  ],
 };
 
 export default nextConfig;

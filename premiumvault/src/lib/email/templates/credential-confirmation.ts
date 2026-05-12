@@ -1,3 +1,5 @@
+import { escapeHtml } from "@/lib/email/html-escape";
+
 type CredentialConfirmationData = {
   orderNumber: string;
   customerEmail: string;
@@ -8,10 +10,11 @@ type CredentialConfirmationData = {
 };
 
 export function credentialConfirmationTemplate(data: CredentialConfirmationData): string {
-  const heading = data.heading ?? "Credentials Received!";
-  const body = (data.body ?? "Congratulations! We've received your account credentials for order {orderNumber}.")
-    .replace(/\{orderNumber\}/g, data.orderNumber);
-  const footer = data.footer ?? "Thank you for choosing PremiumVault.";
+  const heading = data.heading != null ? escapeHtml(data.heading) : "Credentials Received!";
+  const body = data.body != null
+    ? escapeHtml(data.body.replace(/\{orderNumber\}/g, data.orderNumber))
+    : `Congratulations! We&#39;ve received your account credentials for order ${escapeHtml(data.orderNumber)}.`;
+  const footer = data.footer != null ? escapeHtml(data.footer) : "Thank you for choosing PremiumVault.";
 
   return `
 <!DOCTYPE html>
@@ -39,7 +42,7 @@ export function credentialConfirmationTemplate(data: CredentialConfirmationData)
       <p style="color: #71717a; font-size: 14px; line-height: 1.6; margin: 0;">
         Your account${data.serviceCount > 1 ? "s" : ""} will be upgraded within
         <strong style="color: #ffffff;">4&ndash;5 business days</strong>.
-        We will notify you at <strong style="color: #ffffff;">${data.customerEmail}</strong> once complete.
+        We will notify you at <strong style="color: #ffffff;">${escapeHtml(data.customerEmail)}</strong> once complete.
       </p>
     </div>
     <p style="text-align: center; color: #52525b; font-size: 12px; margin-top: 24px;">

@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
           "got:",
           session.amount_total
         );
-        return NextResponse.json({ received: true });
+        return NextResponse.json({ error: "Amount mismatch" }, { status: 500 });
       }
 
       const credentialToken = uuidv4();

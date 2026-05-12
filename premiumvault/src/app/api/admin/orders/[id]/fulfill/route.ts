@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { sendEmail } from "@/lib/email/send";
 import { accountDeliveryTemplate } from "@/lib/email/templates/account-delivery";
 import { getEmailSettings } from "@/lib/email/settings";
+import { encrypt } from "@/lib/crypto";
 
 interface CredentialInput {
   orderItemId: string;
@@ -112,7 +113,7 @@ export async function POST(
             orderItemId: cred.orderItemId,
             serviceType: item.product.serviceType,
             username: cred.username,
-            password: cred.password,
+            password: encrypt(cred.password),
             status: "UPGRADED",
             submittedAt: new Date(),
           },

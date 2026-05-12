@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,6 +8,14 @@ import { isValidEmail } from "@/lib/email-validation";
 import { RefreshCw, CheckCircle } from "lucide-react";
 
 export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInContent />
+    </Suspense>
+  );
+}
+
+function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlError = searchParams.get("error");

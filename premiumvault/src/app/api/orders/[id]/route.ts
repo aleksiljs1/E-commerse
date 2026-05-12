@@ -5,7 +5,8 @@ import { apiError } from "@/lib/api-error";
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const order = await prisma.order.findUnique({ where: { id }, select: { id: true, status: true, orderNumber: true, totalAmount: true, customerEmail: true } });
+    // Only expose minimal info — no customerEmail to unauthenticated users
+    const order = await prisma.order.findUnique({ where: { id }, select: { id: true, status: true, orderNumber: true } });
     if (!order) return apiError("Not found", 404);
     return NextResponse.json(order);
   } catch (err) {

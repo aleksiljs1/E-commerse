@@ -12,6 +12,7 @@ import { Ticket, X, Check, Loader2 } from "lucide-react";
 
 const checkoutSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address").regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Please enter a valid email address"),
+  paypalEmail: z.string().optional(),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -20,7 +21,7 @@ type AppliedCoupon = { id: string; code: string; discountPct: number };
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, clearCart } = useCartStore();
+  const { items, subtotal } = useCartStore();
   const [paymentMethod, setPaymentMethod] = useState<"STRIPE" | "PAYPAL" | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [discount, setDiscount] = useState(0);
@@ -102,6 +103,7 @@ export default function CheckoutPage() {
           paymentMethod,
           items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
           ...(appliedCoupon ? { couponCode: appliedCoupon.code } : {}),
+          ...(paymentMethod === "PAYPAL" && data.paypalEmail ? { paypalEmail: data.paypalEmail } : {}),
         }),
       });
 
@@ -118,12 +120,11 @@ export default function CheckoutPage() {
       };
 
       if (paymentMethod === "STRIPE") {
-        clearCart();
+        // Cart is cleared on success/pending pages after payment confirmation
         url ? (window.location.href = url) : router.push(`/checkout/success?orderId=${orderId}`);
         return;
       }
       if (paymentMethod === "PAYPAL") {
-        clearCart();
         window.location.href = `/checkout/pending?orderId=${orderId}`;
         return;
       }
@@ -262,6 +263,18 @@ export default function CheckoutPage() {
                   </button>
                 ))}
               </div>
+              {paymentMethod === "PAYPAL" && (
+                <div className="mt-3 space-y-1.5">
+                  <label className="text-sm font-medium text-gray-300">PayPal Email</label>
+                  <p className="text-xs text-gray-400">Enter the email the payment will come from</p>
+                  <input
+                    type="email"
+                    placeholder="your-paypal@email.com"
+                    className="bg-white/[0.04] border border-white/[0.08] focus:border-orange-400 rounded-xl text-white px-4 py-3 w-full outline-none transition-colors"
+                    {...register("paypalEmail")}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Continue button */}

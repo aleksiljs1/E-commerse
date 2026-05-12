@@ -22,7 +22,7 @@ function UsersContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const activePage = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
+  const activePage = Math.max(1, Number(searchParams.get("page")) || 1);
   const activeSearch = searchParams.get("search") ?? "";
 
   const [users, setUsers] = useState<User[]>([]);

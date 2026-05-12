@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Mail, RefreshCw, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function VerifySentPage() {
+  return <Suspense><VerifySentPageContent /></Suspense>;
+}
+
+function VerifySentPageContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") ?? "";
   const [resending, setResending] = useState(false);

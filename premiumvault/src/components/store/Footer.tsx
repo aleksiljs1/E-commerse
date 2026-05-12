@@ -60,7 +60,7 @@ export function Footer() {
         </div>
 
         <div className="text-center pt-7 border-t border-white/[0.06] text-gray-400 text-xs">
-          <p>&copy; 2026 PremiumVault. All rights reserved.</p>
+          <p>&copy; 2025 PremiumVault. All rights reserved.</p>
         </div>
       </div>
     </footer>

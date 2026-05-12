@@ -24,11 +24,18 @@ async function rollbackOrder(orderId: string, items: { productId: string; quanti
   }).catch((e) => console.error("[orders/rollback] Failed to roll back order", orderId, e));
 }
 
-/** Cancel PENDING orders older than 1 hour and restore their stock */
+/** Cancel PENDING orders older than 1 hour (Stripe) or 48 hours (PayPal) and restore their stock */
 async function cleanupStalePendingOrders() {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
   const staleOrders = await prisma.order.findMany({
-    where: { status: "PENDING", paymentMethod: "STRIPE", createdAt: { lt: oneHourAgo } },
+    where: {
+      status: "PENDING",
+      OR: [
+        { paymentMethod: "STRIPE", createdAt: { lt: oneHourAgo } },
+        { paymentMethod: "PAYPAL", createdAt: { lt: fortyEightHoursAgo } },
+      ],
+    },
     include: { items: { select: { productId: true, quantity: true } } },
   });
 
@@ -146,7 +153,12 @@ export async function POST(req: NextRequest) {
       return { productId: item.productId, quantity: item.quantity, priceAtPurchase: Number(product.price), lineTotal: Number(product.price) * item.quantity };
     });
     const rawTotal = orderItems.reduce((sum, i) => sum + i.lineTotal, 0);
-    const totalAmount = effectiveDiscount > 0 ? rawTotal * (1 - effectiveDiscount / 100) : rawTotal;
+    // Compute total by summing per-item rounded amounts (in pence) to match Stripe exactly
+    const totalPence = orderItems.reduce((sum, i) => {
+      const discountedUnit = Math.round(i.priceAtPurchase * (1 - effectiveDiscount / 100) * 100);
+      return sum + discountedUnit * i.quantity;
+    }, 0);
+    const totalAmount = effectiveDiscount > 0 ? totalPence / 100 : rawTotal;
     const orderNumber = `PV-${Date.now().toString(36).toUpperCase()}-${uuidv4().slice(0, 6).toUpperCase()}`;
 
     const order = await prisma.$transaction(async (tx) => {

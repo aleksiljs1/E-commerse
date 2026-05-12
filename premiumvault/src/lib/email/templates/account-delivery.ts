@@ -1,3 +1,5 @@
+import { escapeHtml } from "@/lib/email/html-escape";
+
 type DeliveredAccount = {
   productTitle: string;
   username: string;
@@ -17,16 +19,16 @@ export function accountDeliveryTemplate(data: AccountDeliveryData): string {
       (acc, i) => `
       <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; margin-bottom: 12px;">
         <p style="color: #71717a; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 10px 0;">
-          ${acc.productTitle}${data.accounts.filter(a => a.productTitle === acc.productTitle).length > 1 ? ` &mdash; Account ${data.accounts.filter((a, idx) => a.productTitle === acc.productTitle && idx <= i).length}` : ""}
+          ${escapeHtml(acc.productTitle)}${data.accounts.filter(a => a.productTitle === acc.productTitle).length > 1 ? ` &mdash; Account ${data.accounts.filter((a, idx) => a.productTitle === acc.productTitle && idx <= i).length}` : ""}
         </p>
         <table style="width: 100%; border-collapse: collapse;">
           <tr>
             <td style="color: #71717a; font-size: 13px; padding: 4px 0; width: 100px;">Email / Username</td>
-            <td style="color: #ffffff; font-size: 13px; font-family: 'Courier New', monospace; padding: 4px 0; font-weight: 600;">${acc.username}</td>
+            <td style="color: #ffffff; font-size: 13px; font-family: 'Courier New', monospace; padding: 4px 0; font-weight: 600;">${escapeHtml(acc.username)}</td>
           </tr>
           <tr>
             <td style="color: #71717a; font-size: 13px; padding: 4px 0;">Password</td>
-            <td style="color: #ffffff; font-size: 13px; font-family: 'Courier New', monospace; padding: 4px 0; font-weight: 600;">${acc.password}</td>
+            <td style="color: #ffffff; font-size: 13px; font-family: 'Courier New', monospace; padding: 4px 0; font-weight: 600;">${escapeHtml(acc.password)}</td>
           </tr>
         </table>
       </div>`
@@ -53,7 +55,7 @@ export function accountDeliveryTemplate(data: AccountDeliveryData): string {
         Your Account Details
       </h2>
       <p style="color: #71717a; font-size: 14px; margin-top: 0; margin-bottom: 24px; text-align: center;">
-        Order <strong style="color: #a1a1aa;">${data.orderNumber}</strong>
+        Order <strong style="color: #a1a1aa;">${escapeHtml(data.orderNumber)}</strong>
       </p>
 
       <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
@@ -77,7 +79,7 @@ export function accountDeliveryTemplate(data: AccountDeliveryData): string {
     <!-- Footer -->
     <p style="text-align: center; color: #52525b; font-size: 12px; margin-top: 24px;">
       Questions or issues? Contact us at
-      <a href="mailto:${data.supportEmail}" style="color: #71717a;">${data.supportEmail}</a>
+      <a href="mailto:${escapeHtml(data.supportEmail)}" style="color: #71717a;">${escapeHtml(data.supportEmail)}</a>
     </p>
     <p style="text-align: center; color: #3f3f46; font-size: 11px; margin-top: 8px;">
       Thank you for choosing PremiumVault.

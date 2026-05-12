@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { prisma } from "@/lib/db";
 import { getEmailSettings } from "./settings";
+import { escapeHtml } from "./html-escape";
 
 export type EmailOptions = { to: string; subject: string; html: string; orderId?: string };
 
@@ -97,11 +98,11 @@ export async function _attemptSend({
           subject: `⚠️ Email delivery failed — ${to}`,
           html: `<body style="font-family:sans-serif;background:#09090b;color:#e4e4e7;padding:32px">
             <h2 style="color:#f87171;margin-bottom:16px">Email Delivery Failed</h2>
-            <p><strong>To:</strong> ${to}</p>
-            <p><strong>Subject:</strong> ${subject}</p>
-            <p><strong>Error:</strong> ${detail}</p>
+            <p><strong>To:</strong> ${escapeHtml(to)}</p>
+            <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+            <p><strong>Error:</strong> ${escapeHtml(detail)}</p>
             <p><strong>Attempts:</strong> ${newAttempts} / ${MAX_ATTEMPTS}</p>
-            ${orderId ? `<p><strong>Order:</strong> ${orderId}</p>` : ""}
+            ${orderId ? `<p><strong>Order:</strong> ${escapeHtml(orderId)}</p>` : ""}
             ${nextRetry ? `<p><strong>Next retry:</strong> ${nextRetry.toISOString()}</p>` : "<p>No more retries scheduled.</p>"}
             <p style="margin-top:24px;color:#71717a;font-size:13px">Check the admin email logs page for details.</p>
           </body>`,

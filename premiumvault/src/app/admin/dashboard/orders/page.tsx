@@ -20,7 +20,7 @@ function OrdersContent() {
   const router = useRouter();
 
   const activeStatus = searchParams.get("status") ?? "";
-  const activePage = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
+  const activePage = Math.max(1, Number(searchParams.get("page")) || 1);
   const activeSearch = searchParams.get("search") ?? "";
 
   const [orders, setOrders] = useState<any[]>([]);

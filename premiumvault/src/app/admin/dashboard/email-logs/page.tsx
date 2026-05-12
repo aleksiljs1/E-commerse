@@ -34,7 +34,7 @@ function EmailLogsContent() {
   const router = useRouter();
 
   const activeFilter = searchParams.get("status") ?? "ALL";
-  const activePage = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
+  const activePage = Math.max(1, Number(searchParams.get("page")) || 1);
 
   const [logs, setLogs] = useState<EmailLog[]>([]);
   const [loading, setLoading] = useState(true);

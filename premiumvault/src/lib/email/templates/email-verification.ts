@@ -1,3 +1,5 @@
+import { escapeHtml } from "@/lib/email/html-escape";
+
 export function emailVerificationTemplate({
   name,
   verifyUrl,
@@ -20,7 +22,7 @@ export function emailVerificationTemplate({
         Verify your email ✉️
       </h2>
       <p style="color:#a1a1aa;font-size:14px;line-height:1.6;margin-bottom:24px;">
-        Hi ${name}, thanks for signing up. Click the button below to verify your email address and activate your account.
+        Hi ${escapeHtml(name)}, thanks for signing up. Click the button below to verify your email address and activate your account.
       </p>
       <a href="${verifyUrl}"
          style="display:block;background:#6366f1;color:#ffffff;text-align:center;padding:14px 24px;border-radius:10px;font-weight:600;font-size:16px;text-decoration:none;margin-bottom:16px;">

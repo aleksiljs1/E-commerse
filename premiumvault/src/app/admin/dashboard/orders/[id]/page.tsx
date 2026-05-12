@@ -3,10 +3,12 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import { OrderDetailView } from "@/components/admin/OrderDetailView";
+import { decrypt } from "@/lib/crypto";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session) redirect("/admin/login");
+  if ((session.user as any).role !== "ADMIN") redirect("/");
 
   const { id } = await params;
 
@@ -33,11 +35,23 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   if (!order) notFound();
 
+  // Decrypt credential passwords for admin view
+  const orderWithDecrypted = {
+    ...order,
+    items: order.items.map((item) => ({
+      ...item,
+      credentials: item.credentials.map((cred) => ({
+        ...cred,
+        password: cred.password ? (() => { try { return decrypt(cred.password); } catch { return cred.password; } })() : null,
+      })),
+    })),
+  };
+
   return (
     <div className="max-w-3xl space-y-6">
       <h1 className="text-2xl font-bold text-white">Order Detail</h1>
       <OrderDetailView
-        order={JSON.parse(JSON.stringify(order))}
+        order={JSON.parse(JSON.stringify(orderWithDecrypted))}
         deliveredStock={JSON.parse(JSON.stringify(deliveredStock))}
       />
     </div>

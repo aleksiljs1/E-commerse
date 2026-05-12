@@ -1,3 +1,5 @@
+import { escapeHtml } from "@/lib/email/html-escape";
+
 type OrderItem = {
   title: string;
   quantity: number;
@@ -18,11 +20,12 @@ type PurchaseConfirmationData = {
 };
 
 export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): string {
-  const heading = data.heading ?? "Payment Confirmed &#x2705;";
-  const ctaText = data.ctaText ?? "Go to Submission Page &rarr;";
+  const heading = data.heading != null ? escapeHtml(data.heading) : "Payment Confirmed &#x2705;";
+  const ctaText = data.ctaText != null ? escapeHtml(data.ctaText) : "Go to Submission Page &rarr;";
   const footer = (
-    data.footer ??
-    "Your account will be upgraded within 4–5 business days after credential submission.\nQuestions? Contact our support team."
+    data.footer != null
+      ? escapeHtml(data.footer)
+      : "Your account will be upgraded within 4&ndash;5 business days after credential submission.\nQuestions? Contact our support team."
   ).replace(/\n/g, "<br>");
 
   const itemRows = data.items
@@ -30,7 +33,7 @@ export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): st
       (item) =>
         `<tr>
           <td style="padding: 8px 0; border-bottom: 1px solid #27272a; color: #a1a1aa;">
-            ${item.quantity}&times; ${item.title}
+            ${item.quantity}&times; ${escapeHtml(item.title)}
           </td>
           <td style="padding: 8px 0; border-bottom: 1px solid #27272a; text-align: right; color: #ffffff;">
             &pound;${(item.priceAtPurchase * item.quantity).toFixed(2)}
@@ -60,7 +63,7 @@ export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): st
         ${heading}
       </h2>
       <p style="color: #71717a; font-size: 14px; margin-top: 0; margin-bottom: 24px;">
-        Order <strong style="color: #a1a1aa;">${data.orderNumber}</strong> &mdash; sent to ${data.customerEmail}
+        Order <strong style="color: #a1a1aa;">${escapeHtml(data.orderNumber)}</strong> &mdash; sent to ${escapeHtml(data.customerEmail)}
       </p>
 
       <!-- Items table -->
@@ -91,7 +94,7 @@ export function purchaseConfirmationTemplate(data: PurchaseConfirmationData): st
           Backup Access Code (if button doesn't work)
         </p>
         <p style="color: #a1a1aa; font-size: 13px; font-family: 'Courier New', monospace; margin: 0; word-break: break-all;">
-          ${data.credentialToken}
+          ${escapeHtml(data.credentialToken)}
         </p>
       </div>
 

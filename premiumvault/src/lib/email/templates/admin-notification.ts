@@ -1,3 +1,5 @@
+import { escapeHtml } from "@/lib/email/html-escape";
+
 type AdminNotificationData = {
   type: "NEW_PURCHASE" | "CREDENTIALS_SUBMITTED" | "DROPSHIP_ORDER";
   orderNumber: string;
@@ -32,7 +34,7 @@ export function adminNotificationTemplate(data: AdminNotificationData): string {
     .map(
       (i) =>
         `<tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #1a1a2e;color:#e2e8f0;font-size:14px">${i.title}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #1a1a2e;color:#e2e8f0;font-size:14px">${escapeHtml(i.title)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #1a1a2e;color:#94a3b8;font-size:14px;text-align:center">${i.quantity}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #1a1a2e;color:#94a3b8;font-size:14px;text-align:right">£${i.priceAtPurchase.toFixed(2)}</td>
         </tr>`
@@ -61,11 +63,11 @@ export function adminNotificationTemplate(data: AdminNotificationData): string {
           <table style="width:100%;border-collapse:collapse">
             <tr>
               <td style="padding:4px 0;color:#64748b;font-size:12px">Order</td>
-              <td style="padding:4px 0;color:#fff;font-size:14px;font-weight:600;text-align:right;font-family:monospace">${data.orderNumber}</td>
+              <td style="padding:4px 0;color:#fff;font-size:14px;font-weight:600;text-align:right;font-family:monospace">${escapeHtml(data.orderNumber)}</td>
             </tr>
             <tr>
               <td style="padding:4px 0;color:#64748b;font-size:12px">Customer</td>
-              <td style="padding:4px 0;color:#e2e8f0;font-size:14px;text-align:right">${data.customerEmail}</td>
+              <td style="padding:4px 0;color:#e2e8f0;font-size:14px;text-align:right">${escapeHtml(data.customerEmail)}</td>
             </tr>
             <tr>
               <td style="padding:4px 0;color:#64748b;font-size:12px">Total</td>

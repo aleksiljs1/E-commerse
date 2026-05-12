@@ -13,7 +13,7 @@ const NAV_LINKS = [
   // Should display verified Trustpilot/customer reviews with ratings,
   // review text, date, and product purchased. Consider adding filters
   // (by product, rating) and pagination.
-  { href: "#reviews", label: "Reviews" },
+  { href: "/#reviews", label: "Reviews" },
 ];
 
 const AUTH_LINKS = [
@@ -146,7 +146,7 @@ export function Navbar() {
         }}
       >
         <Link
-          href="#"
+          href="/products"
           className="relative z-10 text-white font-medium text-sm tracking-wide hover:opacity-90 transition-opacity"
         >
           {bannerText}

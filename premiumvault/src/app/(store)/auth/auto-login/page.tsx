@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 export default function AutoLoginPage() {
+  return <Suspense><AutoLoginPageContent /></Suspense>;
+}
+
+function AutoLoginPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const attempted = useRef(false);

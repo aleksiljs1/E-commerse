@@ -35,7 +35,7 @@ export function CartItemRow({ item }: Props) {
           value={item.quantity}
           onIncrement={() => updateQuantity(item.productId, item.quantity + 1)}
           onDecrement={() => updateQuantity(item.productId, item.quantity - 1)}
-          max={item.stock}
+          max={item.stock > 0 ? item.stock : 3}
         />
         <button
           onClick={() => removeItem(item.productId)}

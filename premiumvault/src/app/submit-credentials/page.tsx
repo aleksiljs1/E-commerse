@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import api from "@/lib/api";
@@ -19,6 +19,10 @@ type CredField = { username: string; password: string };
 type CredsMap = Record<string, CredField>;
 
 export default function SubmitCredentialsPage() {
+  return <Suspense><SubmitCredentialsPageContent /></Suspense>;
+}
+
+function SubmitCredentialsPageContent() {
   const searchParams = useSearchParams();
   const [orderIdInput, setOrderIdInput] = useState("");
   const [stage, setStage] = useState<"enter" | "filling" | "success">("enter");

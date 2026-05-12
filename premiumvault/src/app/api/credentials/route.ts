@@ -6,6 +6,7 @@ import { getEmailSettings } from "@/lib/email/settings";
 import { apiError } from "@/lib/api-error";
 import { notifyAdminCredentialsSubmitted } from "@/lib/email/notify-admin";
 import { z } from "zod";
+import { encrypt } from "@/lib/crypto";
 
 const submitSchema = z.object({
   token: z.string(),
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
       orderItemId: cred.orderItemId,
       serviceType: cred.serviceType,
       username: cred.username,
-      password: cred.password,
+      password: encrypt(cred.password),
       status: "SUBMITTED" as const,
       submittedAt: new Date(),
     }));

@@ -1,3 +1,5 @@
+import { escapeHtml } from "@/lib/email/html-escape";
+
 type DropshipConfirmationData = {
   orderNumber: string;
   customerEmail: string;
@@ -12,7 +14,7 @@ export function dropshipConfirmationTemplate(data: DropshipConfirmationData): st
       (item) =>
         `<tr>
           <td style="padding: 8px 0; border-bottom: 1px solid #27272a; color: #a1a1aa;">
-            ${item.quantity}&times; ${item.title}
+            ${item.quantity}&times; ${escapeHtml(item.title)}
           </td>
           <td style="padding: 8px 0; border-bottom: 1px solid #27272a; text-align: right; color: #ffffff;">
             &pound;${(item.priceAtPurchase * item.quantity).toFixed(2)}
@@ -40,7 +42,7 @@ export function dropshipConfirmationTemplate(data: DropshipConfirmationData): st
         Order Confirmed &#x2705;
       </h2>
       <p style="color: #71717a; font-size: 14px; margin-top: 0; margin-bottom: 24px;">
-        Order <strong style="color: #a1a1aa;">${data.orderNumber}</strong> &mdash; sent to ${data.customerEmail}
+        Order <strong style="color: #a1a1aa;">${escapeHtml(data.orderNumber)}</strong> &mdash; sent to ${escapeHtml(data.customerEmail)}
       </p>
 
       <!-- Message -->
@@ -70,7 +72,7 @@ export function dropshipConfirmationTemplate(data: DropshipConfirmationData): st
 
     <!-- Footer -->
     <p style="text-align: center; color: #52525b; font-size: 12px; margin-top: 24px;">
-      Questions? Contact our support team at <a href="mailto:${data.supportEmail}" style="color: #71717a;">${data.supportEmail}</a>
+      Questions? Contact our support team at <a href="mailto:${escapeHtml(data.supportEmail)}" style="color: #71717a;">${escapeHtml(data.supportEmail)}</a>
     </p>
   </div>
 </body>
