@@ -1,20 +1,19 @@
-import { auth } from "@/lib/auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default auth((req) => {
-  const { nextUrl } = req;
-  const session = req.auth;
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!session) {
-    return NextResponse.redirect(new URL("/admin/login", nextUrl.origin));
+  if (!token) {
+    return NextResponse.redirect(new URL("/admin/login", req.url));
   }
 
-  if (session.user?.role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/", nextUrl.origin));
+  if (token.role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/admin/dashboard/:path*"],
