@@ -19,11 +19,19 @@ type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 type AppliedCoupon = { id: string; code: string; discountPct: number };
 
+const PAYPAL_BOXES = [
+  { id: "ff", label: "I agree to send the payment as friends & family" },
+  { id: "amount", label: (total: string) => `I agree to send the payment of £${total}` },
+  { id: "nonote", label: "I agree to not add a note to this payment" },
+] as const;
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal } = useCartStore();
   const [paymentMethod, setPaymentMethod] = useState<"STRIPE" | "PAYPAL" | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paypalChecks, setPaypalChecks] = useState({ ff: false, amount: false, nonote: false });
+  const [showErrors, setShowErrors] = useState(false);
   const [discount, setDiscount] = useState(0);
   const [discountTier, setDiscountTier] = useState("");
   const [couponInput, setCouponInput] = useState("");
@@ -90,8 +98,20 @@ export default function CheckoutPage() {
     setCouponError("");
   };
 
+  const allPaypalChecked = paypalChecks.ff && paypalChecks.amount && paypalChecks.nonote;
+
+  const toggleCheck = (key: keyof typeof paypalChecks) => {
+    setPaypalChecks((prev) => ({ ...prev, [key]: !prev[key] }));
+    setShowErrors(false);
+  };
+
   const onSubmit = async (data: CheckoutFormData) => {
     if (!paymentMethod) return;
+
+    if (paymentMethod === "PAYPAL" && !allPaypalChecked) {
+      setShowErrors(true);
+      return;
+    }
 
     setIsProcessing(true);
     try {
@@ -264,15 +284,37 @@ export default function CheckoutPage() {
                 ))}
               </div>
               {paymentMethod === "PAYPAL" && (
-                <div className="mt-3 space-y-1.5">
-                  <label className="text-sm font-medium text-gray-300">PayPal Email</label>
-                  <p className="text-xs text-gray-400">Enter the email the payment will come from</p>
-                  <input
-                    type="email"
-                    placeholder="your-paypal@email.com"
-                    className="bg-white/[0.04] border border-white/[0.08] focus:border-orange-400 rounded-xl text-white px-4 py-3 w-full outline-none transition-colors"
-                    {...register("paypalEmail")}
-                  />
+                <div className="mt-3 space-y-3">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-300">PayPal Email</label>
+                    <p className="text-xs text-gray-400">Enter the email the payment will come from</p>
+                    <input
+                      type="email"
+                      placeholder="your-paypal@email.com"
+                      className="bg-white/[0.04] border border-white/[0.08] focus:border-orange-400 rounded-xl text-white px-4 py-3 w-full outline-none transition-colors"
+                      {...register("paypalEmail")}
+                    />
+                  </div>
+                  <div className="space-y-2 pt-2">
+                    {PAYPAL_BOXES.map((box) => {
+                      const checked = paypalChecks[box.id as keyof typeof paypalChecks];
+                      const labelText = typeof box.label === "function" ? box.label(totalStr) : box.label;
+                      return (
+                        <label key={box.id} className={`flex items-start gap-2.5 cursor-pointer group ${showErrors && !checked ? "text-red-400" : "text-gray-300"}`}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleCheck(box.id as keyof typeof paypalChecks)}
+                            className="mt-0.5 accent-orange-400 w-4 h-4 cursor-pointer"
+                          />
+                          <span className="text-sm">{labelText}</span>
+                        </label>
+                      );
+                    })}
+                    {showErrors && !allPaypalChecked && (
+                      <p className="text-red-400 text-xs">Please agree to all conditions before proceeding</p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
