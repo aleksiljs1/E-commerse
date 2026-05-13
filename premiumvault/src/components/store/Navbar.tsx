@@ -9,11 +9,6 @@ import { useSession } from "next-auth/react";
 
 const NAV_LINKS = [
   { href: "/products", label: "Products" },
-  // TODO: Reviews page — link to a dedicated reviews page or section.
-  // Should display verified Trustpilot/customer reviews with ratings,
-  // review text, date, and product purchased. Consider adding filters
-  // (by product, rating) and pagination.
-  { href: "/#reviews", label: "Reviews" },
 ];
 
 const AUTH_LINKS = [
