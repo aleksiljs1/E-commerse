@@ -189,14 +189,14 @@ export function OrderDetailView({ order: initialOrder, deliveredStock = [] }: Pr
                           )}
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                        <div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                        <div className="min-w-0">
                           <p className="text-gray-600 text-[10px] mb-0.5">Email / Username</p>
-                          <p className="text-white font-mono select-all">{cred.username}</p>
+                          <p className="text-white font-mono select-all text-sm break-all">{cred.username}</p>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-gray-600 text-[10px] mb-0.5">Password</p>
-                          <p className="text-white font-mono select-all">{cred.password}</p>
+                          <p className="text-white font-mono select-all text-sm break-all">{cred.password}</p>
                         </div>
                       </div>
                     </div>
