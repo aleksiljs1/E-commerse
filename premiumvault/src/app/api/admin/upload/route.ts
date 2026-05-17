@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
 import { randomUUID } from "crypto";
 import { auth } from "@/lib/auth";
 import { apiError } from "@/lib/api-error";
 import sharp from "sharp";
+import { put } from "@vercel/blob";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -48,12 +47,13 @@ export async function POST(req: NextRequest) {
       .toFormat("webp", { quality: 88 })
       .toBuffer();
 
-    const filename = `${randomUUID()}.webp`;
-    const uploadDir = join(process.cwd(), "public", "uploads", "products");
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(join(uploadDir, filename), resized);
+    const filename = `products/${randomUUID()}.webp`;
+    const { url } = await put(filename, resized, {
+      access: "public",
+      contentType: "image/webp",
+    });
 
-    return NextResponse.json({ url: `/uploads/products/${filename}` });
+    return NextResponse.json({ url });
   } catch (err) {
     return apiError("Failed to save file", 500, "upload/POST", err);
   }
