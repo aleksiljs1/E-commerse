@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, useState } from "react";
+import { useRef, useCallback, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,15 +34,7 @@ export type ProductFormData = FormSchema & {
   accountCredentials?: { username: string; password: string }[];
 };
 
-const SERVICE_OPTIONS = [
-  { value: "spotify", label: "Spotify" },
-  { value: "netflix", label: "Netflix" },
-  { value: "youtube", label: "YouTube" },
-  { value: "disney", label: "Disney+" },
-  { value: "applemusic", label: "Apple Music" },
-  { value: "hulu", label: "Hulu" },
-  { value: "custom", label: "Custom" },
-];
+type ServiceTypeOption = { slug: string; label: string };
 
 function BoldTextarea({
   value,
@@ -157,6 +149,13 @@ export function ProductForm({
 
   const logoUrl = watch("logoUrl");
   const productType = watch("productType");
+
+  const [serviceOptions, setServiceOptions] = useState<ServiceTypeOption[]>([]);
+  useEffect(() => {
+    api.get("/api/admin/service-types")
+      .then((res) => setServiceOptions((res.data.data ?? res.data).map((t: any) => ({ slug: t.slug, label: t.label }))))
+      .catch(() => {});
+  }, []);
 
   // Edit mode: server-backed stock entries
   const [serverStock, setServerStock] = useState<StockEntry[]>(initialStock);
@@ -285,8 +284,8 @@ export function ProductForm({
             {...register("serviceType")}
           />
           <datalist id="service-type-options">
-            {SERVICE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+            {serviceOptions.map((opt) => (
+              <option key={opt.slug} value={opt.slug}>
                 {opt.label}
               </option>
             ))}

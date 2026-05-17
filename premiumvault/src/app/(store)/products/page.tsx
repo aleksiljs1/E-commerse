@@ -9,7 +9,7 @@ async function ProductsContent() {
       where: { active: true },
       orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
     }),
-    (prisma as any).serviceType?.findMany({ orderBy: { label: "asc" } }).catch(() => []) ?? [],
+    prisma.serviceType.findMany({ orderBy: { label: "asc" } }),
   ]);
 
   const products: SerializedProduct[] = rawProducts.map((p) => ({ ...p, price: Number(p.price) }));
