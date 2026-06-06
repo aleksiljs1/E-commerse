@@ -16,4 +16,4 @@ echo "Starting Tailscale Funnel (public HTTPS)..."
 sudo tailscale funnel --bg 3000
 
 echo "All services started. App running at http://localhost:3000"
-echo "Public URL: https://square-office.tail523b20.ts.net"
+echo "Public URL: https://desktop-35mtkeg.tailaf7658.ts.net"

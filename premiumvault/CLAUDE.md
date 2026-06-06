@@ -5,7 +5,7 @@
 When the user says "run it" or "start the app", execute `dev-start.sh`:
 
 ```bash
-bash /home/aleksander/scrap/premiumvault/dev-start.sh
+bash C:/Users/Admin/Desktop/Legjenda/E-commerse/premiumvault/dev-start.sh
 ```
 
 This script:
@@ -13,7 +13,7 @@ This script:
 2. Starts Next.js dev server on port 3000
 3. Starts the Stripe CLI webhook listener (forwards to localhost:3000/api/webhooks/stripe)
 
-App runs at http://100.64.132.90:3000 (Tailscale IP). Admin at http://100.64.132.90:3000/admin.
+App runs at http://100.125.79.54:3000 (Tailscale IP). Admin at http://100.125.79.54:3000/admin.
 
 ## Changing the app URL
 When moving to production or a new IP, update these two values in `.env`:

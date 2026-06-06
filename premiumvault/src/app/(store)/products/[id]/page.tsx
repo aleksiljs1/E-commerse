@@ -61,7 +61,7 @@ export default async function ProductDetailPage({
               <img
                 src={product.logoUrl}
                 alt={product.title}
-                className="w-full h-56 object-cover"
+                className="w-full max-h-[400px] object-contain"
               />
             </div>
           ) : (
